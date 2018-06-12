@@ -13,7 +13,8 @@
   "author": "",
   "license": "ISC",
   "bin": {
-    "smartglass-discover": "./bin/discover.js"
+    "smartglass-discover": "./bin/discover.js",
+    "smartglass-client": "./bin/client.js"
   },
   "dependencies": {
     "mocha": "^5.2.0"
