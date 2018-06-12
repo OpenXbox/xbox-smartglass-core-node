@@ -4,7 +4,7 @@
   "description": "NodeJS smartglass library for controlling a Xbox",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/mocha/bin/mocha tests/"
   },
   "repository": {
     "type": "git",
@@ -14,5 +14,8 @@
   "license": "ISC",
   "bin": {
     "smartglass-discover": "./bin/discover.js"
+  },
+  "dependencies": {
+    "mocha": "^5.2.0"
   }
 }
