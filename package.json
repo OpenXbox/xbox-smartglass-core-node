@@ -1,0 +1,15 @@
+{
+  "name": "xbox-smartglass-core-node",
+  "version": "0.1.0",
+  "description": "NodeJS smartglass library for controlling a Xbox",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.traphix.nl:xboxone/xbox-smartglass-core-node.git"
+  },
+  "author": "",
+  "license": "ISC"
+}
