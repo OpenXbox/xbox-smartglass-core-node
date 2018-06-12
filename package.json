@@ -8,8 +8,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@git.traphix.nl:xboxone/xbox-smartglass-core-node.git"
+    "url": "git@github.com:unknownskl/xbox-smartglass-core-node.git"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "bin": {
+    "smartglass-discover": "./bin/discover.js"
+  }
 }
