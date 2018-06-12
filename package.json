@@ -10,12 +10,21 @@
     "type": "git",
     "url": "git@github.com:unknownskl/xbox-smartglass-core-node.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "UnknownSKL (Jim Kroon)",
+  "license": "MIT",
   "bin": {
     "smartglass-discover": "./bin/discover.js",
     "smartglass-client": "./bin/client.js"
   },
+  "bugs": {
+    "url": "https://github.com/unknownskl/xbox-smartglass-core-node/issues"
+  },
+  "homepage": "https://github.com/unknownskl/xbox-smartglass-core-node",
+  "keywords": [
+    "xbox",
+    "xbox one",
+    "smartglass"
+  ],
   "dependencies": {
     "mocha": "^5.2.0"
   }
