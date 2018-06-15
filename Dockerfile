@@ -5,7 +5,7 @@ WORKDIR /app
 ADD package.json ./
 RUN npm install
 
-ADD index.js ./
+ADD src/* ./src/
 ADD bin/* ./bin/
 RUN npm link
 

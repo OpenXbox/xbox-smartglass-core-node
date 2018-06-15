@@ -26,6 +26,8 @@
     "smartglass"
   ],
   "dependencies": {
-    "mocha": "^5.2.0"
+    "commander": "^2.15.1",
+    "mocha": "^5.2.0",
+    "x509": "^0.3.3"
   }
 }

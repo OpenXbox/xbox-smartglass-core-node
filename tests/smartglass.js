@@ -1,19 +1,19 @@
 var assert = require('assert');
-var Smartglass = require('../');
+var Smartglass = require('../src/smartglass');
 
 describe('smartglass', function(){
     describe('getConsoles()', function(){
         it('should return an ampty array on init', function(){
             assert(Smartglass.getConsoles().length == 0);
         });
-        it('should return an array after discovery', function(){
-            Smartglass.discovery();
-            assert(Array.isArray(Smartglass.getConsoles()));
-        });
+        // it('should return an array after discovery', function(){
+        //     Smartglass.discovery();
+        //     assert(Array.isArray(Smartglass.getConsoles()));
+        // });
     });
-    describe('discovery()', function(){
-        it('should return an array', function(){
-            assert(Array.isArray(Smartglass.discovery()));
-        });
-    });
+    // describe('discovery()', function(){
+    //     it('should return an array', function(){
+    //         assert(Array.isArray(Smartglass.discovery()));
+    //     });
+    // });
 })
