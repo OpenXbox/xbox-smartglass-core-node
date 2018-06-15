@@ -22,10 +22,10 @@ module.exports = function(packet)
 
         readSGString: function(buffer = false)
         {
-            var dataLength = this._packet.readUInt16BE(this._offset);
-            var data = this._packet.slice(this._offset+2, this._offset+2+dataLength);
+            var dataLength = this.readUInt16();
+            var data = this._packet.slice(this._offset, this._offset+dataLength);
 
-            this._offset = (this._offset+3+dataLength);
+            this._offset = (this._offset+1+dataLength);
 
             if(buffer == false)
                 return data.toString();
@@ -69,7 +69,6 @@ module.exports = function(packet)
         },
 
         /* Private functions */
-
         _add(data)
         {
             this._packet = new Buffer.concat([

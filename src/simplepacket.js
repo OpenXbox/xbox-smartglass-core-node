@@ -1,6 +1,7 @@
+var PacketStructure = require('./packet/structure.js');
+
 const x509 = require('x509');
 var EOL = require('os').EOL;
-var PacketStructure = require('./packet/structure.js');
 
 const PACKET_TYPE_DISCOVERY_REQUEST = new Buffer('dd00', 'hex');
 const PACKET_TYPE_DISCOVERY_RESPONSE = new Buffer('dd01', 'hex');
@@ -21,7 +22,7 @@ module.exports = {
         var payload = PacketStructure();
 
         payload.writeUInt32(0x00000000);
-        payload.writeUInt16('6');
+        payload.writeUInt16('3'); // Client Type: Windows Desktop
         payload.writeUInt16('0');
         payload.writeUInt16('2');
 
@@ -58,7 +59,7 @@ module.exports = {
         // console.log('payloadLength: '+payloadLength);
         // console.log('version: '+version);
 
-        if(type = PACKET_TYPE_DISCOVERY_RESPONSE)
+        if(type == PACKET_TYPE_DISCOVERY_RESPONSE.toString('hex'))
         {
             var recvPayload = PacketStructure(unpackedPayload);
 
@@ -69,8 +70,13 @@ module.exports = {
             var lastError = recvPayload.readUInt32();
             var certificate = recvPayload.readSGString(true);
 
-            var certInfo = x509.parseCert('-----BEGIN CERTIFICATE-----'+EOL+certificate.toString('base64').match(/.{0,64}/g).join('\n')+'-----END CERTIFICATE-----');
-            //console.log(certInfo);
+            try {
+                var certInfo = x509.parseCert('-----BEGIN CERTIFICATE-----'+EOL+certificate.toString('base64').match(/.{0,64}/g).join('\n')+'-----END CERTIFICATE-----');
+            }
+            catch(error)
+            {
+                var certInfo = { 'error:': error };
+            }
 
             var data = {
                 device_flags: deviceFlags,
@@ -78,7 +84,8 @@ module.exports = {
                 device_name: consoleName,
                 device_udid: udid,
                 device_certificate: certInfo,
-                device_certificate_raw: '-----BEGIN CERTIFICATE-----'+EOL+certificate.toString('base64').match(/.{0,64}/g).join('\n')+'-----END CERTIFICATE-----',
+                device_certificate_pem: '-----BEGIN CERTIFICATE-----'+EOL+certificate.toString('base64').match(/.{0,64}/g).join('\n')+'-----END CERTIFICATE-----',
+                device_certificate_raw: certificate,
                 last_error: deviceFlags,
             }
 

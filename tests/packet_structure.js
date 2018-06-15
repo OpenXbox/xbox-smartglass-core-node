@@ -11,52 +11,41 @@ describe('packet/structure', function(){
         assert.deepStrictEqual(packet._packet, new Buffer('0x0001'));
     });
 
-    var testValues = {
-        '1': '\x00\x01',
-        '2': '\x00\x02',
-        '10': '\x00\x10',
-        '100': '\x00\x64'
-    };
 
-    for (testValue in testValues)
-    {
-        describe('test writeUInt16 & readUInt16 with value ('+testValue+')', function(){
-            var packet = PacketStructure();
+    describe('test write and read types', function(){
+        var lPacket = PacketStructure();
 
-            it('should write packet', function(){
-                packet.writeUInt16(testValue);
-                assert.deepStrictEqual(packet._packet, new Buffer(testValues[testValue]));
-            }.bind(packet, testValue, testValues));
+        it('should write UInt16 to the packet and check packet', function(){
+            lPacket.writeUInt16(10);
+            assert.deepEqual(lPacket._packet, new Buffer('\x00\x0a'));
+        }.bind(lPacket));
 
-            it('should read from packet ('+testValue+')', function(){
-                var value = packet.readUInt16();
-                assert.equal(value, testValue);
-            }.bind(packet, testValue, testValues));
-        });
+        it('should write UInt32 to the packet and check packet', function(){
+            lPacket.writeUInt32(10);
+            assert.deepEqual(lPacket._packet, new Buffer('\x00\x0a\x00\x00\x00\x0a'));
+        }.bind(lPacket));
 
-        describe('test writeUInt32 & readUInt32 with value ('+testValue+')', function(){
-            var packet = PacketStructure();
+        it('should write SGString to the packet and check packet', function(){
+            lPacket.writeSGString('test');
+            assert.deepEqual(lPacket._packet, new Buffer('\x00\x0a\x00\x00\x00\x0a\x00\x04\x74\x65\x73\x74\x00'));
+        }.bind(lPacket));
 
-            it('should write packet', function(){
-                packet.writeUInt32(testValue);
-                assert.deepStrictEqual(packet._packet, new Buffer(Buffer.concat([
-                    new Buffer('\x00\x00'),
-                    new Buffer(testValues[testValue])
-                ])));
-            }.bind(packet, testValue, testValues));
+        it('should read UInt16 from the packet and check value and offset', function(){
+            var uint16 = lPacket.readUInt16(10);
+            assert.equal(uint16, 10);
+            assert.equal(lPacket._offset, 2);
+        }.bind(lPacket));
 
-            it('should read from packet ('+testValue+')', function(){
-                var value = packet.readUInt32();
-                assert.equal(value, testValue);
-            }.bind(packet, testValue, testValues));
-        });
-    }
+        it('should read UInt32 from the packet and check value and offset', function(){
+            var uint32 = lPacket.readUInt32(10);
+            assert.equal(uint32, 10);
+            assert.equal(lPacket._offset, 6);
+        }.bind(lPacket));
 
-    // it('obj._offset should be set to 2 when reading UInt16 and return 1', function(){
-    //     var packet = PacketStructure(new Buffer('0x0001'));
-    //     var returnValue = packet.readUInt16();
-    //     console.log(returnValue);
-    //     assert.strictEqual(packet._offset, 2);
-    //     assert.strictEqual(returnValue, 1);
-    // });
+        it('should read SGString from the packet and check value and offset', function(){
+            var sgstring = lPacket.readSGString('test');
+            assert.equal(sgstring, 'test');
+            assert.equal(lPacket._offset, 13);
+        }.bind(lPacket));
+    });
 })

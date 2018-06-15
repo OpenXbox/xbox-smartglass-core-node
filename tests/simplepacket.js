@@ -20,15 +20,7 @@ describe('simplepacket', function(){
     describe('discovery()', function(){
         it('should return a discovery request packet', function(){
             var packet = SimplePacket.discovery();
-            assert.deepStrictEqual(packet, Buffer('dd00000a000000000000000600000002', 'hex'));
+            assert.deepStrictEqual(packet, Buffer('dd00000a000000000000000300000002', 'hex'));
         });
     });
-
-    // describe('unpack()', function(){
-    //     it('should return SimplePacket object', function(){
-    //         var packet = SimplePacket.discovery();
-    //         console.log(packet);
-    //         assert.deepStrictEqual(packet, Buffer('dd00000a000000000000000600000002', 'hex'));
-    //     });
-    // });
 })

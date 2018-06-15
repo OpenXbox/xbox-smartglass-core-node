@@ -12,8 +12,8 @@ module.exports = {
         var client = this._init_client();
         var message = SimplePacket.discovery();
 
-        this._on_discovery_response.push(function(response){
-            callback(response.payload)
+        this._on_discovery_response.push(function(response, device, smartglass){
+            callback(response.payload, device, smartglass);
         }.bind(callback));
 
         this._send({
@@ -45,7 +45,7 @@ module.exports = {
             {
                 setTimeout(sendBoot, 500, client, callback);
             } else {
-                console.log('@TODO: Check if console is booted... return true');
+                // console.log('@TODO: Check if console is booted... return true');
                 callback(true);
                 client._close_client();
             }
@@ -70,12 +70,11 @@ module.exports = {
             {
                 console.log('Warning: UNKNOWN PACKET RECEIVED');
             } else {
-                //console.log(response);
                 var func = '_on_' + response.type.toLowerCase();
                 if(this[func] != undefined)
                 {
                     for (trigger in this[func]){
-                        this[func][trigger](response);
+                        this[func][trigger](response, remote, client);
                     }
                 } else {
                     console.log('Error: UNKNOWN CALLBACK: ' + func);
@@ -95,7 +94,7 @@ module.exports = {
             console.log('smartglass._send: port missing');
 
         this._client.send(message, 0, message.length, options.port, options.ip, function(err, bytes) {
-            //console.log('Sending packet...');
+            // console.log('Sending packet...');
         });
     },
 
