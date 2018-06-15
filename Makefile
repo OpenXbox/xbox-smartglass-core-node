@@ -2,7 +2,7 @@ run: build
 	docker run xbox-smartglass-core-node
 
 run_discovery: build
-	docker run xbox-smartglass-core-node discovery
+	docker run xbox-smartglass-core-node -d
 
 run_boot: build
 	docker run xbox-smartglass-core-node -b -i 127.0.0.1 -l FD000000000000
