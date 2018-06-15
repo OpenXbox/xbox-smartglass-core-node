@@ -13,7 +13,6 @@
   "author": "UnknownSKL (Jim Kroon)",
   "license": "MIT",
   "bin": {
-    "smartglass-discover": "./bin/discover.js",
     "smartglass-client": "./bin/client.js"
   },
   "bugs": {
