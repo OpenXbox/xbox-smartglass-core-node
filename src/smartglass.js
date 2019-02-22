@@ -100,6 +100,8 @@ module.exports = {
 
     _init_client: function()
     {
+        this._on_discovery_response = [];
+
         this._client = dgram.createSocket('udp4');
         this._client.bind();
         // this._client.on("listening", function () {
