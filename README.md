@@ -46,3 +46,9 @@ Smartglass.discovery({
 
 - Broadcasting does not work properly yet
 - Callback when sending a power_on command always returns true for now.
+
+## Changelog
+
+0.1.3:
+
+    Fixed a problem where old callbacks were still used when init a new client
