@@ -12,7 +12,8 @@ commander
   .usage('[-b -d -s] -i <ip_address> -l <live_device_id> [-t <tries>]')
   .option('-b, --boot', 'Boot Xbox console')
   .option('-d, --discover', 'Discover Xbox on the network')
-  //.option('-s, --shutdown', 'Shutdown Xbox console')
+  .option('-c, --connect', 'Connect to Xbox console')
+  .option('-s, --shutdown', 'Shutdown Xbox console')
   .option('-i, --ip <ip>', 'Xbox One IP address', ADDR_BROADCAST)
   .option('-l, --live_id <live_id>', 'Xbox One live id (Example: FD000000000000)')
   .option('-t, --tries <tries>', 'Timeout inn seconds (Default: 4)', 4)
@@ -51,5 +52,27 @@ if(commander.boot == true)
         console.log('LiveID: ' + device.device_certificate.subject.commonName);
         console.log('Certificate valid: ' + device.device_certificate.notBefore + ' - ' + device.device_certificate.notAfter);
         console.log('Certificate fingerprint: ' + device.device_certificate.fingerPrint);
+    });
+
+} else if(commander.connect)
+{
+    console.log('Trying to connect to device...');
+
+    Smartglass.connect({
+        ip: commander.ip,
+        liveid: commander.live_id
+    }, function(device, address){
+        console.log('- Device found: ' + device.device_name);
+    });
+
+} else if(commander.shutdown)
+{
+    console.log('Trying to connect to device...');
+
+    Smartglass.shutdown({
+        ip: commander.ip,
+        liveid: commander.live_id
+    }, function(device, address){
+        console.log('- Device found: ' + device.device_name);
     });
 }

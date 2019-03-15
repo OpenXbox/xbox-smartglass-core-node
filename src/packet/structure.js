@@ -1,18 +1,26 @@
 module.exports = function(packet)
 {
     if(packet == undefined)
-        packet = new Buffer('');
+        packet = Buffer.from('');
+    else
+        packet = packet;
 
     return {
         _packet: packet,
+        _totalLength: packet.length,
         _offset: 0,
+
+        setOffset: function(offset)
+        {
+            this._offset = offset;
+        },
 
         writeSGString: function(data)
         {
             var lengthBuffer = Buffer.allocUnsafe(2);
             lengthBuffer.writeUInt16BE(data.length, 0);
 
-            var dataBuffer = new Buffer(data + '\x00');
+            var dataBuffer = Buffer.from(data + '\x00');
 
             this._add(Buffer.concat([
                 lengthBuffer,
@@ -28,9 +36,38 @@ module.exports = function(packet)
             this._offset = (this._offset+1+dataLength);
 
             if(buffer == false)
-                return data.toString();
+                return data;
             else
                 return data;
+        },
+
+        writeBytes: function(data, type)
+        {
+            var dataBuffer = Buffer.from(data, type);
+
+            this._add(dataBuffer);
+        },
+
+        readBytes: function(count)
+        {
+            var data = this._packet.slice(this._offset, this._offset+count);
+            this._offset = (this._offset+count);
+            return data;
+        },
+
+        writeUInt8: function(data)
+        {
+            var tempBuffer = Buffer.allocUnsafe(1);
+            tempBuffer.writeUInt8(data, 0);
+            this._add(tempBuffer);
+        },
+
+        readUInt8: function()
+        {
+            var data = this._packet.readUInt8(this._offset);
+            this._offset = (this._offset+1);
+
+            return data;
         },
 
         writeUInt16: function(data)
@@ -63,9 +100,28 @@ module.exports = function(packet)
             return data;
         },
 
+        // writeUInt64: function(data)
+        // {
+        //     var tempBuffer = Buffer.allocUnsafe(8);
+        //     tempBuffer.writeUIntBE(data, 8);
+        //     this._add(tempBuffer);
+        // },
+
+        readUInt64: function()
+        {
+            var n = this.readUInt32();
+            var low = this.readUInt32();
+
+            var calc =  n * 4294967296.0 + low;
+            if (low < 0)
+                calc += 4294967296;
+
+            return calc;
+        },
+
         toBuffer: function()
         {
-            return new Buffer(this._packet);
+            return this._packet;
         },
 
         /* Private functions */
@@ -75,6 +131,13 @@ module.exports = function(packet)
                 this._packet,
                 data
             ]);
+        },
+
+        _readInt64BEasFloat(buffer, offset) {
+            var low = readInt32BE(buffer, offset + 4);
+            var n = readInt32BE(buffer, offset) * 4294967296.0 + low;
+            if (low < 0) n += 4294967296;
+            return n;
         }
     };
 }

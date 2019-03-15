@@ -32,7 +32,7 @@ describe('smartglass', function(){
             payload.writeUInt32('0');
             payload.writeSGString('MOCK_TEST_CERT');
 
-            var message = SimplePacket._pack(new Buffer('dd01', 'hex'), payload.toBuffer());
+            var message = SimplePacket._pack(Buffer.from('dd01', 'hex'), payload.toBuffer());
 
             Smartglass._receive(message, remote, smartglass);
 
