@@ -51,7 +51,7 @@ module.exports = function(xbox, packet)
             var signature = payload.toBuffer().slice(-32);
 
             //var iv = payload.toBuffer().slice(-32).slice(0, 16);
-            var iv = payload.toBuffer().slice(2, 18);
+            var iv = payload.toBuffer().slice(0, 16);
             //var iv = this._xbox._crypto.getIv();
 
             var signature_verify = crypto.createHmac('sha256', this._xbox._crypto.getHmac()).update(payload.toBuffer()).digest('hex');
@@ -268,10 +268,10 @@ module.exports = function(xbox, packet)
 
             if(type == 'ConsoleStatus')
             {
-                var liveTvProvider = parseInt(mypayload.readUInt32(), 4);
-                var majorVersion = parseInt(mypayload.readUInt32(), 4);
-                var minorVersion = parseInt(mypayload.readUInt32(), 4);
-                var buildNumber = parseInt(mypayload.readUInt32(), 4);
+                var liveTvProvider = mypayload.readUInt32();
+                var majorVersion = mypayload.readUInt32();
+                var minorVersion = mypayload.readUInt32();
+                var buildNumber = mypayload.readUInt32();
 
                 var locale = mypayload.readSGString();
                 var active_apps_count = parseInt(mypayload.readUInt16(), 2);

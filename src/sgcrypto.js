@@ -82,7 +82,7 @@ module.exports = function()
                 iv = Buffer.from('\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00');
 
             if(useIv != false){
-                var cipher = crypto.createCipheriv('aes-128-cbc', this.iv, data);
+                var cipher = crypto.createCipheriv('aes-128-cbc', this.iv, iv);
             } else {
                 var cipher = crypto.createCipheriv('aes-128-cbc', this.getEncryptionKey(), iv);
             }
