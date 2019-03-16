@@ -1,6 +1,7 @@
 const dgram = require('dgram');
 const SimplePacket = require('./simplepacket');
 const MessagePacket = require('./packet/message');
+const Packer = require('./packet/packer');
 const Xbox = require('./xbox');
 
 module.exports = {
@@ -9,6 +10,7 @@ module.exports = {
 
     _on_discovery_response: [],
     _on_connect_response: [],
+    _on_console_status: [],
 
     discovery: function(options, callback)
     {
@@ -70,20 +72,24 @@ module.exports = {
     connect: function(options, callback)
     {
         var client = this._init_client();
-        var message = SimplePacket.discovery();
+        // var message = SimplePacket.discovery();
+        // console.log(message);
+
+        var discovery_request = Packer('simple.discovery_request');
+        var message = discovery_request.pack();
 
         this._on_discovery_response.push(function(response, device, smartglass){
-            var xbox = Xbox(device.address, response.payload.device_certificate_raw);
+            var xbox = Xbox(device.address, response.packet_decoded.certificate);
             //xbox.set_liveid(response.payload.device_certificate.subject.commonName);
-            xbox.set_iv(response.payload.iv);
-
+            //xbox.set_iv(response.payload.iv);
+            console.log('Attempt to connect..')
             this._connect(device.address, device.port, xbox);
             this._consoles[device.address] = xbox;
         }.bind(this));
 
         this._on_connect_response.push(function(response, device, smartglass){
-
             var xbox = this._consoles[device.address];
+            //xbox.set_iv(response.packet_decoded.iv);
 
             if(xbox._connection_status == true)
             {
@@ -91,17 +97,11 @@ module.exports = {
                 return;
             }
 
-            var protectedPacket = xbox.readPayload(response.payload.protected_payload, response.payload.iv);
+            var connectionResult = response.packet_decoded.protected_payload.connect_result;
+            var pairingState = response.packet_decoded.protected_payload.pairing_state;
+            var participantId = response.packet_decoded.protected_payload.participant_id;
 
-            //console.log('protectedPacket', protectedPacket);
-            var connectionResult = protectedPacket.readUInt16();
-            var pairingState = protectedPacket.readUInt16();
-            var participantId = protectedPacket.readUInt32();
             xbox._participantid = participantId;
-
-            // console.log('connectionResult', connectionResult);
-            // console.log('pairingState', pairingState);
-            // console.log('participantId', participantId);
 
             if(connectionResult == '0')
             {
@@ -131,9 +131,10 @@ module.exports = {
                     console.log('Reason: Client error')
                 }
             }
+        }.bind(this));
 
-            //console.log('protectedPacket ', protectedPacket)
-
+        this._on_console_status.push(function(response, device, smartglass){
+            console.log('[smartglass.js:connect] Got console status:', response)
         }.bind(this));
 
         this._send({
@@ -150,28 +151,7 @@ module.exports = {
     /* Private functions */
     _connect: function(address, port, xbox)
     {
-        // this._on_connect_response.push(function(xbox, response, device, smartglass){
-        //     console.log('GOT CONNECT RESPONSE');
-        //
-        //     xbox.set_iv(response.payload.iv);
-        //     this._consoles[address] = xbox;
-        //
-        //     var protectedPacket = xbox.readPayload(response.payload.protected_payload, response.payload.iv);
-        //     console.log('protectedPacket', protectedPacket);
-        //     var connectionResult = protectedPacket.readUInt32();
-        //     var pairingState = protectedPacket.readUInt32();
-        //     var participantId = protectedPacket.readUInt32();
-        //
-        //     console.log('connectionResult', connectionResult);
-        //     console.log('pairingState', pairingState);
-        //     console.log('participantId', participantId);
-        //
-        //     console.log('Connected consoles: ', this._consoles);
-        //
-        // }.bind(this, xbox));
-
-        message = xbox.connect_request();
-        // console.log(xbox);
+        var message = xbox.connect();
 
         this._send({
             'ip': address,
@@ -181,43 +161,36 @@ module.exports = {
 
     _receive: function(message, remote, client)
     {
-        var response = SimplePacket.unpack(message);
-        var type = message.slice(0,2).toString('hex');
-        console.log('  _receive() called: ', type);
+        var message = Packer(message);
+        var response = message.unpack(this._consoles[remote.address]);
 
-        if(type != 'd00d')
+        //console.log('[smartglass:_receive] Got response: ', response);
+        var type = response.name;
+
+        if(response.packet_decoded.type != 'd00d')
         {
             // Discovery Response
-
-            if(response == false)
+            var func = '_on_' + type.toLowerCase();
+            console.log('[smartglass.js:_receive] '+func+' called');
+            if(this[func] != undefined)
             {
-                console.log('Warning: UNKNOWN PACKET RECEIVED');
-            } else {
-                var func = '_on_' + response.type.toLowerCase();
-                console.log('Trigger: '+func);
-                if(this[func] != undefined)
-                {
-                    for (trigger in this[func]){
-                        this[func][trigger](response, remote, client);
-                    }
-                } else {
-                    console.log('Error: UNKNOWN CALLBACK: ' + func);
+                for (trigger in this[func]){
+                    this[func][trigger](response, remote, client);
                 }
+            } else {
+                console.log('Error: UNKNOWN CALLBACK: ' + func);
             }
+
         } else {
-            console.log('Process encrypted packet');
-            console.log(message);
-            var messagePacket = new MessagePacket(this._consoles[remote.address]);
-
-            var data = messagePacket.unpack(message);
-
-            if(data.flags.type == 'ConsoleStatus')
+            var func = '_on_' + message.structure.packet_decoded.name.toLowerCase();
+            console.log('[smartglass.js:_receive] '+func+' called');
+            if(this[func] != undefined)
             {
-                // This is a Console status packet. Let set the status
-                // var status = messagePacket.decodePayload(data.flags.type, data.decrypted_payload, iv);
-
-                //console.log('[smartglass] - data:', data);
-                console.log('[smartglass] - Console Status:', data.decrypted_payload);
+                for (trigger in this[func]){
+                    this[func][trigger](response, remote, client);
+                }
+            } else {
+                console.log('Error: UNKNOWN CALLBACK: ' + func);
             }
         }
     },

@@ -38,6 +38,7 @@ module.exports = function(xbox, packet)
             var packetFlags = payload.readBytes(2);
             var channelId = payload.readUInt64();
 
+            console.log('_unpack - type:', type.toString('hex'));
             console.log('_unpack - targetId:', targetId);
             console.log('_unpack - sourceId:', sourceId);
             console.log('_unpack - channelId:', channelId);
@@ -268,6 +269,7 @@ module.exports = function(xbox, packet)
 
             if(type == 'ConsoleStatus')
             {
+
                 var liveTvProvider = mypayload.readUInt32();
                 var majorVersion = mypayload.readUInt32();
                 var minorVersion = mypayload.readUInt32();

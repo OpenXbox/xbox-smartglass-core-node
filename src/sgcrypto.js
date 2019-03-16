@@ -94,30 +94,54 @@ module.exports = function()
             return Buffer.from(encryptedPayload, 'hex').toString('hex');
         },
 
+        _encrypt(data, key, iv = undefined)
+        {
+            data = Buffer.from(data);
+
+            if(iv == undefined)
+                iv = Buffer.from('\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00');
+
+            if(key != false){
+                var cipher = crypto.createCipheriv('aes-128-cbc', key, iv);
+            } else {
+                var cipher = crypto.createCipheriv('aes-128-cbc', this.getEncryptionKey(), iv);
+            }
+
+            cipher.setAutoPadding(false);
+            var encryptedPayload = cipher.update(data, 'binary', 'binary');
+            encryptedPayload += cipher.final('binary');
+
+            return Buffer.from(encryptedPayload, 'binary');
+        },
+
         decrypt: function(data, iv)
         {
             data = this._addPadding(data);
 
-            console.log('[sgCrypto.decrypt] - input data:', data, data.length);
-            console.log('[sgCrypto.decrypt] - encryptionKey:', this.getEncryptionKey());
-            console.log('[sgCrypto.decrypt] - iv:', iv);
-
-            var cipher = crypto.createDecipheriv('aes-128-cbc', this.getEncryptionKey(), iv);
-
-            cipher.setAutoPadding(false);
-            // var decryptedPayload = cipher.update(data, 'binary', 'utf8');
-            //
-            // //console.log('----- decryptedPayload 1:', Buffer.from(decryptedPayload).toString('hex'));
-            // decryptedPayload += cipher.final('utf8');
-            //
-            // console.log('----- decryptedPayload 2:', Buffer.from(decryptedPayload).toString('hex'));
-            //
-            // return decryptedPayload;
+            var cipher = crypto.createDecipheriv('aes-128-cbc', this.getEncryptionKey(), iv)
+            cipher.setAutoPadding(false)
 
             var decryptedPayload = cipher.update(data, 'hex', 'hex');
             decryptedPayload += cipher.final('hex');
 
             return this._removePadding(Buffer.from(decryptedPayload, 'hex'));
+        },
+
+        _decrypt(data, iv, key = false)
+        {
+            data = this._addPadding(data);
+
+            if(key == false){
+                key = this.getEncryptionKey()
+            }
+
+            var cipher = crypto.createDecipheriv('aes-128-cbc', key, iv);
+            cipher.setAutoPadding(false);
+
+            var decryptedPayload = cipher.update(data, 'binary', 'binary');
+            decryptedPayload += cipher.final('binary');
+
+            return this._removePadding(Buffer.from(decryptedPayload, 'binary'));
         },
 
         sign: function(data)
@@ -144,8 +168,8 @@ module.exports = function()
 
         _addPadding(payload)
         {
-            console.log('[sgCrypto._addPadding] - payload:', payload.toString('hex'));
-            console.log('[sgCrypto._addPadding] - length:', payload.length);
+            // console.log('[sgCrypto._addPadding] - payload:', payload.toString('hex'));
+            // console.log('[sgCrypto._addPadding] - length:', payload.length);
 
             //length = parseInt(length.toString('hex'));
             // length = length.readUInt8(0);

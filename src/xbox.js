@@ -1,6 +1,7 @@
 var SimplePacket = require('./simplepacket.js');
 var PacketStructure = require('./packet/structure.js');
 var MessagePacket = require('./packet/message.js');
+var Packer = require('./packet/packer');
 const SGCrypto = require('./sgcrypto.js');
 var os = require('os');
 var EOL = require('os').EOL;
@@ -75,7 +76,7 @@ module.exports = function(ip, certificate)
             return packet.pack(0x39, this._participantid, this._liveid);
         },
 
-        connect_request: function()
+        connect: function()
         {
             var iv = this._generate_iv();
 
@@ -93,27 +94,26 @@ module.exports = function(ip, certificate)
 
             var uuid4 = Buffer.from(uuidParse.parse(uuid.v4()));
 
-            // var sgcrypto = new SGCrypto();
-            // this._crypto = sgcrypto;
-
             // Sign certificate using python
             const { spawnSync } = require('child_process');
             var process = spawnSync("python", ["src/python/crypto.py", ecKey.pubKeyHex])
             object = JSON.parse(process.stdout);
 
-            //console.log('++ Xbox connection created: ', object);
-            //this._crypto.load(Buffer.from(object.public_key, 'hex'), Buffer.from(object.secret, 'hex'))
-
             this.loadCrypto(object.public_key, object.secret);
 
-            return SimplePacket.connect_request(this, uuid4, this._crypto);
-        },
+            var message = SimplePacket.connect_request(this, uuid4, this._crypto);
+            //console.log('[smartglass.js:_connect] org message:', message)
 
-        readPayload: function(payload, iv)
-        {
-            var payload = this._crypto.decrypt(payload, iv);
+            // var discovery_request = Packer('simple.connect_request');
+            // discovery_request.set('uuid', uuid4);
+            // discovery_request.set('public_key', this._crypto.getPublicKey());
+            // discovery_request.set('iv', this._crypto.getIv());
+            //
+            // var message = discovery_request.pack();
+            // console.log('[smartglass.js:_connect] new message:', message)
+            // process.exit()
 
-            return new PacketStructure(Buffer.from(payload, 'hex'));
+            return message
         },
 
         loadCrypto: function(public_key, shared_secret)

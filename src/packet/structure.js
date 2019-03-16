@@ -26,6 +26,8 @@ module.exports = function(packet)
                 lengthBuffer,
                 dataBuffer
             ]));
+
+            return this;
         },
 
         readSGString: function(buffer = false)
@@ -46,12 +48,19 @@ module.exports = function(packet)
             var dataBuffer = Buffer.from(data, type);
 
             this._add(dataBuffer);
+            return this;
         },
 
-        readBytes: function(count)
+        readBytes: function(count = false)
         {
-            var data = this._packet.slice(this._offset, this._offset+count);
-            this._offset = (this._offset+count);
+            if(count == false){
+                var data = this._packet.slice(this._offset);
+                this._offset = (this._totalLength);
+            } else {
+                var data = this._packet.slice(this._offset, this._offset+count);
+                this._offset = (this._offset+count);
+            }
+
             return data;
         },
 
@@ -60,6 +69,7 @@ module.exports = function(packet)
             var tempBuffer = Buffer.allocUnsafe(1);
             tempBuffer.writeUInt8(data, 0);
             this._add(tempBuffer);
+            return this;
         },
 
         readUInt8: function()
@@ -75,6 +85,7 @@ module.exports = function(packet)
             var tempBuffer = Buffer.allocUnsafe(2);
             tempBuffer.writeUInt16BE(data, 0);
             this._add(tempBuffer);
+            return this;
         },
 
         readUInt16: function()
@@ -90,6 +101,7 @@ module.exports = function(packet)
             var tempBuffer = Buffer.allocUnsafe(4);
             tempBuffer.writeUInt32BE(data, 0);
             this._add(tempBuffer);
+            return this;
         },
 
         readUInt32: function()
