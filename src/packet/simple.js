@@ -143,6 +143,10 @@ module.exports = function(packet_format, packet_data = false){
 
             if(this.name == 'discovery_request'){
                 var packet = this._pack(Buffer.from('DD00', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
+
+            } else if(this.name == 'discovery_response'){
+                var packet = this._pack(Buffer.from('DD01', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
+
             } else if(this.name == 'connect_request'){
                 var packet = this._pack(Buffer.from('CC00', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
             }
