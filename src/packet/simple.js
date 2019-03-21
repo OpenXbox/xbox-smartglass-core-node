@@ -47,10 +47,18 @@ module.exports = function(packet_format, packet_data = false){
                     return packet_structure.readSGString().toString();
                 }
             }
+        },
+        Optional: function(type){
+            return {
+                value: type
+            }
         }
     }
 
     var Packet = {
+        poweron: {
+            liveid: Type.sgString(),
+        },
         discovery_request: {
             flags: Type.uInt32('0'),
             client_type: Type.uInt16('3'),
@@ -116,7 +124,7 @@ module.exports = function(packet_format, packet_data = false){
             }
 
             // Lets decrypt the data when the payload is encrypted
-            if(packet.protected_payload != undefined){
+            if(packet.protected_payload_length != undefined){
                 var decrypted_payload = device._crypto._decrypt(packet.protected_payload, packet.iv).slice(0, packet.protected_payload_length);
                 decrypted_payload = PacketStructure(decrypted_payload)
 
