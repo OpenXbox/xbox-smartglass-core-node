@@ -134,7 +134,7 @@ module.exports = {
         }.bind(this));
 
         this._on_console_status.push(function(response, device, smartglass){
-            console.log('[smartglass.js:connect] Got console status:', response)
+            console.log('[smartglass.js:connect] Console info:', response.packet_decoded.protected_payload)
         }.bind(this));
 
         this._send({
@@ -169,29 +169,29 @@ module.exports = {
 
         if(response.packet_decoded.type != 'd00d')
         {
-            // Discovery Response
             var func = '_on_' + type.toLowerCase();
-            console.log('[smartglass.js:_receive] '+func+' called');
-            if(this[func] != undefined)
-            {
-                for (trigger in this[func]){
-                    this[func][trigger](response, remote, client);
-                }
-            } else {
-                console.log('Error: UNKNOWN CALLBACK: ' + func);
+        } else {
+            if(response.packet_decoded.target_participant_id != this._consoles[remote.address]._participantid){
+                console.log('[smartglass.js:_receive] Participantid does not match. Ignoring packet.')
+                return;
             }
 
-        } else {
-            var func = '_on_' + message.structure.packet_decoded.name.toLowerCase();
-            console.log('[smartglass.js:_receive] '+func+' called');
-            if(this[func] != undefined)
-            {
-                for (trigger in this[func]){
-                    this[func][trigger](response, remote, client);
-                }
-            } else {
-                console.log('Error: UNKNOWN CALLBACK: ' + func);
+            // Lets see if we must ack..
+            if(response.packet_decoded.flags.need_ack == true){
+                console.log('[smartglass.js:_receive] Packet needs ack.. (sequence_number, list?, list?)')
             }
+
+            var func = '_on_' + message.structure.packet_decoded.name.toLowerCase();
+        }
+
+        console.log('[smartglass.js:_receive] '+func+' called');
+        if(this[func] != undefined)
+        {
+            for (trigger in this[func]){
+                this[func][trigger](response, remote, client);
+            }
+        } else {
+            console.log('Error: UNKNOWN CALLBACK: ' + func);
         }
     },
 

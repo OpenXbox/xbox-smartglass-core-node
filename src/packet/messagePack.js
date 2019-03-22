@@ -48,6 +48,31 @@ module.exports = function(packet_data = false){
                     return packet_structure.readSGString().toString();
                 }
             }
+        },
+        sgArray: function(value){
+            return {
+                value: value,
+                pack: function(packet_structure){
+                    //return packet_structure.writeSGString(this.value);
+                },
+                unpack: function(packet_structure){
+                    var array_count = packet_structure.readUInt16();
+                    var array = []
+
+                    for(i = 0; i < array_count; i++) {
+                        var array_structure = Packet[this.value];
+                        var item = {}
+
+                        for(name in array_structure){
+                            item[name] = array_structure[name].unpack(packet_structure)
+                        }
+
+                        array.push(item)
+                    }
+
+                    return array;
+                }
+            }
         }
     }
 
@@ -57,7 +82,15 @@ module.exports = function(packet_data = false){
             major_version: Type.uInt32('0'),
             minor_version: Type.uInt32('0'),
             build_number: Type.uInt32('0'),
-            locale: Type.sgString()
+            locale: Type.sgString(),
+            apps: Type.sgArray('_active_apps')
+        },
+        _active_apps: {
+            title_id: Type.uInt32('0'),
+            flags: Type.bytes(2),
+            product_id: Type.bytes(16),
+            sandbox_id: Type.bytes(16),
+            aum_id: Type.sgString()
         },
     };
 
