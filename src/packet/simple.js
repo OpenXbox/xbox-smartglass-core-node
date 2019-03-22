@@ -48,9 +48,19 @@ module.exports = function(packet_format, packet_data = false){
                 }
             }
         },
-        Optional: function(type){
+        optional: function(type){
             return {
-                value: type
+                type: type,
+                pack: function(packet_structure){
+                    if(type.value == ''){
+                        return packet_structure
+                    } else {
+                        return this.type.pack(packet_structure)
+                    }
+                },
+                unpack: function(packet_structure){
+                    return this.type.unpack(packet_structure)
+                }
             }
         }
     }
@@ -77,8 +87,16 @@ module.exports = function(packet_format, packet_data = false){
         connect_request: {
             uuid: Type.bytes(16, ''),
             public_key_type: Type.uInt16('3'),
-            public_key: Type.sgString(),
-            iv: Type.bytes(16, '')
+            public_key: Type.bytes(64, ''),
+            iv: Type.bytes(16, ''),
+            protected_payload: Type.bytes()
+        },
+        connect_request_protected: {
+            userhash: Type.sgString(''),
+            jwt: Type.sgString(''),
+            connect_request_num: Type.uInt32('0'),
+            connect_request_group_start: Type.uInt32('0'),
+            connect_request_group_end: Type.uInt32('1')
         },
         connect_response: {
             iv: Type.bytes(16, ''),
@@ -125,8 +143,15 @@ module.exports = function(packet_format, packet_data = false){
 
             // Lets decrypt the data when the payload is encrypted
             if(packet.protected_payload_length != undefined){
+
+                packet['protected_payload'] = packet.protected_payload.slice(0, -32);
+                packet['signature'] = packet.protected_payload.slice(-32)
+
+                // console.log('packet:', packet)
                 var decrypted_payload = device._crypto._decrypt(packet.protected_payload, packet.iv).slice(0, packet.protected_payload_length);
+                //console.log('decrypted_payload:', decrypted_payload)
                 decrypted_payload = PacketStructure(decrypted_payload)
+
 
                 var protected_structure = Packet[packet_format+'_protected'];
                 packet['protected_payload'] = {}
@@ -142,7 +167,7 @@ module.exports = function(packet_format, packet_data = false){
             return this;
         },
 
-        pack: function(){
+        pack: function(device = false){
             var payload = PacketStructure()
 
             for(name in structure){
@@ -156,24 +181,79 @@ module.exports = function(packet_format, packet_data = false){
                 var packet = this._pack(Buffer.from('DD01', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
 
             } else if(this.name == 'connect_request'){
-                var packet = this._pack(Buffer.from('CC00', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
+
+                var packet = this._pack(Buffer.from('CC00', 'hex'), payload.toBuffer(), Buffer.from('0002', 'hex'), structure.protected_payload.value.length)
+
+                // Sign protected payload
+                var protected_payload_hash = device._crypto._sign(packet);
+                packet = Buffer.concat([
+                    packet,
+                    Buffer.from(protected_payload_hash)
+                ]);
+
+                //console.log(protected_payload_hash);
+
+            } else if(this.name == 'connect_response'){
+                var packet = this._pack(Buffer.from('CC01', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
+
+            } else if(this.name == 'connect_request_protected'){
+
+                // Pad packet
+                console.log('payload',payload)
+                if(payload.toBuffer().length > 16)
+                {
+                    var padStart = payload.toBuffer().length % 16;
+                    var padTotal = (16-padStart);
+                    for(var paddingnum = (padStart+1); paddingnum <= 16; paddingnum++)
+                    {
+                        payload.writeUInt8(padTotal);
+
+                    }
+                }
+                console.log('protectedPayload', payload.toBuffer().toString('hex'));
+
+                var encrypted_payload = device._crypto._encrypt(payload.toBuffer(), device._crypto.getIv());
+                encrypted_payload = PacketStructure(encrypted_payload)
+
+                packet = encrypted_payload.toBuffer();
             }
 
             return packet;
         },
 
-        _pack: function(type, payload, version)
+        _pack: function(type, payload, version, protected_payload_length = false)
         {
-            var payloadLength = PacketStructure();
-            payloadLength.writeUInt16(payload.length);
-            payloadLength = payloadLength.toBuffer();
+            if(protected_payload_length !== false)
+            {
+                var payload_length = PacketStructure();
+                payload_length.writeUInt16(payload.length-protected_payload_length);
+                payload_length = payload_length.toBuffer();
 
-            return Buffer.concat([
-                type,
-                payloadLength,
-                Buffer.from('\x00' + String.fromCharCode(version)),
-                payload
-            ]);
+                var protected_length = PacketStructure();
+                protected_length.writeUInt16(protected_payload_length);
+                protected_length = protected_length.toBuffer();
+
+                return Buffer.concat([
+                    type,
+                    payload_length,
+                    protected_length,
+                    version,
+                    payload
+                ]);
+
+            } else {
+
+                var payload_length = PacketStructure();
+                payload_length.writeUInt16(payload.length);
+                payload_length = payload_length.toBuffer();
+
+                return Buffer.concat([
+                    type,
+                    payload_length,
+                    Buffer.from('\x00' + String.fromCharCode(version)),
+                    payload
+                ]);
+            }
         },
     }
 }

@@ -39,8 +39,8 @@ module.exports = function(type)
         set: function(key, value){
             this.structure.set(key, value)
         },
-        pack: function(){
-            return structure.pack()
+        pack: function(device = undefined){
+            return structure.pack(device)
         },
         unpack: function(device = undefined){
             return structure.unpack(device)

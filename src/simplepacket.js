@@ -73,6 +73,8 @@ module.exports = {
         protectedPayload.writeUInt32('0'); // Start of group // 4 bytes
         protectedPayload.writeUInt32('1'); // End of group // 4 bytes
 
+        // console.log('protectedPayload.toBuffer()', protectedPayload.toBuffer())
+
         var protectedPayloadLength = protectedPayload.toBuffer().toString().length;
 
         if(protectedPayload.toBuffer().length > 16)
@@ -90,6 +92,7 @@ module.exports = {
             }
             //console.log('padding added: ', protectedPayload.toBuffer().toString('hex'), ' ('+protectedPayload.toBuffer().toString().length+')');
         }
+        // console.log('protectedPayload org', protectedPayload.toBuffer().toString('hex'));
 
         var encryptedPayload = sgcrypto.encrypt(protectedPayload.toBuffer(), sgcrypto.getIv());
 

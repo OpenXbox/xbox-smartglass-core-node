@@ -201,11 +201,7 @@ module.exports = function(packet_data = false){
             if(packet.protected_payload != undefined){
                 var iv = device._crypto._encrypt(this.packet_data.slice(0, 16), device._crypto.getIv());
                 var decrypted_payload = device._crypto._decrypt(packet.protected_payload, iv);
-
-                //console.log('[packet/messagePack.js:unpack] decrypted_payload:', decrypted_payload);
                 decrypted_payload = PacketStructure(decrypted_payload)
-
-                //console.log('[packet/messagePack.js:unpack] packet_format:', packet['name']);
 
                 var protected_structure = Packet[packet['name']];
                 packet['protected_payload'] = {}
@@ -214,7 +210,6 @@ module.exports = function(packet_data = false){
                     packet['protected_payload'][name] = protected_structure[name].unpack(decrypted_payload)
                     //this.set('protected_payload', packet[name])
                 }
-                //console.log('[packet/messagePack.js:unpack] protected_payload:', packet['protected_payload']);
             }
 
             this.packet_decoded = packet;

@@ -153,6 +153,15 @@ module.exports = function()
             return protectedPayloadHash;
         },
 
+        _sign: function(data)
+        {
+            var hashHmac = crypto.createHmac('sha256', this.getHashKey());
+            hashHmac.update(data, 'binary', 'binary');
+            var protectedPayloadHash = hashHmac.digest('binary');
+
+            return Buffer.from(protectedPayloadHash, 'binary');
+        },
+
         _removePadding(payload)
         {
             var length = Buffer.from(payload.slice(-1));

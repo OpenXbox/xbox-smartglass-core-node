@@ -9,7 +9,7 @@ var certificate = Buffer.from('041db1e7943878b28c773228ebdcfb05b985be4a386a55f50
 var packets = {
     'simple.discovery_request': 'tests/data/packets/discovery_request',
     'simple.discovery_response': 'tests/data/packets/discovery_response',
-    //'simple.connect_request': 'tests/data/packets/connect_request',
+    'simple.connect_request': 'tests/data/packets/connect_request',
     'simple.connect_response': 'tests/data/packets/connect_response',
     'simple.poweron': 'tests/data/packets/poweron',
 }
@@ -61,23 +61,25 @@ describe('packet/packer', function(){
         assert.deepStrictEqual(message.packet_decoded.certificate.length, 519)
     });
 
-    // it('should unpack a connect_request packet', function(){
-    //     var data_packet = fs.readFileSync('tests/data/packets/connect_request')
-    //
-    //     var connect_request = Packer(data_packet)
-    //     var message = connect_request.unpack(device)
-    //
-    //     console.log(message)
-    //
-    //     assert.deepStrictEqual(message.type, 'simple')
-    //     assert.deepStrictEqual(message.name, 'connect_request')
-    //     assert.deepStrictEqual(message.packet_decoded.payload_length, 98)
-    //     assert.deepStrictEqual(message.packet_decoded.protected_payload_length, 47)
-    //     assert.deepStrictEqual(message.packet_decoded.uuid, Buffer.from('de305d5475b4431badb2eb6b9e546014', 'hex'))
-    //     assert.deepStrictEqual(message.packet_decoded.protected_payload_length, 47)
-    //     assert.deepStrictEqual(message.packet_decoded.protected_payload_length, 47)
-    //     assert.deepStrictEqual(message.packet_decoded.protected_payload_length, 47)
-    // });
+    it('should unpack a connect_request packet', function(){
+        var data_packet = fs.readFileSync('tests/data/packets/connect_request')
+
+        var connect_request = Packer(data_packet)
+        var message = connect_request.unpack(device)
+
+        assert.deepStrictEqual(message.type, 'simple')
+        assert.deepStrictEqual(message.name, 'connect_request')
+        assert.deepStrictEqual(message.packet_decoded.payload_length, 98)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload_length, 47)
+        assert.deepStrictEqual(message.packet_decoded.uuid, Buffer.from('de305d5475b4431badb2eb6b9e546014', 'hex'))
+        assert.deepStrictEqual(message.packet_decoded.public_key_type, 0)
+        //assert.deepStrictEqual(message.packet_decoded.public_key, "\xFF".repeat(64))
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.userhash, 'deadbeefdeadbeefde')
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.jwt, 'dummy_token')
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.connect_request_num, 0)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.connect_request_group_start, 0)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.connect_request_group_end, 2)
+    });
 
     it('should unpack a connect_response packet', function(){
         var data_packet = fs.readFileSync('tests/data/packets/connect_response')
