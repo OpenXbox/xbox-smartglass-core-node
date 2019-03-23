@@ -11,7 +11,8 @@ module.exports = function(packet_data = false){
                     return packet_structure.writeUInt32(this.value);
                 },
                 unpack: function(packet_structure){
-                    return packet_structure.readUInt32();
+                    this.value = packet_structure.readUInt32();
+                    return this.value
                 }
             }
         },
@@ -22,7 +23,8 @@ module.exports = function(packet_data = false){
                     return packet_structure.writeUInt16(this.value);
                 },
                 unpack: function(packet_structure){
-                    return packet_structure.readUInt16();
+                    this.value = packet_structure.readUInt16();
+                    return this.value
                 }
             }
         },
@@ -34,7 +36,8 @@ module.exports = function(packet_data = false){
                     return packet_structure.writeBytes(this.value);
                 },
                 unpack: function(packet_structure){
-                    return packet_structure.readBytes(length);
+                    this.value = packet_structure.readBytes(length);
+                    return this.value
                 }
             }
         },
@@ -45,7 +48,22 @@ module.exports = function(packet_data = false){
                     return packet_structure.writeSGString(this.value);
                 },
                 unpack: function(packet_structure){
-                    return packet_structure.readSGString().toString();
+                    this.value = packet_structure.readSGString().toString();
+                    return this.value
+                }
+            }
+        },
+        flags: function(length, value){
+
+            return {
+                value: value,
+                length: length,
+                pack: function(packet_structure){
+                    return packet_structure.writeBytes(setFlags(this.value));
+                },
+                unpack: function(packet_structure){
+                    this.value = readFlags(packet_structure.readBytes(this.length));
+                    return this.value
                 }
             }
         },
@@ -53,7 +71,21 @@ module.exports = function(packet_data = false){
             return {
                 value: value,
                 pack: function(packet_structure){
-                    //return packet_structure.writeSGString(this.value);
+                    // @Todo
+                    packet_structure.writeUInt16(value.length);
+                    var array_structure = Packet[this.value];
+
+                    for(name in array_structure){
+                        packet_structure = array_structure[name].pack(packet_structure)
+                    }
+
+                    console.log(array_structure);
+
+                    return packet_structure;
+
+
+
+                    return packet_structure.writeSGString(this.value);
                 },
                 unpack: function(packet_structure){
                     var array_count = packet_structure.readUInt16();
@@ -82,15 +114,16 @@ module.exports = function(packet_data = false){
             major_version: Type.uInt32('0'),
             minor_version: Type.uInt32('0'),
             build_number: Type.uInt32('0'),
-            locale: Type.sgString(),
+            locale: Type.sgString('en-US'),
             apps: Type.sgArray('_active_apps')
         },
         _active_apps: {
             title_id: Type.uInt32('0'),
+            //flags: Type.flags(2, {}),
             flags: Type.bytes(2),
-            product_id: Type.bytes(16),
-            sandbox_id: Type.bytes(16),
-            aum_id: Type.sgString()
+            product_id: Type.bytes(16, ''),
+            sandbox_id: Type.bytes(16, ''),
+            aum_id: Type.sgString('')
         },
     };
 
@@ -166,17 +199,24 @@ module.exports = function(packet_data = false){
         }
     }
 
-    //var structure = Packet[packet_format];
+    function setFlags(flags)
+    {
+        return Buffer.from('8003', 'hex')
+    }
 
     return {
         type: 'message',
         //name: packet_format,
-        //structure: structure,
+        // structure: false,
         packet_data: packet_data,
         packet_decoded: false,
 
-        set: function(key, value){
-            this.structure[key].value = value
+        set: function(key, value, subkey = false){
+            if(subkey == false){
+                this.structure[key].value = value
+            } else {
+                this.structure[subkey][key].value = value
+            }
         },
 
         unpack: function(device = undefined){
@@ -203,12 +243,13 @@ module.exports = function(packet_data = false){
                 var decrypted_payload = device._crypto._decrypt(packet.protected_payload, iv);
                 decrypted_payload = PacketStructure(decrypted_payload)
 
-                var protected_structure = Packet[packet['name']];
+                this.structure = Packet[packet.name];
+
+                var protected_structure = Packet[packet.name];
                 packet['protected_payload'] = {}
 
                 for(name in protected_structure){
-                    packet['protected_payload'][name] = protected_structure[name].unpack(decrypted_payload)
-                    //this.set('protected_payload', packet[name])
+                    packet.protected_payload[name] = protected_structure[name].unpack(decrypted_payload)
                 }
             }
 
@@ -217,34 +258,52 @@ module.exports = function(packet_data = false){
             return this;
         },
 
-        pack: function(){
+        pack: function(device){
             var payload = PacketStructure()
 
-            for(name in structure){
-                structure[name].pack(payload)
+            for(name in this.structure){
+                this.structure[name].pack(payload)
             }
 
-            if(this.name == 'discovery_request'){
-                var packet = this._pack(Buffer.from('DD00', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
-            } else if(this.name == 'connect_request'){
-                var packet = this._pack(Buffer.from('CC00', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
-            }
+            //var packet = this._pack(Buffer.from('D001', 'hex'), payload.toBuffer(), Buffer.from('0002', 'hex'))
 
-            return packet;
-        },
+            var header = PacketStructure()
+            header.writeBytes(Buffer.from('d00d', 'hex'))
+            header.writeUInt16(payload.toBuffer().length)
+            header.writeUInt32('5') // sequence_number
+            header.writeUInt32('31') // target_participant_id
+            header.writeUInt32('0') // source_participant_id
+            header.writeBytes(Buffer.from('a01e', 'hex')) // flags: readFlags(payload.readBytes(2)),
+            header.writeUInt32('0') // channel_id
+            header.writeUInt32('0') // channel_id
 
-        _pack: function(type, payload, version)
-        {
             var payloadLength = PacketStructure();
-            payloadLength.writeUInt16(payload.length);
+            payloadLength.writeUInt16(payload.toBuffer().length);
             payloadLength = payloadLength.toBuffer();
 
+            // Pad packet
+            // if(payload.toBuffer().length > 16)
+            // {
+            //     var padStart = payload.toBuffer().length % 16;
+            //     var padTotal = (16-padStart);
+            //     for(var paddingnum = (padStart+1); paddingnum <= 16; paddingnum++)
+            //     {
+            //         payload.writeUInt8(padTotal);
+            //
+            //     }
+            // }
+
+            console.log(payload.toBuffer().toString('hex'));
+
+            var iv = device._crypto._encrypt(payload.toBuffer().slice(0, 16), device._crypto.getIv());
+            var encrypted_payload = device._crypto._encrypt(payload.toBuffer(), iv);
+
             return Buffer.concat([
-                type,
-                payloadLength,
-                Buffer.from('\x00' + String.fromCharCode(version)),
-                payload
+                header.toBuffer(),
+                encrypted_payload
             ]);
-        },
+
+            return packet;
+        }
     }
 }

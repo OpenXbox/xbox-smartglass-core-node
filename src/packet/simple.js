@@ -141,15 +141,17 @@ module.exports = function(packet_format, packet_data = false){
                 this.set(name, packet[name])
             }
 
+            if(packet.type == 'dd02'){
+                this.name = 'poweron'
+            }
+
             // Lets decrypt the data when the payload is encrypted
             if(packet.protected_payload_length != undefined){
 
                 packet['protected_payload'] = packet.protected_payload.slice(0, -32);
                 packet['signature'] = packet.protected_payload.slice(-32)
 
-                // console.log('packet:', packet)
                 var decrypted_payload = device._crypto._decrypt(packet.protected_payload, packet.iv).slice(0, packet.protected_payload_length);
-                //console.log('decrypted_payload:', decrypted_payload)
                 decrypted_payload = PacketStructure(decrypted_payload)
 
 
@@ -174,7 +176,10 @@ module.exports = function(packet_format, packet_data = false){
                 structure[name].pack(payload)
             }
 
-            if(this.name == 'discovery_request'){
+            if(this.name == 'poweron'){
+                var packet = this._pack(Buffer.from('DD02', 'hex'), payload.toBuffer(), '')
+
+            } else if(this.name == 'discovery_request'){
                 var packet = this._pack(Buffer.from('DD00', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
 
             } else if(this.name == 'discovery_response'){
@@ -191,15 +196,12 @@ module.exports = function(packet_format, packet_data = false){
                     Buffer.from(protected_payload_hash)
                 ]);
 
-                //console.log(protected_payload_hash);
-
             } else if(this.name == 'connect_response'){
                 var packet = this._pack(Buffer.from('CC01', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
 
             } else if(this.name == 'connect_request_protected'){
 
                 // Pad packet
-                console.log('payload',payload)
                 if(payload.toBuffer().length > 16)
                 {
                     var padStart = payload.toBuffer().length % 16;
@@ -210,12 +212,13 @@ module.exports = function(packet_format, packet_data = false){
 
                     }
                 }
-                console.log('protectedPayload', payload.toBuffer().toString('hex'));
 
                 var encrypted_payload = device._crypto._encrypt(payload.toBuffer(), device._crypto.getIv());
                 encrypted_payload = PacketStructure(encrypted_payload)
 
                 packet = encrypted_payload.toBuffer();
+            } else {
+                packet = payload.toBuffer();
             }
 
             return packet;
