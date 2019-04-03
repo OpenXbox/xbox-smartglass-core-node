@@ -295,7 +295,7 @@ module.exports = function(packet_data = false){
 
             console.log(payload.toBuffer().toString('hex'));
 
-            var iv = device._crypto._encrypt(payload.toBuffer().slice(0, 16), device._crypto.getIv());
+            var iv = device._crypto._encrypt(payload.toBuffer().slice(0, 16), device._crypto.getIv(), device._crypto.getIv());
             var encrypted_payload = device._crypto._encrypt(payload.toBuffer(), iv);
 
             return Buffer.concat([
