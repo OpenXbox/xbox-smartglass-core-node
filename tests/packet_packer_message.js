@@ -49,10 +49,7 @@ describe('packet/packer/message', function(){
                 var discovery_request = Packer(data_packet)
                 var message = discovery_request.unpack(device)
 
-                console.log('data_packet 1:', data_packet.toString('hex'))
-
                 var repacked = message.pack(device);
-                console.log('repacked 1:', repacked.toString('hex'))
 
                 //assert.deepStrictEqual(data_packet, Buffer.from(repacked))
             });

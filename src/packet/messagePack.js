@@ -79,8 +79,6 @@ module.exports = function(packet_data = false){
                         packet_structure = array_structure[name].pack(packet_structure)
                     }
 
-                    console.log(array_structure);
-
                     return packet_structure;
 
 
@@ -292,8 +290,6 @@ module.exports = function(packet_data = false){
             //
             //     }
             // }
-
-            console.log(payload.toBuffer().toString('hex'));
 
             var iv = device._crypto._encrypt(payload.toBuffer().slice(0, 16), device._crypto.getIv(), device._crypto.getIv());
             var encrypted_payload = device._crypto._encrypt(payload.toBuffer(), iv);
