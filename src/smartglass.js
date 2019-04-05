@@ -18,7 +18,7 @@ module.exports = {
         var message = SimplePacket.discovery();
 
         this._on_discovery_response.push(function(response, device, smartglass){
-            callback(response.payload, device, smartglass);
+            callback(response.packet_decoded, device, smartglass);
         }.bind(callback));
 
         this._send({

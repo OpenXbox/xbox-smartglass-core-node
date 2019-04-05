@@ -47,11 +47,11 @@ if(commander.boot == true)
     Smartglass.discovery({
         ip: commander.ip
     }, function(device, address){
-        console.log('- Device found: ' + device.device_name);
-        console.log('Address: '+ address.address + ':' + address.port);
-        console.log('LiveID: ' + device.device_certificate.subject.commonName);
-        console.log('Certificate valid: ' + device.device_certificate.notBefore + ' - ' + device.device_certificate.notAfter);
-        console.log('Certificate fingerprint: ' + device.device_certificate.fingerPrint);
+        console.log('- Device found: ' + device.name);
+        console.log('  Address: '+ address.address + ':' + address.port);
+        // console.log('LiveID: ' + device.device_certificate.subject.commonName);
+        // console.log('Certificate valid: ' + device.device_certificate.notBefore + ' - ' + device.device_certificate.notAfter);
+        // console.log('Certificate fingerprint: ' + device.device_certificate.fingerPrint);
     });
 
 } else if(commander.connect)
