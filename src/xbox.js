@@ -101,11 +101,8 @@ module.exports = function(ip, certificate)
 
             this.loadCrypto(object.public_key, object.secret);
 
-
-
-
             var message = SimplePacket.connect_request(this, uuid4, this._crypto);
-            
+
             // var discovery_request = Packer('simple.connect_request');
             // discovery_request.set('uuid', uuid4);
             // discovery_request.set('public_key', this._crypto.getPublicKey());

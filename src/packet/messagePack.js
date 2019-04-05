@@ -240,12 +240,9 @@ module.exports = function(packet_data = false){
 
             // Lets decrypt the data when the payload is encrypted
             if(packet.protected_payload != undefined){
-                var iv = device._crypto._encrypt(this.packet_data.slice(0, 16), device._crypto.getIv());
-                console.log('messgePack pack 1:', Buffer.from(packet.protected_payload).toString('hex'))
+                var key = device._crypto._encrypt(this.packet_data.slice(0, 16), device._crypto.getIv());
 
-                var decrypted_payload = device._crypto._decrypt(packet.protected_payload, iv);
-                var encrypted_payload = device._crypto._encrypt(decrypted_payload, device._crypto.getEncryptionKey(), iv);
-                console.log('messgePack repack 1:', Buffer.from(encrypted_payload).toString('hex'))
+                var decrypted_payload = device._crypto._decrypt(packet.protected_payload, key);
 
                 decrypted_payload = PacketStructure(decrypted_payload)
 
@@ -276,10 +273,10 @@ module.exports = function(packet_data = false){
             var header = PacketStructure()
             header.writeBytes(Buffer.from('d00d', 'hex'))
             header.writeUInt16(payload.toBuffer().length)
-            header.writeUInt32('5') // sequence_number
-            header.writeUInt32('31') // target_participant_id
-            header.writeUInt32('0') // source_participant_id
-            header.writeBytes(Buffer.from('a01e', 'hex')) // flags: readFlags(payload.readBytes(2)),
+            header.writeUInt32('1882') // sequence_number
+            header.writeUInt32('0') // target_participant_id
+            header.writeUInt32('2') // source_participant_id
+            header.writeBytes(Buffer.from('a039', 'hex')) // flags: readFlags(payload.readBytes(2)),
             header.writeUInt32('0') // channel_id
             header.writeUInt32('0') // channel_id
 
@@ -288,23 +285,30 @@ module.exports = function(packet_data = false){
             payloadLength = payloadLength.toBuffer();
 
             // Pad packet
-            // if(payload.toBuffer().length > 16)
-            // {
-            //     var padStart = payload.toBuffer().length % 16;
-            //     var padTotal = (16-padStart);
-            //     for(var paddingnum = (padStart+1); paddingnum <= 16; paddingnum++)
-            //     {
-            //         payload.writeUInt8(padTotal);
-            //
-            //     }
-            // }
+            if(payload.toBuffer().length > 16)
+            {
+                var padStart = payload.toBuffer().length % 16;
+                var padTotal = (16-padStart);
+                for(var paddingnum = (padStart+1); paddingnum <= 16; paddingnum++)
+                {
+                    payload.writeUInt8(padTotal);
 
-            var iv = device._crypto._encrypt(payload.toBuffer().slice(0, 16), device._crypto.getIv());
-            var encrypted_payload = device._crypto._encrypt(payload.toBuffer(), device._crypto.getEncryptionKey(), iv);
+                }
+            }
 
-            return Buffer.concat([
+            var key = device._crypto._encrypt(header.toBuffer().slice(0, 16), device._crypto.getIv());
+            var encrypted_payload = device._crypto._encrypt(payload.toBuffer(), device._crypto.getEncryptionKey(), key);
+
+            var packet = Buffer.concat([
                 header.toBuffer(),
                 encrypted_payload
+            ]);
+
+            // Sign protected payload
+            var protected_payload_hash = device._crypto._sign(packet);
+            packet = Buffer.concat([
+                packet,
+                Buffer.from(protected_payload_hash)
             ]);
 
             return packet;
