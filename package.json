@@ -4,7 +4,7 @@
   "description": "NodeJS smartglass library for controlling a Xbox",
   "main": "src/smartglass.js",
   "scripts": {
-    "test": "nyc ./node_modules/mocha/bin/mocha tests/"
+    "test": "nyc --reporter=html --reporter=text ./node_modules/mocha/bin/mocha tests/"
   },
   "repository": {
     "type": "git",

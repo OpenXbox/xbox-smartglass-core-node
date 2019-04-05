@@ -41,15 +41,33 @@ describe('packet/packer/message', function(){
         assert.deepStrictEqual(message.packet_decoded.protected_payload.apps[0].aum_id, 'Xbox.Home_8wekyb3d8bbwe!Xbox.Home.Application')
     });
 
+    it('should unpack a poweroff packet', function(){
+        var data_packet = fs.readFileSync('tests/data/packets/poweroff')
+
+        var poweroff_request = Packer(data_packet)
+        var message = poweroff_request.unpack(device)
+
+        assert.deepStrictEqual(message.type, 'message')
+        assert.deepStrictEqual(message.packet_decoded.flags.version, '2')
+        assert.deepStrictEqual(message.packet_decoded.flags.need_ack, true)
+        assert.deepStrictEqual(message.packet_decoded.flags.is_fragment, false)
+        assert.deepStrictEqual(message.packet_decoded.flags.type, 'power_off')
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.liveid, 'FD00112233FFEE66')
+    });
+
     describe('should repack messages correctly', function(){
         for(packetType in packets) {
             it('should repack a valid '+packetType+' packet', function(){
                 var data_packet = fs.readFileSync(packets[packetType])
 
-                var discovery_request = Packer(data_packet)
-                var message = discovery_request.unpack(device)
+                var response = Packer(data_packet)
+                var message = response.unpack(device)
+
+                console.log('message test:', Buffer.from(data_packet).toString('hex'))
 
                 var repacked = message.pack(device);
+
+                console.log('repack test:', Buffer.from(repacked).toString('hex'))
 
                 //assert.deepStrictEqual(data_packet, Buffer.from(repacked))
             });

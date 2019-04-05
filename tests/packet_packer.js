@@ -105,7 +105,7 @@ describe('packet/packer', function(){
                 var response = Packer(data_packet)
                 var message = response.unpack()
 
-                var repacked = message.pack();
+                var repacked = message.pack(device);
 
                 assert.deepStrictEqual(data_packet, Buffer.from(repacked))
             });

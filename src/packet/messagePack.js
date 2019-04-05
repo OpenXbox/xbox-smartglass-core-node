@@ -123,6 +123,9 @@ module.exports = function(packet_data = false){
             sandbox_id: Type.bytes(16, ''),
             aum_id: Type.sgString('')
         },
+        power_off: {
+            liveid: Type.sgString(''),
+        },
     };
 
     function getMsgType(type)
@@ -157,7 +160,7 @@ module.exports = function(packet_data = false){
             0x36: "PairedIdentityStateChanged",
             0x37: "Unsnap",
             0x38: "GameDvrRecord",
-            0x39: "PowerOff",
+            0x39: "power_off",
             0xF00: "MediaControllerRemoved",
             0xF01: "MediaCommand",
             0xF02: "MediaCommandResult",
@@ -238,7 +241,12 @@ module.exports = function(packet_data = false){
             // Lets decrypt the data when the payload is encrypted
             if(packet.protected_payload != undefined){
                 var iv = device._crypto._encrypt(this.packet_data.slice(0, 16), device._crypto.getIv());
+                console.log('messgePack pack 1:', Buffer.from(packet.protected_payload).toString('hex'))
+
                 var decrypted_payload = device._crypto._decrypt(packet.protected_payload, iv);
+                var encrypted_payload = device._crypto._encrypt(decrypted_payload, device._crypto.getEncryptionKey(), iv);
+                console.log('messgePack repack 1:', Buffer.from(encrypted_payload).toString('hex'))
+
                 decrypted_payload = PacketStructure(decrypted_payload)
 
                 this.structure = Packet[packet.name];
@@ -291,8 +299,8 @@ module.exports = function(packet_data = false){
             //     }
             // }
 
-            var iv = device._crypto._encrypt(payload.toBuffer().slice(0, 16), device._crypto.getIv(), device._crypto.getIv());
-            var encrypted_payload = device._crypto._encrypt(payload.toBuffer(), iv);
+            var iv = device._crypto._encrypt(payload.toBuffer().slice(0, 16), device._crypto.getIv());
+            var encrypted_payload = device._crypto._encrypt(payload.toBuffer(), device._crypto.getEncryptionKey(), iv);
 
             return Buffer.concat([
                 header.toBuffer(),
