@@ -10,5 +10,8 @@ run_boot: build
 run_help: build
 	docker run xbox-smartglass-core-node --help
 
+test:
+	npm test
+	
 build:
 	docker build -t xbox-smartglass-core-node .
