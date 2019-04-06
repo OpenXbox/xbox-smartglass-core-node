@@ -7,8 +7,9 @@ var secret = Buffer.from('82bba514e6d19521114940bd65121af2'+'34c53654a8e67add771
 var certificate = Buffer.from('041db1e7943878b28c773228ebdcfb05b985be4a386a55f50066231360785f61b60038caf182d712d86c8a28a0e7e2733a0391b1169ef2905e4e21555b432b262d', 'hex');
 
 var packets = [
-    //{'message.console_status': 'tests/data/packets/console_status'},
-    {'message.power_off': 'tests/data/packets/poweroff'}
+    {'message.console_status': 'tests/data/packets/console_status'},
+    {'message.power_off': 'tests/data/packets/poweroff'},
+    {'message.acknowledgement': 'tests/data/packets/acknowledge'}
 ]
 
 var device = Xbox('127.0.0.1', certificate);
@@ -31,7 +32,7 @@ describe('packet/packer/message', function(){
         assert.deepStrictEqual(message.packet_decoded.flags.need_ack, true)
         assert.deepStrictEqual(message.packet_decoded.flags.is_fragment, false)
         assert.deepStrictEqual(message.packet_decoded.flags.type, 'console_status')
-        assert.deepStrictEqual(message.packet_decoded.channel_id, 0)
+        assert.deepStrictEqual(message.packet_decoded.channel_id, Buffer.from('\x00\x00\x00\x00\x00\x00\x00\x00'))
         assert.deepStrictEqual(message.packet_decoded.protected_payload.live_tv_provider, 0)
         assert.deepStrictEqual(message.packet_decoded.protected_payload.major_version, 10)
         assert.deepStrictEqual(message.packet_decoded.protected_payload.minor_version, 0)
@@ -60,7 +61,32 @@ describe('packet/packer/message', function(){
         assert.deepStrictEqual(message.packet_decoded.flags.need_ack, true)
         assert.deepStrictEqual(message.packet_decoded.flags.is_fragment, false)
         assert.deepStrictEqual(message.packet_decoded.flags.type, 'power_off')
+        assert.deepStrictEqual(message.packet_decoded.channel_id, Buffer.from('\x00\x00\x00\x00\x00\x00\x00\x00'))
+
         assert.deepStrictEqual(message.packet_decoded.protected_payload.liveid, 'FD00112233FFEE66')
+    });
+
+    it('should unpack an acknowledgement packet', function(){
+        var data_packet = fs.readFileSync('tests/data/packets/acknowledge')
+
+        var acknowledge = Packer(data_packet)
+        var message = acknowledge.unpack(device)
+
+        assert.deepStrictEqual(message.type, 'message')
+        assert.deepStrictEqual(message.packet_decoded.sequence_number, 1)
+        assert.deepStrictEqual(message.packet_decoded.source_participant_id, 0)
+        assert.deepStrictEqual(message.packet_decoded.target_participant_id, 31)
+
+        assert.deepStrictEqual(message.packet_decoded.flags.version, '2')
+        assert.deepStrictEqual(message.packet_decoded.flags.need_ack, false)
+        assert.deepStrictEqual(message.packet_decoded.flags.is_fragment, false)
+        assert.deepStrictEqual(message.packet_decoded.flags.type, 'acknowledgement')
+        assert.deepStrictEqual(message.packet_decoded.channel_id, Buffer.from('\x10\x00\x00\x00\x00\x00\x00\x00'))
+
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.low_watermark, 0)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.processed_list.length, 1)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.rejected_list.length, 0)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.processed_list[0].id, 1)
     });
 
     describe('should repack messages correctly', function(){
@@ -69,16 +95,19 @@ describe('packet/packer/message', function(){
 
             it('should repack a valid '+name+' packet', function(){
                 var data_packet = fs.readFileSync(element[name])
-                console.log('d_packet', data_packet.toString('hex'));
+                // console.log('d_packet', data_packet.toString('hex'));
+
                 var response = Packer(data_packet)
                 var message = response.unpack(device)
+                // console.log('d_packet message:', message.packet_decoded.decrypted_payload.toString('hex'));
+                // console.log(message);
 
                 device._request_num = message.packet_decoded.sequence_number
                 device._target_participant_id = message.packet_decoded.target_participant_id
                 device._source_participant_id = message.packet_decoded.source_participant_id
 
                 var repacked = message.pack(device)
-                console.log('repacked', repacked.toString('hex'));
+                // console.log('repacked', repacked.toString('hex'));
 
                 assert.deepStrictEqual(data_packet, Buffer.from(repacked))
             });

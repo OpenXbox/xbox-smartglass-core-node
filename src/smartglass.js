@@ -191,6 +191,16 @@ module.exports = {
             // Lets see if we must ack..
             if(response.packet_decoded.flags.need_ack == true){
                 console.log('[smartglass.js:_receive] Packet needs ack.. (sequence_number, list?, list?)')
+
+                var ack = Packer('message.acknowledge');
+                //ack.set('liveid', xbox._liveid)
+                var ack_message = ack.pack(this._consoles[remote.address]);
+
+                console.log('[smartglass.js:_receive] Sending ack for packetid:', response.packet_decoded.sequence_number)
+                // this._send({
+                //     ip: device.address,
+                //     port: 5050
+                // }, message);
             }
 
             var func = '_on_' + message.structure.packet_decoded.name.toLowerCase();
