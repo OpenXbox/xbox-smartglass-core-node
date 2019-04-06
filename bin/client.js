@@ -16,7 +16,7 @@ commander
   .option('-s, --shutdown', 'Shutdown Xbox console')
   .option('-i, --ip <ip>', 'Xbox One IP address', ADDR_BROADCAST)
   .option('-l, --live_id <live_id>', 'Xbox One live id (Example: FD000000000000)')
-  .option('-t, --tries <tries>', 'Timeout inn seconds (Default: 10)', 10)
+  .option('-t, --tries <tries>', 'Timeout inn seconds (Default: 5)', 5)
   .version(pkgInfo['version'])
   .parse(process.argv);
 

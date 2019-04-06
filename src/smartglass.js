@@ -7,6 +7,7 @@ const Xbox = require('./xbox');
 module.exports = {
     _consoles: [],
     _client: false,
+    _last_received_time: false,
 
     _on_discovery_response: [],
     _on_connect_response: [],
@@ -91,16 +92,19 @@ module.exports = {
         var discovery_request = Packer('simple.discovery_request');
         var message = discovery_request.pack();
 
+        var timeout = setTimeout(function(){
+            console.log('Connection timout of 10 sec.. Closing client.')
+            this._close_client()
+        }.bind(this), 10000);
+
         this._on_discovery_response.push(function(response, device, smartglass){
             var xbox = Xbox(device.address, response.packet_decoded.certificate);
-            //xbox.set_liveid(response.payload.device_certificate.subject.commonName);
-            //xbox.set_iv(response.payload.iv);
-            console.log('Attempt to connect..')
+
             this._connect(device.address, device.port, xbox);
             this._consoles[device.address] = xbox;
         }.bind(this));
 
-        this._on_connect_response.push(function(device, response, remote){
+        this._on_connect_response.push(function(callback, timeout, response, remote){
             var xbox = this._consoles[remote.address];
             //xbox.set_iv(response.packet_decoded.iv);
 
@@ -120,6 +124,7 @@ module.exports = {
             {
                 // Console connected! Set xbox to connected
                 xbox._connection_status = true;
+                clearTimeout(timeout)
                 callback(true)
 
                 var local_join = Packer('message.local_join');
@@ -131,6 +136,13 @@ module.exports = {
                 }, message);
 
                 setInterval(function(){
+                    if((Math.floor(Date.now() / 1000))-this._last_received_time > 30)
+                    {
+                        console.log('No message for the last 30 seconds. Timeout...')
+                        this._close_client()
+                        return;
+                    }
+
                     var ack = Packer('message.acknowledge')
                     ack.set('low_watermark', xbox._request_num)
                     var ack_message = ack.pack(xbox)
@@ -164,9 +176,10 @@ module.exports = {
                 } else {
                     console.log('Reason: Client error')
                 }
+                clearTimeout(timeout)
                 callback(false)
             }
-        }.bind(this, callback));
+        }.bind(this, callback, timeout));
 
         // this._on_console_status.push(function(response, device, smartglass){
         //     console.log('[smartglass.js:connect] Console info:', response.packet_decoded.protected_payload)
@@ -206,6 +219,7 @@ module.exports = {
 
     _receive: function(message, remote, client)
     {
+        this._last_received_time = Math.floor(Date.now() / 1000)
         var message = Packer(message);
         var response = message.unpack(this._consoles[remote.address]);
 
@@ -267,6 +281,9 @@ module.exports = {
 
     _init_client: function()
     {
+        if(this._client)
+            this._close_client()
+
         this._on_discovery_response = [];
 
         this._client = dgram.createSocket('udp4');
@@ -284,6 +301,7 @@ module.exports = {
 
     _close_client: function()
     {
-        this._client.close();
+        if(this._client)
+            this._client.close();
     }
 }
