@@ -4,11 +4,11 @@ var PacketStructure = require('../src/packet/structure');
 describe('packet/structure', function(){
     it('obj._packet should be empty on new instance without parameters', function(){
         var packet = PacketStructure();
-        assert.deepStrictEqual(packet._packet, new Buffer(''));
+        assert.deepStrictEqual(packet._packet, Buffer.from(''));
     });
     it('obj._packet should be not empty on new instance with parameters', function(){
-        var packet = PacketStructure(new Buffer('0x0001'));
-        assert.deepStrictEqual(packet._packet, new Buffer('0x0001'));
+        var packet = PacketStructure(Buffer.from('0x0001'));
+        assert.deepStrictEqual(packet._packet, Buffer.from('0x0001'));
     });
 
 
@@ -17,17 +17,17 @@ describe('packet/structure', function(){
 
         it('should write UInt16 to the packet and check packet', function(){
             lPacket.writeUInt16(10);
-            assert.deepEqual(lPacket._packet, new Buffer('\x00\x0a'));
+            assert.deepEqual(lPacket._packet, Buffer.from('\x00\x0a'));
         }.bind(lPacket));
 
         it('should write UInt32 to the packet and check packet', function(){
             lPacket.writeUInt32(10);
-            assert.deepEqual(lPacket._packet, new Buffer('\x00\x0a\x00\x00\x00\x0a'));
+            assert.deepEqual(lPacket._packet, Buffer.from('\x00\x0a\x00\x00\x00\x0a'));
         }.bind(lPacket));
 
         it('should write SGString to the packet and check packet', function(){
             lPacket.writeSGString('test');
-            assert.deepEqual(lPacket._packet, new Buffer('\x00\x0a\x00\x00\x00\x0a\x00\x04\x74\x65\x73\x74\x00'));
+            assert.deepEqual(lPacket._packet, Buffer.from('\x00\x0a\x00\x00\x00\x0a\x00\x04\x74\x65\x73\x74\x00'));
         }.bind(lPacket));
 
         it('should read UInt16 from the packet and check value and offset', function(){
