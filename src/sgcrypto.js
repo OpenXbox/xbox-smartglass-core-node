@@ -77,6 +77,27 @@ module.exports = function()
             return this.hash_key;
         },
 
+        encrypt: function(data, iv = undefined, useIv = false)
+        {
+            data = Buffer.from(data);
+
+            if(iv == undefined)
+                iv = Buffer.from('\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00');
+
+            if(useIv != false){
+                var cipher = crypto.createCipheriv('aes-128-cbc', this.iv, iv);
+            } else {
+                var cipher = crypto.createCipheriv('aes-128-cbc', this.getEncryptionKey(), iv);
+            }
+
+            cipher.setAutoPadding(false);
+            var encryptedPayload = cipher.update(data.toString('hex'), 'hex', 'hex');
+            encryptedPayload += cipher.final('hex');
+
+            return Buffer.from(encryptedPayload, 'hex').toString('hex');
+        },
+
+
         _encrypt(data, key = false, iv = false)
         {
             data = Buffer.from(data);

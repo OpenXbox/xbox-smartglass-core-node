@@ -86,7 +86,7 @@ module.exports = function(packet_format, packet_data = false){
         },
         connect_request: {
             uuid: Type.bytes(16, ''),
-            public_key_type: Type.uInt16('3'),
+            public_key_type: Type.uInt16('0'),
             public_key: Type.bytes(64, ''),
             iv: Type.bytes(16, ''),
             protected_payload: Type.bytes()
@@ -120,6 +120,9 @@ module.exports = function(packet_format, packet_data = false){
 
         set: function(key, value){
             this.structure[key].value = value
+
+            if(this.structure[key].length != undefined)
+                this.structure[key].length = value.length
         },
 
         unpack: function(device = undefined){
@@ -136,31 +139,32 @@ module.exports = function(packet_format, packet_data = false){
                 packet.version = payload.readUInt16()
             }
 
-            for(name in structure){
-                packet[name] = structure[name].unpack(payload)
+            for(name in this.structure){
+                packet[name] = this.structure[name].unpack(payload)
                 this.set(name, packet[name])
             }
 
             if(packet.type == 'dd02'){
                 this.name = 'poweron'
+
             }
 
             // Lets decrypt the data when the payload is encrypted
-            if(packet.protected_payload_length != undefined){
+            if(packet.protected_payload != undefined){
 
-                packet['protected_payload'] = packet.protected_payload.slice(0, -32);
-                packet['signature'] = packet.protected_payload.slice(-32)
+                packet.protected_payload = packet.protected_payload.slice(0, -32);
+                packet.signature = packet.protected_payload.slice(-32)
 
                 var decrypted_payload = device._crypto._decrypt(packet.protected_payload, packet.iv).slice(0, packet.protected_payload_length);
                 decrypted_payload = PacketStructure(decrypted_payload)
 
 
                 var protected_structure = Packet[packet_format+'_protected'];
-                packet['protected_payload'] = {}
+                packet.protected_payload = {}
 
                 for(name in protected_structure){
-                    packet['protected_payload'][name] = protected_structure[name].unpack(decrypted_payload)
-                    //this.set('protected_payload', packet[name])
+                    packet.protected_payload[name] = protected_structure[name].unpack(decrypted_payload)
+                    this.set('protected_payload', packet.protected_payload)
                 }
             }
 
@@ -172,8 +176,41 @@ module.exports = function(packet_format, packet_data = false){
         pack: function(device = false){
             var payload = PacketStructure()
 
-            for(name in structure){
-                structure[name].pack(payload)
+            for(name in this.structure){
+                if(name != 'protected_payload'){
+                    this.structure[name].pack(payload)
+
+                } else {
+                    var protected_payload = new PacketStructure();
+
+                    var protected_structure = Packet[packet_format+'_protected'];
+
+                    for(name_struct in protected_structure){
+
+                        if(this.structure.protected_payload.value != undefined){
+                            protected_structure[name_struct].value = this.structure.protected_payload.value[name_struct]
+                        }
+
+                        protected_structure[name_struct].pack(protected_payload)
+                    }
+
+                    var protected_payload_length = protected_payload.toBuffer().length
+
+                    // Pad packet
+                    if(protected_payload.toBuffer().length % 16 > 0)
+                    {
+                        var padStart = protected_payload.toBuffer().length % 16;
+                        var padTotal = (16-padStart);
+                        for(var paddingnum = (padStart+1); paddingnum <= 16; paddingnum++)
+                        {
+                            protected_payload.writeUInt8(padTotal);
+                        }
+                    }
+
+                    var protected_payload_length_real = protected_payload.toBuffer().length
+                    var encrypted_payload = device._crypto._encrypt(protected_payload.toBuffer(), device._crypto.getEncryptionKey(), this.structure.iv.value);
+                    payload.writeBytes(encrypted_payload)
+                }
             }
 
             if(this.name == 'poweron'){
@@ -187,7 +224,7 @@ module.exports = function(packet_format, packet_data = false){
 
             } else if(this.name == 'connect_request'){
 
-                var packet = this._pack(Buffer.from('CC00', 'hex'), payload.toBuffer(), Buffer.from('0002', 'hex'), structure.protected_payload.value.length)
+                var packet = this._pack(Buffer.from('CC00', 'hex'), payload.toBuffer(), Buffer.from('0002', 'hex'), protected_payload_length, protected_payload_length_real)
 
                 // Sign protected payload
                 var protected_payload_hash = device._crypto._sign(packet);
@@ -200,7 +237,6 @@ module.exports = function(packet_format, packet_data = false){
                 var packet = this._pack(Buffer.from('CC01', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
 
             } else if(this.name == 'connect_request_protected'){
-
                 // Pad packet
                 if(payload.toBuffer().length > 16)
                 {
@@ -224,12 +260,12 @@ module.exports = function(packet_format, packet_data = false){
             return packet;
         },
 
-        _pack: function(type, payload, version, protected_payload_length = false)
+        _pack: function(type, payload, version, protected_payload_length = false, protected_payload_length_real = 0)
         {
             if(protected_payload_length !== false)
             {
                 var payload_length = PacketStructure();
-                payload_length.writeUInt16(payload.length-protected_payload_length);
+                payload_length.writeUInt16(payload.length-protected_payload_length_real);
                 payload_length = payload_length.toBuffer();
 
                 var protected_length = PacketStructure();

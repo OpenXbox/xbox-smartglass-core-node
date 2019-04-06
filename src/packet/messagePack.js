@@ -170,22 +170,34 @@ module.exports = function(type, packet_data = false){
         power_off: {
             liveid: Type.sgString(''),
         },
-        acknowledgement: {
+        acknowledge: {
             low_watermark: Type.uInt32(0),
-            processed_list: Type.sgList('_acknowledgement_list', []),
-            rejected_list: Type.sgList('_acknowledgement_list', []),
+            processed_list: Type.sgList('_acknowledge_list', []),
+            rejected_list: Type.sgList('_acknowledge_list', []),
         },
-        _acknowledgement_list: {
+        _acknowledge_list: {
             id: Type.uInt32(0),
+        },
+        local_join: {
+            client_type: Type.uInt16(0),
+            native_width: Type.uInt16(0),
+            native_height: Type.uInt16(0),
+            dpi_x: Type.uInt16(0),
+            dpi_y: Type.uInt16(0),
+            device_capabilities: Type.bytes(8),
+            client_version: Type.uInt32(0),
+            os_major_version: Type.uInt32(0),
+            os_minor_version: Type.uInt32(0),
+            display_name: Type.sgString(''),
         },
     };
 
     function getMsgType(type)
     {
         var message_types = {
-            0x1: "acknowledgement",
+            0x1: "acknowledge",
             0x2: "Group",
-            0x3: "LocalJoin",
+            0x3: "local_join",
             0x5: "StopActivity",
             0x19: "AuxilaryStream",
             0x1A: "ActiveSurfaceChange",
@@ -256,9 +268,9 @@ module.exports = function(type, packet_data = false){
     {
         //var msgType = getMsgType(type)
         var message_flags = {
-            acknowledgement: Buffer.from('8001', 'hex'),
+            acknowledge: Buffer.from('8001', 'hex'),
             0x2: "Group",
-            0x3: "LocalJoin",
+            local_join: Buffer.from('2003', 'hex'),
             0x5: "StopActivity",
             0x19: "AuxilaryStream",
             0x1A: "ActiveSurfaceChange",
@@ -305,7 +317,7 @@ module.exports = function(type, packet_data = false){
 
     return {
         type: 'message',
-        name: '',
+        name: type,
         structure: structure,
         packet_data: packet_data,
         packet_decoded: false,
@@ -341,6 +353,7 @@ module.exports = function(type, packet_data = false){
             this.setChannel(packet.channel_id);
 
             packet.name = packet.flags.type
+            this.name = packet.flags.type
             packet.protected_payload = packet.protected_payload.slice(0, -32);
             packet.signature = packet.protected_payload.slice(-32)
 
@@ -381,8 +394,7 @@ module.exports = function(type, packet_data = false){
             header.writeUInt32(device._request_num) // sequence_number
             header.writeUInt32(device._target_participant_id) // target_participant_id
             header.writeUInt32(device._source_participant_id) // source_participant_id
-            //header.writeBytes(Buffer.from('8001', 'hex')) // flags: readFlags(payload.readBytes(2)), //a01e
-            header.writeBytes(setFlags(this.packet_decoded.flags.type)) // flags: readFlags(payload.readBytes(2)), //a01e
+            header.writeBytes(setFlags(this.name)) // flags: readFlags(payload.readBytes(2)), //a01e
             header.writeBytes(this.channel_id) // channel_id
 
             var payloadLength = PacketStructure();

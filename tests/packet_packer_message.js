@@ -9,7 +9,8 @@ var certificate = Buffer.from('041db1e7943878b28c773228ebdcfb05b985be4a386a55f50
 var packets = [
     {'message.console_status': 'tests/data/packets/console_status'},
     {'message.power_off': 'tests/data/packets/poweroff'},
-    {'message.acknowledgement': 'tests/data/packets/acknowledge'}
+    {'message.acknowledgement': 'tests/data/packets/acknowledge'},
+    {'message.local_join': 'tests/data/packets/local_join'}
 ]
 
 var device = Xbox('127.0.0.1', certificate);
@@ -66,7 +67,7 @@ describe('packet/packer/message', function(){
         assert.deepStrictEqual(message.packet_decoded.protected_payload.liveid, 'FD00112233FFEE66')
     });
 
-    it('should unpack an acknowledgement packet', function(){
+    it('should unpack an acknowledge packet', function(){
         var data_packet = fs.readFileSync('tests/data/packets/acknowledge')
 
         var acknowledge = Packer(data_packet)
@@ -80,13 +81,42 @@ describe('packet/packer/message', function(){
         assert.deepStrictEqual(message.packet_decoded.flags.version, '2')
         assert.deepStrictEqual(message.packet_decoded.flags.need_ack, false)
         assert.deepStrictEqual(message.packet_decoded.flags.is_fragment, false)
-        assert.deepStrictEqual(message.packet_decoded.flags.type, 'acknowledgement')
+        assert.deepStrictEqual(message.packet_decoded.flags.type, 'acknowledge')
         assert.deepStrictEqual(message.packet_decoded.channel_id, Buffer.from('\x10\x00\x00\x00\x00\x00\x00\x00'))
 
         assert.deepStrictEqual(message.packet_decoded.protected_payload.low_watermark, 0)
         assert.deepStrictEqual(message.packet_decoded.protected_payload.processed_list.length, 1)
         assert.deepStrictEqual(message.packet_decoded.protected_payload.rejected_list.length, 0)
         assert.deepStrictEqual(message.packet_decoded.protected_payload.processed_list[0].id, 1)
+    });
+
+    it('should unpack a local_join packet', function(){
+        var data_packet = fs.readFileSync('tests/data/packets/local_join')
+
+        var local_join = Packer(data_packet)
+        var message = local_join.unpack(device)
+
+        assert.deepStrictEqual(message.type, 'message')
+        assert.deepStrictEqual(message.packet_decoded.sequence_number, 1)
+        assert.deepStrictEqual(message.packet_decoded.source_participant_id, 31)
+        assert.deepStrictEqual(message.packet_decoded.target_participant_id, 0)
+
+        assert.deepStrictEqual(message.packet_decoded.flags.version, '0')
+        assert.deepStrictEqual(message.packet_decoded.flags.need_ack, true)
+        assert.deepStrictEqual(message.packet_decoded.flags.is_fragment, false)
+        assert.deepStrictEqual(message.packet_decoded.flags.type, 'local_join')
+        assert.deepStrictEqual(message.packet_decoded.channel_id, Buffer.from('\x00\x00\x00\x00\x00\x00\x00\x00'))
+
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.client_type, 8)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.native_width, 600)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.native_height, 1024)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.dpi_x, 160)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.dpi_y, 160)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.device_capabilities, Buffer.from('ffffffffffffffff', 'hex'))
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.client_version, 133713371)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.os_major_version, 42)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.os_minor_version, 0)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.display_name, 'package.name.here')
     });
 
     describe('should repack messages correctly', function(){

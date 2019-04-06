@@ -75,7 +75,6 @@ module.exports = function(ip, certificate)
         {
             var packet = new MessagePacket(this);
 
-            console.log('Turn off: '+this._liveid);
             return packet.pack(0x39, this._participantid, this._liveid);
         },
 
@@ -106,22 +105,14 @@ module.exports = function(ip, certificate)
 
             this.loadCrypto(object.public_key, object.secret);
 
-            var message = SimplePacket.connect_request(this, uuid4, this._crypto);
-
-            // var discovery_request = Packer('simple.connect_request');
-            // discovery_request.set('uuid', uuid4);
-            // discovery_request.set('public_key', this._crypto.getPublicKey());
-            // discovery_request.set('iv', this._crypto.getIv());
-            // console.log('this._crypto.getIv()', this._crypto.getIv().toString('hex'))
+            var discovery_request = Packer('simple.connect_request');
+            discovery_request.set('uuid', uuid4);
+            discovery_request.set('public_key', this._crypto.getPublicKey());
+            discovery_request.set('iv', this._crypto.getIv());
             //
-            // var protected_payload = Packer('simple.connect_request_protected');
-            // discovery_request.set('protected_payload', protected_payload.pack(this));
-            //
-            // console.log('protected_payload new', protected_payload.pack(this));
-            //
-            // var message = discovery_request.pack(this);
-            //  console.log('[smartglass.js:_connect] new message:', message.toString('hex'), message.length)
-            //  // process.exit()
+            var protected_payload = Packer('simple.connect_request_protected');
+            var result = protected_payload.pack(this)
+            var message = discovery_request.pack(this);
 
             return message
         },
