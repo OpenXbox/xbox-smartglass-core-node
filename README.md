@@ -41,7 +41,7 @@ Smartglass.power_on({
 });
 ```
 
-### Boot the Xbox console
+### Shutdown the Xbox console
 
 ```
 Smartglass.shutdown({
