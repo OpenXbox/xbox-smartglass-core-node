@@ -76,9 +76,11 @@ var sgClient = Smartglass.connect({
 sgClient._on_console_status.push(function(response, device, smartglass){
     deviceStatus.connection_status = true
 
-    if(deviceStatus.current_app != response.packet_decoded.protected_payload.apps[0].aum_id){
-        deviceStatus.current_app = response.packet_decoded.protected_payload.apps[0].aum_id
-        console.log('Current active app:', deviceStatus)
+    if(response.packet_decoded.protected_payload.apps[0] != undefined){
+        if(deviceStatus.current_app != response.packet_decoded.protected_payload.apps[0].aum_id){
+            deviceStatus.current_app = response.packet_decoded.protected_payload.apps[0].aum_id
+            console.log('Current active app:', deviceStatus)
+        }
     }
 }.bind(deviceStatus));
 ```
