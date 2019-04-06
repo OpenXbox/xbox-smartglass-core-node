@@ -61,8 +61,8 @@ if(commander.boot == true)
     Smartglass.connect({
         ip: commander.ip,
         liveid: commander.live_id
-    }, function(device, address){
-        console.log('- Device found: ' + device.device_name);
+    }, function(result){
+        console.log('- Device found: ' + result);
     });
 
 } else if(commander.shutdown)
@@ -72,7 +72,7 @@ if(commander.boot == true)
     Smartglass.shutdown({
         ip: commander.ip,
         liveid: commander.live_id
-    }, function(device, address){
-        console.log('- Device found: ' + device.device_name);
+    }, function(result){
+        console.log('- Device found: ' + result);
     });
 }

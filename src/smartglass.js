@@ -64,7 +64,7 @@ module.exports = {
     shutdown: function(options, callback)
     {
         // Connect to console
-        this.connect(options);
+        this.connect(options, callback);
 
         this._on_connect_response.push(function(response, device, smartglass){
             var xbox = this._consoles[device.address];
@@ -74,7 +74,6 @@ module.exports = {
             var poweroff = Packer('message.power_off');
             poweroff.set('liveid', xbox._liveid)
             var message = poweroff.pack(xbox);
-            console.log(message)
 
             this._send({
                 ip: device.address,
@@ -88,7 +87,6 @@ module.exports = {
     {
         var client = this._init_client();
         // var message = SimplePacket.discovery();
-        // console.log(message);
 
         var discovery_request = Packer('simple.discovery_request');
         var message = discovery_request.pack();
@@ -102,8 +100,8 @@ module.exports = {
             this._consoles[device.address] = xbox;
         }.bind(this));
 
-        this._on_connect_response.push(function(response, device, smartglass){
-            var xbox = this._consoles[device.address];
+        this._on_connect_response.push(function(device, response, remote){
+            var xbox = this._consoles[remote.address];
             //xbox.set_iv(response.packet_decoded.iv);
 
             if(xbox._connection_status == true)
@@ -121,8 +119,8 @@ module.exports = {
             if(connectionResult == '0')
             {
                 // Console connected! Set xbox to connected
-                console.log('Xbox succesfully connected! Sending join...');
                 xbox._connection_status = true;
+                callback(true)
 
                 var local_join = Packer('message.local_join');
                 var message = local_join.pack(xbox);
@@ -136,8 +134,6 @@ module.exports = {
                     var ack = Packer('message.acknowledge')
                     ack.set('low_watermark', xbox._request_num)
                     var ack_message = ack.pack(xbox)
-
-                    console.log('[smartglass.js:_receive] Sending heartbeat packet')
 
                     this._send({
                         ip: options.ip,
@@ -168,25 +164,28 @@ module.exports = {
                 } else {
                     console.log('Reason: Client error')
                 }
+                callback(false)
             }
-        }.bind(this));
+        }.bind(this, callback));
 
-        this._on_console_status.push(function(response, device, smartglass){
-            console.log('[smartglass.js:connect] Console info:', response.packet_decoded.protected_payload)
-        }.bind(this));
+        // this._on_console_status.push(function(response, device, smartglass){
+        //     console.log('[smartglass.js:connect] Console info:', response.packet_decoded.protected_payload)
+        // }.bind(this));
 
         this._on_local_join.push(function(response, device, smartglass){
-            console.log('[smartglass.js:connect] Got local_join:', response.packet_decoded.protected_payload)
+            // console.log('[smartglass.js:connect] Got local_join:', response.packet_decoded.protected_payload)
         }.bind(this));
 
         this._on_acknowledge.push(function(response, device, smartglass){
-            console.log('[smartglass.js:connect] Got acknowledge:', response.packet_decoded.protected_payload)
+            // console.log('[smartglass.js:connect] Got acknowledge:', response.packet_decoded.protected_payload)
         }.bind(this));
 
         this._send({
             ip: options.ip,
             port: 5050
         }, message);
+
+        return this;
     },
 
     getConsoles: function()
@@ -242,7 +241,7 @@ module.exports = {
             var func = '_on_' + message.structure.packet_decoded.name.toLowerCase();
         }
 
-        console.log('[smartglass.js:_receive] '+func+' called');
+        //console.log('[smartglass.js:_receive] '+func+' called');
         if(this[func] != undefined)
         {
             for (trigger in this[func]){
