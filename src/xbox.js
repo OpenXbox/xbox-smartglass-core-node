@@ -3,7 +3,7 @@ var PacketStructure = require('./packet/structure.js');
 var MessagePacket = require('./packet/message.js');
 var Packer = require('./packet/packer');
 const SGCrypto = require('./sgcrypto.js');
-var os = require('os');
+const os = require('os');
 var EOL = require('os').EOL;
 
 const crypto = require('crypto');
@@ -100,7 +100,8 @@ module.exports = function(ip, certificate)
 
             // Sign certificate using python
             const { spawnSync } = require('child_process');
-            var process = spawnSync("python", ["src/python/crypto.py", ecKey.pubKeyHex])
+            console.log('__file__', __dirname )
+            var process = spawnSync("python", [__dirname+"/python/crypto.py", ecKey.pubKeyHex])
             object = JSON.parse(process.stdout);
 
             this.loadCrypto(object.public_key, object.secret);
