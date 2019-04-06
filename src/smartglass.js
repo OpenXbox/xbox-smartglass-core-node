@@ -65,7 +65,19 @@ module.exports = {
 
         this._on_connect_response.push(function(response, device, smartglass){
             var xbox = this._consoles[device.address];
-            console.log('[smartglass] - Sending shutdown: ', xbox._connection_status)
+            console.log('[smartglass] - Sending shutdown:', xbox._connection_status)
+
+            xbox.get_requestnum()
+            var poweroff = Packer('message.power_off');
+            poweroff.set('liveid', xbox._liveid)
+            var message = poweroff.pack(xbox);
+            console.log(message)
+
+            this._send({
+                ip: device.address,
+                port: 5050
+            }, message);
+
         }.bind(this));
     },
 
@@ -101,7 +113,7 @@ module.exports = {
             var pairingState = response.packet_decoded.protected_payload.pairing_state;
             var participantId = response.packet_decoded.protected_payload.participant_id;
 
-            xbox._participantid = participantId;
+            xbox.set_participantid(participantId);
 
             if(connectionResult == '0')
             {

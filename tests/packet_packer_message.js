@@ -6,10 +6,10 @@ var Xbox = require('../src/xbox');
 var secret = Buffer.from('82bba514e6d19521114940bd65121af2'+'34c53654a8e67add7710b3725db44f77'+'30ed8e3da7015a09fe0f08e9bef3853c0506327eb77c9951769d923d863a2f5e', 'hex');
 var certificate = Buffer.from('041db1e7943878b28c773228ebdcfb05b985be4a386a55f50066231360785f61b60038caf182d712d86c8a28a0e7e2733a0391b1169ef2905e4e21555b432b262d', 'hex');
 
-var packets = {
-    //'message.console_status': 'tests/data/packets/console_status',
-    'message.power_off': 'tests/data/packets/poweroff',
-}
+var packets = [
+    //{'message.console_status': 'tests/data/packets/console_status'},
+    {'message.power_off': 'tests/data/packets/poweroff'}
+]
 
 var device = Xbox('127.0.0.1', certificate);
 device.loadCrypto(certificate.toString('hex'), secret.toString('hex'));
@@ -23,6 +23,10 @@ describe('packet/packer/message', function(){
         var message = poweron_request.unpack(device)
 
         assert.deepStrictEqual(message.type, 'message')
+        assert.deepStrictEqual(message.packet_decoded.sequence_number, 5)
+        assert.deepStrictEqual(message.packet_decoded.source_participant_id, 0)
+        assert.deepStrictEqual(message.packet_decoded.target_participant_id, 31)
+
         assert.deepStrictEqual(message.packet_decoded.flags.version, '2')
         assert.deepStrictEqual(message.packet_decoded.flags.need_ack, true)
         assert.deepStrictEqual(message.packet_decoded.flags.is_fragment, false)
@@ -60,16 +64,24 @@ describe('packet/packer/message', function(){
     });
 
     describe('should repack messages correctly', function(){
-        for(packetType in packets) {
-            it('should repack a valid '+packetType+' packet', function(){
-                var data_packet = fs.readFileSync(packets[packetType])
+        packets.forEach(function(element, packetType){
+            for (var name in element) break;
 
+            it('should repack a valid '+name+' packet', function(){
+                var data_packet = fs.readFileSync(element[name])
+                console.log('d_packet', data_packet.toString('hex'));
                 var response = Packer(data_packet)
                 var message = response.unpack(device)
-                var repacked = message.pack(device);
+
+                device._request_num = message.packet_decoded.sequence_number
+                device._target_participant_id = message.packet_decoded.target_participant_id
+                device._source_participant_id = message.packet_decoded.source_participant_id
+
+                var repacked = message.pack(device)
+                console.log('repacked', repacked.toString('hex'));
 
                 assert.deepStrictEqual(data_packet, Buffer.from(repacked))
             });
-        }
+        })
     });
 })

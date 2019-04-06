@@ -16,7 +16,7 @@ module.exports = function(type)
         if(type.slice(0, 6) == 'simple'){
             return SimplePacket(type.slice(7), value);
         } else if(type.slice(0, 7) == 'message'){
-            return MessagePacket(value);
+            return MessagePacket(type.slice(8), value);
         } else {
             throw new Error('[packet/packer.js] Packet format not found: '+type.toString('hex'));
         }

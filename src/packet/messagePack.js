@@ -2,7 +2,7 @@ var PacketStructure = require('./structure');
 var Packer = require('./packer');
 var hexToBin = require('hex-to-binary');
 
-module.exports = function(packet_data = false){
+module.exports = function(type, packet_data = false){
     var Type = {
         uInt32: function(value){
             return {
@@ -205,10 +205,12 @@ module.exports = function(packet_data = false){
         return Buffer.from('8003', 'hex')
     }
 
+    var structure = Packet[type];
+
     return {
         type: 'message',
         //name: packet_format,
-        // structure: false,
+        structure: structure,
         packet_data: packet_data,
         packet_decoded: false,
 
@@ -273,10 +275,10 @@ module.exports = function(packet_data = false){
             var header = PacketStructure()
             header.writeBytes(Buffer.from('d00d', 'hex'))
             header.writeUInt16(payload.toBuffer().length)
-            header.writeUInt32('1882') // sequence_number
-            header.writeUInt32('0') // target_participant_id
-            header.writeUInt32('2') // source_participant_id
-            header.writeBytes(Buffer.from('a039', 'hex')) // flags: readFlags(payload.readBytes(2)),
+            header.writeUInt32(device._request_num) // sequence_number
+            header.writeUInt32(device._target_participant_id) // target_participant_id
+            header.writeUInt32(device._source_participant_id) // source_participant_id
+            header.writeBytes(Buffer.from('a039', 'hex')) // flags: readFlags(payload.readBytes(2)), //a01e
             header.writeUInt32('0') // channel_id
             header.writeUInt32('0') // channel_id
 

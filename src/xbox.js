@@ -28,6 +28,8 @@ module.exports = function(ip, certificate)
 
         _connection_status: false,
         _request_num: 1,
+        _target_participant_id: 0,
+        _source_participant_id: 0,
 
         _crypto: false,
         _crypto_iv: false,
@@ -65,7 +67,8 @@ module.exports = function(ip, certificate)
 
         set_participantid: function(participantId)
         {
-            this._participantid = participantId;
+            this._participantid =  participantId;
+            this._source_participant_id = participantId;
         },
 
         shutdown: function()
@@ -89,6 +92,8 @@ module.exports = function(ip, certificate)
             var sSubject   = deviceCert.getSubjectString();   // '/C=US/O=z2'
             var sNotBefore = deviceCert.getNotBefore();       // '100513235959Z'
             var sNotAfter  = deviceCert.getNotAfter();        // '200513235959Z'
+
+            this.set_liveid(deviceCert.getSubjectString().slice(4))
 
             var ecKey = jsrsasign.X509.getPublicKeyFromCertPEM(pem);
 
