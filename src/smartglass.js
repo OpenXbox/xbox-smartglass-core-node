@@ -10,7 +10,10 @@ module.exports = {
 
     _on_discovery_response: [],
     _on_connect_response: [],
+
     _on_console_status: [],
+    _on_local_join: [],
+    _on_acknowledge: [],
 
     discovery: function(options, callback)
     {
@@ -118,8 +121,31 @@ module.exports = {
             if(connectionResult == '0')
             {
                 // Console connected! Set xbox to connected
-                console.log('Xbox succesfully connected!');
+                console.log('Xbox succesfully connected! Sending join...');
                 xbox._connection_status = true;
+
+                var local_join = Packer('message.local_join');
+                var message = local_join.pack(xbox);
+
+                this._send({
+                    ip: options.ip,
+                    port: 5050
+                }, message);
+
+                setInterval(function(){
+                    var ack = Packer('message.acknowledge')
+                    ack.set('low_watermark', xbox._request_num)
+                    var ack_message = ack.pack(xbox)
+
+                    console.log('[smartglass.js:_receive] Sending heartbeat packet')
+
+                    this._send({
+                        ip: options.ip,
+                        port: 5050
+                    }, ack_message);
+                }.bind(this, xbox, options), 15000)
+
+
             } else {
                 // Cound not connect..
                 console.log('Could not connect to xbox. ('+connectionResult+')');
@@ -147,6 +173,14 @@ module.exports = {
 
         this._on_console_status.push(function(response, device, smartglass){
             console.log('[smartglass.js:connect] Console info:', response.packet_decoded.protected_payload)
+        }.bind(this));
+
+        this._on_local_join.push(function(response, device, smartglass){
+            console.log('[smartglass.js:connect] Got local_join:', response.packet_decoded.protected_payload)
+        }.bind(this));
+
+        this._on_acknowledge.push(function(response, device, smartglass){
+            console.log('[smartglass.js:connect] Got acknowledge:', response.packet_decoded.protected_payload)
         }.bind(this));
 
         this._send({
@@ -190,17 +224,19 @@ module.exports = {
 
             // Lets see if we must ack..
             if(response.packet_decoded.flags.need_ack == true){
-                console.log('[smartglass.js:_receive] Packet needs ack.. (sequence_number, list?, list?)')
 
-                var ack = Packer('message.acknowledge');
-                //ack.set('liveid', xbox._liveid)
-                var ack_message = ack.pack(this._consoles[remote.address]);
+                var xbox = this._consoles[remote.address]
+                xbox._request_num = response.packet_decoded.sequence_number
 
-                console.log('[smartglass.js:_receive] Sending ack for packetid:', response.packet_decoded.sequence_number)
-                // this._send({
-                //     ip: device.address,
-                //     port: 5050
-                // }, message);
+                var ack = Packer('message.acknowledge')
+                ack.set('low_watermark', response.packet_decoded.sequence_number)
+                ack.structure.structure.processed_list.value.push({id: response.packet_decoded.sequence_number})
+                var ack_message = ack.pack(xbox)
+
+                this._send({
+                    ip: remote.address,
+                    port: 5050
+                }, ack_message);
             }
 
             var func = '_on_' + message.structure.packet_decoded.name.toLowerCase();
