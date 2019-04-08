@@ -93,6 +93,10 @@ sgClient._on_console_status.push(function(response, device, smartglass){
 
 ## Changelog
 
+0.2.1:
+
+    Fixed a bug that caused the connection to fail because the path to the python signing component was invalid
+
 0.2.0:
 
     Big update! xbox-smartglass-node-core can connect to the Xbox! For now only polling the status of the active app and tuning off the console
