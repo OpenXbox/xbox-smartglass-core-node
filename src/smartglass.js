@@ -31,7 +31,7 @@ module.exports = {
         }, message);
 
         setTimeout(function(client){
-            client._close_client();
+            //client._close_client();
         }, 1000, this);
     },
 
@@ -131,7 +131,7 @@ module.exports = {
                 var message = local_join.pack(xbox);
 
                 this._send({
-                    ip: options.ip,
+                    ip: remote.address,
                     port: 5050
                 }, message);
 
@@ -139,7 +139,7 @@ module.exports = {
                     if((Math.floor(Date.now() / 1000))-this._last_received_time > 30)
                     {
                         console.log('No message for the last 30 seconds. Timeout...')
-                        this._close_client()
+                        this._init_client()
                         return;
                     }
 
@@ -147,11 +147,13 @@ module.exports = {
                     ack.set('low_watermark', xbox._request_num)
                     var ack_message = ack.pack(xbox)
 
+                    //console.log('send ack')
                     this._send({
-                        ip: options.ip,
+                        ip: remote.address,
                         port: 5050
                     }, ack_message);
-                }.bind(this, xbox, options), 15000)
+
+                }.bind(this, xbox, remote), 15000)
 
 
             } else {
@@ -221,9 +223,10 @@ module.exports = {
     {
         this._last_received_time = Math.floor(Date.now() / 1000)
         var message = Packer(message);
+        // console.log('message', message)
         var response = message.unpack(this._consoles[remote.address]);
 
-        //console.log('[smartglass:_receive] Got response: ', response);
+        // console.log('[smartglass:_receive] Got response: ', response);
         var type = response.name;
 
         if(response.packet_decoded.type != 'd00d')
@@ -246,10 +249,16 @@ module.exports = {
                 ack.structure.structure.processed_list.value.push({id: response.packet_decoded.sequence_number})
                 var ack_message = ack.pack(xbox)
 
-                this._send({
-                    ip: remote.address,
-                    port: 5050
-                }, ack_message);
+                try {
+                    this._send({
+                        ip: remote.address,
+                        port: 5050
+                    }, ack_message);
+                }
+                catch(error) {
+                    this._init_client()
+                }
+
             }
 
             var func = '_on_' + message.structure.packet_decoded.name.toLowerCase();
@@ -274,17 +283,23 @@ module.exports = {
         if(options.port == undefined)
             console.log('smartglass._send: port missing');
 
-        this._client.send(message, 0, message.length, options.port, options.ip, function(err, bytes) {
-            // console.log('Sending packet...');
-        });
+        //if(this._client.fd != null){
+            this._client.send(message, 0, message.length, options.port, options.ip, function(err, bytes) {
+                 //console.log('Sending packet to', options.ip);
+            });
+
+        //}
     },
 
     _init_client: function()
     {
-        if(this._client)
-            this._close_client()
+        //this._close_client()
 
         this._on_discovery_response = [];
+        this._on_connect_response = [],
+        this._on_console_status = [],
+        this._on_local_join = [],
+        this._on_acknowledge = [],
 
         this._client = dgram.createSocket('udp4');
         this._client.bind();
@@ -295,6 +310,10 @@ module.exports = {
         this._client.on('message', function(message, remote){
             this._receive(message, remote, this);
         }.bind(this));
+
+        this._client.on('close', function() {
+            console.log('Client UDP socket closed : BYE!')
+        });
 
         return this._client;
     },

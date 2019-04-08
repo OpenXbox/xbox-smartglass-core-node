@@ -157,11 +157,10 @@ module.exports = function(type, packet_data = false){
             minor_version: Type.uInt32('0'),
             build_number: Type.uInt32('0'),
             locale: Type.sgString('en-US'),
-            apps: Type.sgArray('_active_apps', [])
+            apps: Type.sgArray('_active_apps')
         },
         _active_apps: {
             title_id: Type.uInt32('0'),
-            //flags: Type.flags(2, {}),
             flags: Type.bytes(2),
             product_id: Type.bytes(16, ''),
             sandbox_id: Type.bytes(16, ''),
@@ -171,23 +170,23 @@ module.exports = function(type, packet_data = false){
             liveid: Type.sgString(''),
         },
         acknowledge: {
-            low_watermark: Type.uInt32(0),
+            low_watermark: Type.uInt32('0'),
             processed_list: Type.sgList('_acknowledge_list', []),
             rejected_list: Type.sgList('_acknowledge_list', []),
         },
         _acknowledge_list: {
-            id: Type.uInt32(0),
+            id: Type.uInt32('0'),
         },
         local_join: {
-            client_type: Type.uInt16(3),
-            native_width: Type.uInt16(1080),
-            native_height: Type.uInt16(1920),
-            dpi_x: Type.uInt16(96),
-            dpi_y: Type.uInt16(96),
+            client_type: Type.uInt16('3'),
+            native_width: Type.uInt16('1080'),
+            native_height: Type.uInt16('1920'),
+            dpi_x: Type.uInt16('96'),
+            dpi_y: Type.uInt16('96'),
             device_capabilities: Type.bytes(8, Buffer.from('ffffffffffffffff', 'hex')),
-            client_version: Type.uInt32(15),
-            os_major_version: Type.uInt32(6),
-            os_minor_version: Type.uInt32(2),
+            client_version: Type.uInt32('15'),
+            os_major_version: Type.uInt32('6'),
+            os_minor_version: Type.uInt32('2'),
             display_name: Type.sgString('Xbox-Smartglass-Node'),
         },
     };
@@ -354,7 +353,8 @@ module.exports = function(type, packet_data = false){
 
             packet.name = packet.flags.type
             this.name = packet.flags.type
-            packet.protected_payload = packet.protected_payload.slice(0, -32);
+            //console.log('packet type:', packet)
+            packet.protected_payload = Buffer.from(packet.protected_payload.slice(0, -32));
             packet.signature = packet.protected_payload.slice(-32)
 
             // Lets decrypt the data when the payload is encrypted
@@ -365,13 +365,14 @@ module.exports = function(type, packet_data = false){
                 packet.decrypted_payload = PacketStructure(decrypted_payload).toBuffer()
                 decrypted_payload = PacketStructure(decrypted_payload)
 
-                this.structure = Packet[packet.name];
-
-                var protected_structure = Packet[packet.name];
+                this.structure = Packet[packet.name]
+                protected_structure = Packet[packet.name]
                 packet['protected_payload'] = {}
 
                 for(name in protected_structure){
+                    //console.log('unpacking', name, decrypted_payload.toBuffer().toString('hex'))
                     packet.protected_payload[name] = protected_structure[name].unpack(decrypted_payload)
+                    //console.log('unpacked', packet.protected_payload)
                 }
             }
 

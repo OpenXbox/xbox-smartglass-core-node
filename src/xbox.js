@@ -100,7 +100,6 @@ module.exports = function(ip, certificate)
 
             // Sign certificate using python
             const { spawnSync } = require('child_process');
-            console.log('__file__', __dirname )
             var process = spawnSync("python", [__dirname+"/python/crypto.py", ecKey.pubKeyHex])
             object = JSON.parse(process.stdout);
 
