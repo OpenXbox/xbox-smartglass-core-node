@@ -3,3 +3,11 @@ node_js:
     - "11"
     - "10"
     - "9"
+
+addons:
+  sonarcloud:
+    organization: "unknownskl-github"
+
+script:
+  - sonar-scanner
+  - npm test
