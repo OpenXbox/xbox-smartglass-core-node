@@ -1,5 +1,8 @@
 # Xbox-Smartglass-Core-Node
 [![Build Status](https://travis-ci.org/unknownskl/xbox-smartglass-core-node.svg?branch=master)](https://travis-ci.org/unknownskl/xbox-smartglass-core-node)
+[![Technical debt](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=sqale_index)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=sqale_index)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=bugs)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=bugs)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=coverage)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=coverage)
 
 NodeJS smartglass library for controlling a Xbox
 
