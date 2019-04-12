@@ -53,7 +53,7 @@ module.exports = {
             {
                 setTimeout(sendBoot, 500, client, callback);
             } else {
-                // console.log('@TODO: Check if console is booted... return true');
+                // @TODO: Check if console is booted and return true when success
                 callback(true);
                 client._close_client();
             }
@@ -68,7 +68,6 @@ module.exports = {
 
         this._on_connect_response.push(function(response, device, smartglass){
             var xbox = this._consoles[device.address];
-            console.log('[smartglass] - Sending shutdown:', xbox._connection_status)
 
             xbox.get_requestnum()
             var poweroff = Packer('message.power_off');
@@ -108,10 +107,7 @@ module.exports = {
             //xbox.set_iv(response.packet_decoded.iv);
 
             if(xbox._connection_status == true)
-            {
-                console.log('Console is already connected. Ignore connect response packet..');
                 return;
-            }
 
             var connectionResult = response.packet_decoded.protected_payload.connect_result;
             var pairingState = response.packet_decoded.protected_payload.pairing_state;
