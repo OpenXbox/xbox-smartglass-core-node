@@ -2,8 +2,6 @@ module.exports = function(packet)
 {
     if(packet == undefined)
         packet = Buffer.from('');
-    else
-        packet = packet;
 
     return {
         _packet: packet,
@@ -35,17 +33,14 @@ module.exports = function(packet)
             return this;
         },
 
-        readSGString: function(buffer = false)
+        readSGString: function()
         {
             var dataLength = this.readUInt16();
             var data = this._packet.slice(this._offset, this._offset+dataLength);
 
             this._offset = (this._offset+1+dataLength);
 
-            if(buffer == false)
-                return data;
-            else
-                return data;
+            return data;
         },
 
         writeBytes: function(data, type)
@@ -58,11 +53,13 @@ module.exports = function(packet)
 
         readBytes: function(count = false)
         {
+            var data =  '';
+
             if(count == false){
-                var data = this._packet.slice(this._offset);
+                data = this._packet.slice(this._offset);
                 this._offset = (this._totalLength);
             } else {
-                var data = this._packet.slice(this._offset, this._offset+count);
+                data = this._packet.slice(this._offset, this._offset+count);
                 this._offset = (this._offset+count);
             }
 
