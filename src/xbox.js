@@ -5,7 +5,7 @@ const uuidParse = require('uuid-parse');
 var uuid = require('uuid');
 
 const os = require('os');
-var EOL = require('os').EOL;
+const EOL = os.EOL;
 
 const crypto = require('crypto');
 var jsrsasign = require('jsrsasign');
@@ -30,22 +30,22 @@ module.exports = function(ip, certificate)
         _crypto_device_keys: false,
         _crypto_client_keys: false,
 
-        get_ip: function()
+        getIp: function()
         {
             return this._ip
         },
 
-        get_certificate: function()
+        getCertificate: function()
         {
             return this._certificate
         },
 
-        set_iv: function(iv)
+        getLiveid: function()
         {
-            this._iv = iv;
+            return this._liveid;
         },
 
-        set_liveid: function(liveid)
+        setLiveid: function(liveid)
         {
             this._liveid = liveid;
         },
@@ -69,7 +69,8 @@ module.exports = function(ip, certificate)
         {
             var iv = this._generate_iv();
 
-            var pem = '-----BEGIN CERTIFICATE-----'+EOL+this._certificate.toString('base64').match(/.{0,64}/g).join('\n')+'-----END CERTIFICATE-----';
+            // // Set liveid
+            var pem = '-----BEGIN CERTIFICATE-----'+EOL+this.getCertificate().toString('base64').match(/.{0,64}/g).join('\n')+'-----END CERTIFICATE-----';
             var deviceCert = new jsrsasign.X509();
             deviceCert.readCertPEM(pem);
 
@@ -79,17 +80,20 @@ module.exports = function(ip, certificate)
             var sNotBefore = deviceCert.getNotBefore();       // '100513235959Z'
             var sNotAfter  = deviceCert.getNotAfter();        // '200513235959Z'
 
-            this.set_liveid(deviceCert.getSubjectString().slice(4))
+            this.setLiveid(deviceCert.getSubjectString().slice(4))
 
-            var ecKey = jsrsasign.X509.getPublicKeyFromCertPEM(pem);
-
+            // Set uuid
             var uuid4 = Buffer.from(uuidParse.parse(uuid.v4()));
+
+            // Create public key
+            var ecKey = jsrsasign.X509.getPublicKeyFromCertPEM(pem);
 
             // Sign certificate using python
             const { spawnSync } = require('child_process');
             var process = spawnSync("python", [__dirname+"/python/crypto.py", ecKey.pubKeyHex])
             object = JSON.parse(process.stdout);
 
+            // Load crypto data
             this.loadCrypto(object.public_key, object.secret);
 
             var discovery_request = Packer('simple.connect_request');
