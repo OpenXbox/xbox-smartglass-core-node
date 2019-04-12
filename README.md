@@ -2,6 +2,8 @@
 
 NodeJS smartglass library for controlling a Xbox
 
+[![Build Status](https://travis-ci.org/unknownskl/xbox-smartglass-core-node.svg?branch=master)](https://travis-ci.org/unknownskl/xbox-smartglass-core-node)
+
 ## Dependencies
 
 - NPM
@@ -92,6 +94,14 @@ sgClient._on_console_status.push(function(response, device, smartglass){
 - Protocol can be broken sometimes.
 
 ## Changelog
+
+0.2.2:
+
+    No code changes. Integrated Travis CI.
+
+0.2.1:
+
+    Fixed a bug that caused the connection to fail because the path to the python signing component was invalid
 
 0.2.0:
 
