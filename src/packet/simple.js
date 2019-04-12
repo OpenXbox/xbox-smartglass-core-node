@@ -205,7 +205,7 @@ module.exports = function(packet_format, packet_data = false){
                 var packet = this._pack(Buffer.from('DD00', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
 
             } else if(this.name == 'discovery_response'){
-                var packet = this._pack(Buffer.from('DD01', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
+                var packet = this._pack(Buffer.from('DD01', 'hex'), payload.toBuffer(), '2')
 
             } else if(this.name == 'connect_request'){
 
@@ -219,25 +219,25 @@ module.exports = function(packet_format, packet_data = false){
                 ]);
 
             } else if(this.name == 'connect_response'){
-                var packet = this._pack(Buffer.from('CC01', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
+                var packet = this._pack(Buffer.from('CC01', 'hex'), payload.toBuffer(), '2')
 
-            } else if(this.name == 'connect_request_protected'){
-                // Pad packet
-                if(payload.toBuffer().length > 16)
-                {
-                    var padStart = payload.toBuffer().length % 16;
-                    var padTotal = (16-padStart);
-                    for(var paddingnum = (padStart+1); paddingnum <= 16; paddingnum++)
-                    {
-                        payload.writeUInt8(padTotal);
-
-                    }
-                }
-
-                var encrypted_payload = device._crypto._encrypt(payload.toBuffer(), device._crypto.getIv());
-                encrypted_payload = PacketStructure(encrypted_payload)
-
-                packet = encrypted_payload.toBuffer();
+            // } else if(this.name == 'connect_request_protected'){
+            //     // Pad packet
+            //     if(payload.toBuffer().length > 16)
+            //     {
+            //         var padStart = payload.toBuffer().length % 16;
+            //         var padTotal = (16-padStart);
+            //         for(var paddingnum = (padStart+1); paddingnum <= 16; paddingnum++)
+            //         {
+            //             payload.writeUInt8(padTotal);
+            //
+            //         }
+            //     }
+            //
+            //     var encrypted_payload = device._crypto._encrypt(payload.toBuffer(), device._crypto.getIv());
+            //     encrypted_payload = PacketStructure(encrypted_payload)
+            //
+            //     packet = encrypted_payload.toBuffer();
             } else {
                 packet = payload.toBuffer();
             }
