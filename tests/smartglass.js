@@ -31,7 +31,7 @@ describe('smartglass', function(){
             sgClient.connect({
                 ip: '127.0.0.1'
             }, function(result){
-                // assert.fail('Should not trigger a response')
+                assert.fail('Should not trigger a response')
             })
         });
     });
@@ -43,7 +43,7 @@ describe('smartglass', function(){
                 ip: '127.0.0.1'
             }, function(result){
                 console.log('result', result)
-                // assert.fail('Should not trigger a response')
+                assert.fail('Should not trigger a response')
             })
         });
     });

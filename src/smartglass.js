@@ -18,7 +18,7 @@ module.exports = function()
 
         discovery: function(options, callback)
         {
-            var client = this._init_client();
+            this._init_client();
 
             var discovery_packet = Packer('simple.discovery_request')
             var message  = discovery_packet.pack()
@@ -39,7 +39,7 @@ module.exports = function()
 
         powerOn: function(options, callback)
         {
-            var client = this._init_client();
+            this._init_client();
 
             var poweron_packet = Packer('simple.poweron')
             poweron_packet.set('liveid', options.live_id)
@@ -89,7 +89,7 @@ module.exports = function()
 
         connect: function(options, callback)
         {
-            var client = this._init_client();
+            this._init_client();
 
             var discovery_request = Packer('simple.discovery_request');
             var message = discovery_request.pack();
@@ -101,8 +101,13 @@ module.exports = function()
 
             this._on_discovery_response.push(function(response, device, smartglass){
                 var xbox = Xbox(device.address, response.packet_decoded.certificate);
+                var message = xbox.connect();
 
-                this._connect(device.address, device.port, xbox);
+                this._send({
+                    'ip': device.address,
+                    'port': device.port
+                }, message);
+
                 this._consoles[device.address] = xbox;
             }.bind(this));
 
@@ -207,17 +212,6 @@ module.exports = function()
             return this._consoles;
         },
 
-        /* Private functions */
-        _connect: function(address, port, xbox)
-        {
-            var message = xbox.connect();
-
-            this._send({
-                'ip': address,
-                'port': port
-            }, message);
-        },
-
         _receive: function(message, remote, client)
         {
             this._last_received_time = Math.floor(Date.now() / 1000)
@@ -309,7 +303,7 @@ module.exports = function()
             }.bind(this));
 
             this._client.on('close', function() {
-                console.log('Client UDP socket closed : BYE!')
+                // console.log('Client UDP socket closed : BYE!')
             });
 
             return this._client;

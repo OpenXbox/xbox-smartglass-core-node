@@ -22,13 +22,15 @@ commander
 if(process.argv.length <= 2)
     commander.help();
 
+var sgClient = Smartglass()
+
 if(commander.boot == true)
 {
     if(commander.live_id == undefined)
         console.error('--live_id parameter required');
     else {
         console.log('Trying to boot device...');
-        Smartglass.power_on({
+        sgClient.powerOn({
             live_id: commander.live_id,
             tries: commander.tries,
             ip: commander.ip
@@ -43,7 +45,7 @@ if(commander.boot == true)
 } else if(commander.discover)
 {
     console.log('Trying to discover devices...');
-    Smartglass.discovery({
+    sgClient.discovery({
         ip: commander.ip
     }, function(device, address){
         console.log('- Device found: ' + device.name);
@@ -57,21 +59,41 @@ if(commander.boot == true)
 {
     console.log('Trying to connect to device...');
 
-    Smartglass.connect({
+    sgClient.connect({
         ip: commander.ip,
         liveid: commander.live_id
     }, function(result){
-        console.log('- Device found: ' + result);
+        console.log('Connected to Xbox');
     });
+
+    var deviceStatus = {
+        current_app: false,
+        connection_status: false
+    }
+
+    sgClient._on_console_status.push(function(response, device, smartglass){
+        deviceStatus.connection_status = true
+
+        if(response.packet_decoded.protected_payload.apps[0] != undefined){
+            if(deviceStatus.current_app != response.packet_decoded.protected_payload.apps[0].aum_id){
+                deviceStatus.current_app = response.packet_decoded.protected_payload.apps[0].aum_id
+                console.log('Current active apps:')
+                for(var app in response.packet_decoded.protected_payload.apps)
+                {
+                    console.log('- aum:', response.packet_decoded.protected_payload.apps[app].aum_id)
+                }
+            }
+        }
+    }.bind(deviceStatus));
 
 } else if(commander.shutdown)
 {
     console.log('Trying to connect to device...');
 
-    Smartglass.shutdown({
-        ip: commander.ip,
-        liveid: commander.live_id
+    sgClient.powerOff({
+        ip: commander.ip
     }, function(result){
-        console.log('- Device found: ' + result);
+        console.log('Turned off device');
+        sgClient._close_client()
     });
 }
