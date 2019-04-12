@@ -1,6 +1,4 @@
-var SimplePacket = require('./simplepacket.js');
 var PacketStructure = require('./packet/structure.js');
-var MessagePacket = require('./packet/message.js');
 var Packer = require('./packet/packer');
 const SGCrypto = require('./sgcrypto.js');
 const os = require('os');
@@ -69,13 +67,6 @@ module.exports = function(ip, certificate)
         {
             this._participantid =  participantId;
             this._source_participant_id = participantId;
-        },
-
-        shutdown: function()
-        {
-            var packet = new MessagePacket(this);
-
-            return packet.pack(0x39, this._participantid, this._liveid);
         },
 
         connect: function()

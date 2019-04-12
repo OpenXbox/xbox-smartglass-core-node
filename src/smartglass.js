@@ -1,6 +1,5 @@
 const dgram = require('dgram');
 const SimplePacket = require('./simplepacket');
-const MessagePacket = require('./packet/message');
 const Packer = require('./packet/packer');
 const Xbox = require('./xbox');
 
