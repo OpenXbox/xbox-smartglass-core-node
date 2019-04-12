@@ -1,8 +1,7 @@
 # Xbox-Smartglass-Core-Node
+[![Build Status](https://travis-ci.org/unknownskl/xbox-smartglass-core-node.svg?branch=master)](https://travis-ci.org/unknownskl/xbox-smartglass-core-node)
 
 NodeJS smartglass library for controlling a Xbox
-
-[![Build Status](https://travis-ci.org/unknownskl/xbox-smartglass-core-node.svg?branch=master)](https://travis-ci.org/unknownskl/xbox-smartglass-core-node)
 
 ## Dependencies
 
