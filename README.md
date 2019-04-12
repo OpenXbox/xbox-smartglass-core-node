@@ -1,4 +1,5 @@
 # Xbox-Smartglass-Core-Node
+[![Build Status](https://travis-ci.org/unknownskl/xbox-smartglass-core-node.svg?branch=master)](https://travis-ci.org/unknownskl/xbox-smartglass-core-node)
 
 NodeJS smartglass library for controlling a Xbox
 
@@ -92,6 +93,10 @@ sgClient._on_console_status.push(function(response, device, smartglass){
 - Protocol can be broken sometimes.
 
 ## Changelog
+
+0.2.2:
+
+    No code changes. Integrated Travis CI.
 
 0.2.1:
 

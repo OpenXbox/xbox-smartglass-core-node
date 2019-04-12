@@ -1,6 +1,6 @@
 {
   "name": "xbox-smartglass-core-node",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "NodeJS smartglass library for controlling a Xbox",
   "main": "src/smartglass.js",
   "scripts": {
