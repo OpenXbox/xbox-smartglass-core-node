@@ -1,5 +1,4 @@
 const dgram = require('dgram');
-const SimplePacket = require('./simplepacket');
 const Packer = require('./packet/packer');
 const Xbox = require('./xbox');
 
@@ -18,7 +17,9 @@ module.exports = {
     discovery: function(options, callback)
     {
         var client = this._init_client();
-        var message = SimplePacket.discovery();
+
+        var discovery_packet = Packer('simple.discovery_request')
+        var message  = discovery_packet.pack()
 
         this._on_discovery_response.push(function(response, device, smartglass){
             callback(response.packet_decoded, device, smartglass);
@@ -30,14 +31,17 @@ module.exports = {
         }, message);
 
         setTimeout(function(client){
-            //client._close_client();
+            client._close_client();
         }, 1000, this);
     },
 
     power_on: function(options, callback)
     {
         var client = this._init_client();
-        var message = SimplePacket.power_on(options.live_id);
+
+        var poweron_packet = Packer('simple.poweron')
+        poweron_packet.set('liveid', options.live_id)
+        var message  = poweron_packet.pack()
 
         var try_num = 0;
 
@@ -85,7 +89,6 @@ module.exports = {
     connect: function(options, callback)
     {
         var client = this._init_client();
-        // var message = SimplePacket.discovery();
 
         var discovery_request = Packer('simple.discovery_request');
         var message = discovery_request.pack();

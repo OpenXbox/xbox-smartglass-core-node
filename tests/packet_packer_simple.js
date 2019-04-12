@@ -1,6 +1,6 @@
 var assert = require('assert');
 var fs = require('fs');
-var Packer = require('../src/packet/packer');
+const Packer = require('../src/packet/packer');
 var Xbox = require('../src/xbox');
 
 var secret = Buffer.from('82bba514e6d19521114940bd65121af2'+'34c53654a8e67add7710b3725db44f77'+'30ed8e3da7015a09fe0f08e9bef3853c0506327eb77c9951769d923d863a2f5e', 'hex');
