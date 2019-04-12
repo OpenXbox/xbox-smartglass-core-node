@@ -9,6 +9,30 @@ describe('sgcrypto', function(){
         assert.deepStrictEqual(rand_iv.length, 0);
     });
 
+    it('should return an encryption key', function(){
+        var clientCrypto = sgCrypto();
+        clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');
+        var encryptionKey = clientCrypto.getEncryptionKey();
+
+        assert.deepStrictEqual(encryptionKey, Buffer.from('0123456789012345'));
+    });
+
+    it('should return a secret', function(){
+        var clientCrypto = sgCrypto();
+        clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');
+        var secret = clientCrypto.getSecret();
+
+        assert.deepStrictEqual(secret, Buffer.from('0123456789012345678901234567890123456789012345678901234567890123'));
+    });
+
+    it('should return a hmac', function(){
+        var clientCrypto = sgCrypto();
+        clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');
+        var hmac = clientCrypto.getHmac();
+
+        assert.deepStrictEqual(hmac, Buffer.from('23456789012345678901234567890123'));
+    });
+
     it('should generate a static iv with a secret', function(){
         var clientCrypto = sgCrypto();
         clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');

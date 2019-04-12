@@ -1,8 +1,4 @@
-//let pythonBridge = require('python-bridge');
-//let python = pythonBridge();
-
 const crypto = require('crypto');
-
 
 module.exports = function()
 {
@@ -17,8 +13,8 @@ module.exports = function()
         {
             if(pubkey != undefined && secret != undefined)
             {
-                this.pubkey = pubkey;
-                this.secret = secret;
+                this.pubkey = Buffer.from(pubkey);
+                this.secret = Buffer.from(secret);
             }
 
             var data = {
@@ -77,25 +73,25 @@ module.exports = function()
             return this.hash_key;
         },
 
-        encrypt: function(data, iv = undefined, useIv = false)
-        {
-            data = Buffer.from(data);
-
-            if(iv == undefined)
-                iv = Buffer.from('\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00');
-
-            if(useIv != false){
-                var cipher = crypto.createCipheriv('aes-128-cbc', this.iv, iv);
-            } else {
-                var cipher = crypto.createCipheriv('aes-128-cbc', this.getEncryptionKey(), iv);
-            }
-
-            cipher.setAutoPadding(false);
-            var encryptedPayload = cipher.update(data.toString('hex'), 'hex', 'hex');
-            encryptedPayload += cipher.final('hex');
-
-            return Buffer.from(encryptedPayload, 'hex').toString('hex');
-        },
+        // encrypt: function(data, iv = undefined, useIv = false)
+        // {
+        //     data = Buffer.from(data);
+        //
+        //     if(iv == undefined)
+        //         iv = Buffer.from('\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00');
+        //
+        //     if(useIv != false){
+        //         var cipher = crypto.createCipheriv('aes-128-cbc', this.iv, iv);
+        //     } else {
+        //         var cipher = crypto.createCipheriv('aes-128-cbc', this.getEncryptionKey(), iv);
+        //     }
+        //
+        //     cipher.setAutoPadding(false);
+        //     var encryptedPayload = cipher.update(data.toString('hex'), 'hex', 'hex');
+        //     encryptedPayload += cipher.final('hex');
+        //
+        //     return Buffer.from(encryptedPayload, 'hex').toString('hex');
+        // },
 
 
         _encrypt(data, key = false, iv = false)
@@ -139,14 +135,14 @@ module.exports = function()
             return this._removePadding(Buffer.from(decryptedPayload, 'binary'));
         },
 
-        sign: function(data)
-        {
-            var hashHmac = crypto.createHmac('sha256', this.getHashKey());
-            hashHmac.update(data);
-            var protectedPayloadHash = hashHmac.digest('hex');
-
-            return protectedPayloadHash;
-        },
+        // sign: function(data)
+        // {
+        //     var hashHmac = crypto.createHmac('sha256', this.getHashKey());
+        //     hashHmac.update(data);
+        //     var protectedPayloadHash = hashHmac.digest('hex');
+        //
+        //     return protectedPayloadHash;
+        // },
 
         _sign: function(data)
         {

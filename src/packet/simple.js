@@ -47,21 +47,6 @@ module.exports = function(packet_format, packet_data = false){
                     return packet_structure.readSGString().toString();
                 }
             }
-        },
-        optional: function(type){
-            return {
-                type: type,
-                pack: function(packet_structure){
-                    if(type.value == ''){
-                        return packet_structure
-                    } else {
-                        return this.type.pack(packet_structure)
-                    }
-                },
-                unpack: function(packet_structure){
-                    return this.type.unpack(packet_structure)
-                }
-            }
         }
     }
 
