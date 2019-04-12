@@ -1,5 +1,5 @@
 var SimplePacket = require('./simple');
-var MessagePacket = require('./messagePack');
+var MessagePacket = require('./message');
 
 module.exports = function(type)
 {

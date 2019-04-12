@@ -25,16 +25,15 @@
     "smartglass"
   ],
   "dependencies": {
-    "baseconvert": "^1.0.0",
-    "commander": "^2.15.1",
+    "commander": "^2.20.0",
     "hex-to-binary": "^1.0.1",
     "jsrsasign": "^8.0.12",
-    "mocha": "^5.2.0",
     "uuid": "^3.3.2",
     "uuid-parse": "^1.1.0",
-    "x509": "^0.3.3"
+    "x509": "^0.3.4"
   },
   "devDependencies": {
-    "nyc": "^13.3.0"
+    "nyc": "^13.3.0",
+    "mocha": "^5.2.0"
   }
 }

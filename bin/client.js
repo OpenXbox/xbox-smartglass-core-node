@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 var Smartglass = require('../src/smartglass');
 var commander = require('commander');
-var assert = require('assert');
 var pkgInfo = require('../package.json');
 
 const ADDR_BROADCAST = '255.255.255.255';

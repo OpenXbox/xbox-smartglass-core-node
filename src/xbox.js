@@ -1,18 +1,14 @@
-var PacketStructure = require('./packet/structure.js');
 var Packer = require('./packet/packer');
 const SGCrypto = require('./sgcrypto.js');
+
+const uuidParse = require('uuid-parse');
+var uuid = require('uuid');
+
 const os = require('os');
 var EOL = require('os').EOL;
 
 const crypto = require('crypto');
-//const { ECDH } = require('crypto');
-//const x509 = require('x509');
-const uuidParse = require('uuid-parse');
-
 var jsrsasign = require('jsrsasign');
-var keyutil = jsrsasign.KEYUTIL;
-var uuid = require('uuid');
-//var forge = require('node-forge');
 
 module.exports = function(ip, certificate)
 {
