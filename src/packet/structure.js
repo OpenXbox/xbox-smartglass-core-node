@@ -15,6 +15,11 @@ module.exports = function(packet)
             this._offset = offset;
         },
 
+        getOffset: function()
+        {
+            return this._offset;
+        },
+
         writeSGString: function(data)
         {
             var lengthBuffer = Buffer.allocUnsafe(2);
@@ -112,23 +117,11 @@ module.exports = function(packet)
             return data;
         },
 
-        // writeUInt64: function(data)
-        // {
-        //     var tempBuffer = Buffer.allocUnsafe(8);
-        //     tempBuffer.writeUIntBE(data, 8);
-        //     this._add(tempBuffer);
-        // },
-
         readUInt64: function()
         {
-            var n = this.readUInt32();
-            var low = this.readUInt32();
+            var data = this.readBytes(8)
 
-            var calc =  n * 4294967296.0 + low;
-            if (low < 0)
-                calc += 4294967296;
-
-            return calc;
+            return data
         },
 
         toBuffer: function()
@@ -144,12 +137,5 @@ module.exports = function(packet)
                 data
             ]);
         },
-
-        _readInt64BEasFloat(buffer, offset) {
-            var low = readInt32BE(buffer, offset + 4);
-            var n = readInt32BE(buffer, offset) * 4294967296.0 + low;
-            if (low < 0) n += 4294967296;
-            return n;
-        }
     };
 }
