@@ -6,7 +6,8 @@ var deviceStatus = {
     connection_status: false
 }
 
-var sgClient = Smartglass.connect({
+var sgClient = Smartglass()
+sgClient.connect({
     ip: '192.168.2.5'
 }, function(result){
     if(result === true){

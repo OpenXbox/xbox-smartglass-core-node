@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 var Smartglass = require('../src/smartglass');
 
-Smartglass.shutdown({
+var sgClient = Smartglass()
+sgClient.powerOff({
     ip: '192.168.2.5'
 }, function(result){
     if(result === true){
