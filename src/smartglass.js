@@ -13,7 +13,6 @@ module.exports = function()
         _on_connect_response: [],
 
         _on_console_status: [],
-        _on_local_join: [],
         _on_acknowledge: [],
 
         discovery: function(options, callback)
@@ -68,7 +67,6 @@ module.exports = function()
 
         powerOff: function(options, callback)
         {
-            // Connect to console
             this.connect(options, callback);
 
             this._on_connect_response.push(function(response, device, smartglass){
@@ -113,20 +111,17 @@ module.exports = function()
 
             this._on_connect_response.push(function(callback, timeout, response, remote){
                 var xbox = this._consoles[remote.address];
-                //xbox.set_iv(response.packet_decoded.iv);
 
                 if(xbox._connection_status == true)
                     return;
 
                 var connectionResult = response.packet_decoded.protected_payload.connect_result;
-                //var pairingState = response.packet_decoded.protected_payload.pairing_state;
                 var participantId = response.packet_decoded.protected_payload.participant_id;
 
                 xbox.set_participantid(participantId);
 
                 if(connectionResult == '0')
                 {
-                    // Console connected! Set xbox to connected
                     xbox._connection_status = true;
                     clearTimeout(timeout)
                     callback(true)
@@ -151,17 +146,14 @@ module.exports = function()
                         ack.set('low_watermark', xbox._request_num)
                         var ack_message = ack.pack(xbox)
 
-                        //console.log('send ack')
                         this._send({
                             ip: remote.address,
                             port: 5050
                         }, ack_message);
 
                     }.bind(this, xbox, remote), 15000)
-
-
                 } else {
-                    // Cound not connect..
+
                     console.log('Could not connect to xbox. ('+connectionResult+')');
                     if(connectionResult == 0x02){
                         console.log('Reason: Unknown Error')
@@ -187,14 +179,6 @@ module.exports = function()
                 }
             }.bind(this, callback, timeout));
 
-            // this._on_console_status.push(function(response, device, smartglass){
-            //     console.log('[smartglass.js:connect] Console info:', response.packet_decoded.protected_payload)
-            // }.bind(this));
-
-            this._on_local_join.push(function(response, device, smartglass){
-                // console.log('[smartglass.js:connect] Got local_join:', response.packet_decoded.protected_payload)
-            }.bind(this));
-
             this._on_acknowledge.push(function(response, device, smartglass){
                 // console.log('[smartglass.js:connect] Got acknowledge:', response.packet_decoded.protected_payload)
             }.bind(this));
@@ -216,10 +200,8 @@ module.exports = function()
         {
             this._last_received_time = Math.floor(Date.now() / 1000)
             message = Packer(message);
-            // console.log('message', message)
             var response = message.unpack(this._consoles[remote.address]);
 
-            // console.log('[smartglass:_receive] Got response: ', response);
             var type = response.name;
             var func = '';
 
@@ -232,7 +214,6 @@ module.exports = function()
                     return;
                 }
 
-                // Lets see if we must ack..
                 if(response.packet_decoded.flags.need_ack == true){
 
                     var xbox = this._consoles[remote.address]
@@ -250,7 +231,7 @@ module.exports = function()
                         }, ack_message);
                     }
                     catch(error) {
-                        this._init_client()
+                        this._close_client()
                     }
 
                 }
@@ -258,7 +239,6 @@ module.exports = function()
                 func = '_on_' + message.structure.packet_decoded.name.toLowerCase();
             }
 
-            //console.log('[smartglass.js:_receive] '+func+' called');
             if(this[func] != undefined)
             {
                 for(var trigger in this[func]){
@@ -271,13 +251,6 @@ module.exports = function()
 
         _send: function(options, message)
         {
-            if(options.ip == undefined)
-                console.log('smartglass._send: ip missing');
-
-            if(options.port == undefined)
-                console.log('smartglass._send: port missing');
-
-
             this._client.send(message, 0, message.length, options.port, options.ip, function(err, bytes) {
                  //console.log('Sending packet to', options.ip);
             });
@@ -288,14 +261,10 @@ module.exports = function()
             this._on_discovery_response = [];
             this._on_connect_response = [];
             this._on_console_status = [];
-            this._on_local_join = [];
             this._on_acknowledge = [];
 
             this._client = dgram.createSocket('udp4');
             this._client.bind();
-            // this._client.on("listening", function () {
-            //     //this._client_info = this._client.address();
-            // });
 
             this._client.on('message', function(message, remote){
                 this._receive(message, remote, this);
@@ -316,7 +285,6 @@ module.exports = function()
             this._on_discovery_response = [];
             this._on_connect_response = [];
             this._on_console_status = [];
-            this._on_local_join = [];
             this._on_acknowledge = [];
         }
     }

@@ -181,7 +181,6 @@ module.exports = function(packet_format, packet_data = false){
 
                     var protected_payload_length = protected_payload.toBuffer().length
 
-                    // Pad packet
                     if(protected_payload.toBuffer().length % 16 > 0)
                     {
                         var padStart = protected_payload.toBuffer().length % 16;

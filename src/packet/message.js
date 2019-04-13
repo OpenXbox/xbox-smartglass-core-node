@@ -86,7 +86,6 @@ module.exports = function(type, packet_data = false){
                     }
 
                     return packet_structure;
-                    //return packet_structure.writeSGString(this.value);
                 },
                 unpack: function(packet_structure){
                     var array_count = packet_structure.readUInt16();
@@ -126,7 +125,6 @@ module.exports = function(type, packet_data = false){
                     }
 
                     return packet_structure;
-                    //return packet_structure.writeSGString(this.value);
                 },
                 unpack: function(packet_structure){
                     var array_count = packet_structure.readUInt32();
@@ -265,7 +263,6 @@ module.exports = function(type, packet_data = false){
 
     function setFlags(type)
     {
-        //var msgType = getMsgType(type)
         var message_flags = {
             acknowledge: Buffer.from('8001', 'hex'),
             0x2: "Group",
@@ -370,9 +367,7 @@ module.exports = function(type, packet_data = false){
                 packet['protected_payload'] = {}
 
                 for(name in protected_structure){
-                    //console.log('unpacking', name, decrypted_payload.toBuffer().toString('hex'))
                     packet.protected_payload[name] = protected_structure[name].unpack(decrypted_payload)
-                    //console.log('unpacked', packet.protected_payload)
                 }
             }
 
@@ -388,17 +383,15 @@ module.exports = function(type, packet_data = false){
                 this.structure[name].pack(payload)
             }
 
-            //var packet = this._pack(Buffer.from('D001', 'hex'), payload.toBuffer(), Buffer.from('0002', 'hex'))
             var header = PacketStructure()
             header.writeBytes(Buffer.from('d00d', 'hex'))
             header.writeUInt16(payload.toBuffer().length)
-            header.writeUInt32(device._request_num) // sequence_number
-            header.writeUInt32(device._target_participant_id) // target_participant_id
-            header.writeUInt32(device._source_participant_id) // source_participant_id
-            header.writeBytes(setFlags(this.name)) // flags: readFlags(payload.readBytes(2)), //a01e
-            header.writeBytes(this.channel_id) // channel_id
+            header.writeUInt32(device._request_num)
+            header.writeUInt32(device._target_participant_id)
+            header.writeUInt32(device._source_participant_id)
+            header.writeBytes(setFlags(this.name))
+            header.writeBytes(this.channel_id)
 
-            // Pad packet
             if(payload.toBuffer().length % 16 > 0)
             {
                 var padStart = payload.toBuffer().length % 16;
@@ -409,8 +402,6 @@ module.exports = function(type, packet_data = false){
                 }
             }
 
-            // console.log('payload repack:', payload.toBuffer().toString('hex'))
-
             var key = device._crypto._encrypt(header.toBuffer().slice(0, 16), device._crypto.getIv());
             var encrypted_payload = device._crypto._encrypt(payload.toBuffer(), device._crypto.getEncryptionKey(), key);
 
@@ -419,7 +410,6 @@ module.exports = function(type, packet_data = false){
                 encrypted_payload
             ]);
 
-            // Sign protected payload
             var protected_payload_hash = device._crypto._sign(packet);
             packet = Buffer.concat([
                 packet,

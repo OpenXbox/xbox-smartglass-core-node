@@ -73,27 +73,6 @@ module.exports = function()
             return this.hash_key;
         },
 
-        // encrypt: function(data, iv = undefined, useIv = false)
-        // {
-        //     data = Buffer.from(data);
-        //
-        //     if(iv == undefined)
-        //         iv = Buffer.from('\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00');
-        //
-        //     if(useIv != false){
-        //         var cipher = crypto.createCipheriv('aes-128-cbc', this.iv, iv);
-        //     } else {
-        //         var cipher = crypto.createCipheriv('aes-128-cbc', this.getEncryptionKey(), iv);
-        //     }
-        //
-        //     cipher.setAutoPadding(false);
-        //     var encryptedPayload = cipher.update(data.toString('hex'), 'hex', 'hex');
-        //     encryptedPayload += cipher.final('hex');
-        //
-        //     return Buffer.from(encryptedPayload, 'hex').toString('hex');
-        // },
-
-
         _encrypt(data, key = false, iv = false)
         {
             data = Buffer.from(data);
@@ -135,15 +114,6 @@ module.exports = function()
             return this._removePadding(Buffer.from(decryptedPayload, 'binary'));
         },
 
-        // sign: function(data)
-        // {
-        //     var hashHmac = crypto.createHmac('sha256', this.getHashKey());
-        //     hashHmac.update(data);
-        //     var protectedPayloadHash = hashHmac.digest('hex');
-        //
-        //     return protectedPayloadHash;
-        // },
-
         _sign: function(data)
         {
             var hashHmac = crypto.createHmac('sha256', this.getHashKey());
@@ -168,23 +138,6 @@ module.exports = function()
 
         _addPadding(payload)
         {
-            // console.log('[sgCrypto._addPadding] - payload:', payload.toString('hex'));
-            // console.log('[sgCrypto._addPadding] - length:', payload.length);
-
-            //length = parseInt(length.toString('hex'));
-            // length = length.readUInt8(0);
-            //
-            // if(length > 0 && length < 16)
-            // {
-            //     console.log('_removePadding - padding length:', length);
-            //     console.log('_removePadding - return:', Buffer.from(payload.toString().slice(0, payload.toString().length-length)).toString('hex'));
-            //
-            //     return Buffer.from(payload.toString().slice(0, payload.toString().length-length));
-            // } else {
-            //     console.log('_removePadding - No padding needed..('+length+')');
-            //     return payload;
-            // }
-
             return payload;
         }
     }

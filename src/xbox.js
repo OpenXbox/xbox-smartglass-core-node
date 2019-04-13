@@ -26,9 +26,6 @@ module.exports = function(ip, certificate)
         _source_participant_id: 0,
 
         _crypto: false,
-        _crypto_iv: false,
-        _crypto_device_keys: false,
-        _crypto_client_keys: false,
 
         getIp: function()
         {
