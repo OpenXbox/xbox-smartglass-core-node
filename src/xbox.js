@@ -74,11 +74,11 @@ module.exports = function(ip, certificate)
             var deviceCert = new jsrsasign.X509();
             deviceCert.readCertPEM(pem);
 
-            var hSerial    = deviceCert.getSerialNumberHex(); // '009e755e" hexadecimal string
-            var sIssuer    = deviceCert.getIssuerString();    // '/C=US/O=z2'
-            var sSubject   = deviceCert.getSubjectString();   // '/C=US/O=z2'
-            var sNotBefore = deviceCert.getNotBefore();       // '100513235959Z'
-            var sNotAfter  = deviceCert.getNotAfter();        // '200513235959Z'
+            // var hSerial    = deviceCert.getSerialNumberHex(); // '009e755e" hexadecimal string
+            // var sIssuer    = deviceCert.getIssuerString();    // '/C=US/O=z2'
+            // var sSubject   = deviceCert.getSubjectString();   // '/C=US/O=z2'
+            // var sNotBefore = deviceCert.getNotBefore();       // '100513235959Z'
+            // var sNotAfter  = deviceCert.getNotAfter();        // '200513235959Z'
 
             this.setLiveid(deviceCert.getSubjectString().slice(4))
 
@@ -109,9 +109,7 @@ module.exports = function(ip, certificate)
             discovery_request.set('uuid', uuid4);
             discovery_request.set('public_key', this._crypto.getPublicKey());
             discovery_request.set('iv', this._crypto.getIv());
-            //
-            var protected_payload = Packer('simple.connect_request_protected');
-            var result = protected_payload.pack(this)
+
             var message = discovery_request.pack(this);
 
             return message

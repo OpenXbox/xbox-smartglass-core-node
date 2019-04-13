@@ -12,9 +12,6 @@ import binascii
 
 import sys;
 
-#print('Xbox-Debug Python POC');
-#print('input: '+ sys.argv[1])
-
 _backend = default_backend()
 
 CURVE_MAP = {
