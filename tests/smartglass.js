@@ -42,7 +42,6 @@ describe('smartglass', function(){
             sgClient.powerOff({
                 ip: '127.0.0.1'
             }, function(result){
-                console.log('result', result)
                 assert.fail('Should not trigger a response')
             })
         });
