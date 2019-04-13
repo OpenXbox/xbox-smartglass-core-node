@@ -8,6 +8,7 @@ from binascii import unhexlify
 
 from pprint import pprint
 import json
+import binascii
 
 import sys;
 
@@ -61,8 +62,8 @@ def cryptoSign(foreign_public_key, privkey=None, pubkey=None):
     _foreign_pubkey = foreign_public_key
 
     return {
-        "public_key": str(_pubkey_bytes).encode('hex'),
-        "secret": str(_expanded_secret).encode('hex')
+        "public_key": binascii.hexlify(_pubkey_bytes),
+        "secret": binascii.hexlify(_expanded_secret)
     }
 
 def loadPublicKey(foreign_public_key, public_key_type=None):
@@ -100,6 +101,6 @@ def loadPublicKey(foreign_public_key, public_key_type=None):
     foreign_public_key = nums.public_key(_backend)
     return foreign_public_key
 
-public_key = sys.argv[1].decode("hex")
+public_key = binascii.unhexlify(sys.argv[1])
 
 print(json.dumps(cryptoSign(loadPublicKey(public_key))))

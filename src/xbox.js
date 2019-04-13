@@ -89,9 +89,11 @@ module.exports = function(ip, certificate)
             var ecKey = jsrsasign.X509.getPublicKeyFromCertPEM(pem);
 
             try {
+                console.log('ecKey.pubKeyHex', ecKey.pubKeyHex.toString('hex'))
                 // Sign certificate using python
                 const { spawnSync } = require('child_process');
                 var process = spawnSync("python", [__dirname+"/python/crypto.py", ecKey.pubKeyHex])
+                console.log('process.stdout', process.stdout.toString())
                 object = JSON.parse(process.stdout);
             } catch(error){
                 object = {
