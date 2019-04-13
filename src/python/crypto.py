@@ -8,11 +8,9 @@ from binascii import unhexlify
 
 from pprint import pprint
 import json
+import binascii
 
 import sys;
-
-#print('Xbox-Debug Python POC');
-#print('input: '+ sys.argv[1])
 
 _backend = default_backend()
 
@@ -24,7 +22,7 @@ CURVE_MAP = {
 
 PUBLIC_KEY_TYPE_MAP = {v: k for k, v in CURVE_MAP.items()}
 
-def cryptoSign(foreign_public_key, privkey=None, pubkey=None):
+def crypto_sign(foreign_public_key, privkey=None, pubkey=None):
     if not isinstance(foreign_public_key, ec.EllipticCurvePublicKey):
         raise ValueError("Unsupported public key format, \
             expected EllipticCurvePublicKey")
@@ -47,25 +45,17 @@ def cryptoSign(foreign_public_key, privkey=None, pubkey=None):
 
     secret = privkey.exchange(ec.ECDH(), foreign_public_key)
     salted_secret = secret
-    #for salt in _kdf_salts:
-    #    salted_secret = salt.apply(salted_secret)
     salted_secret = unhexlify('D637F1AAE2F0418C')+salted_secret+unhexlify('A8F81A574E228AB7')
 
     _expanded_secret = hashlib.sha512(salted_secret).digest()
-    _encrypt_key = _expanded_secret[:16]
-    _iv_key = _expanded_secret[16:32]
-    _hash_key = _expanded_secret[32:]
-
-    _pubkey_type = PUBLIC_KEY_TYPE_MAP[type(_pubkey.curve)]
     _pubkey_bytes = _pubkey.public_numbers().encode_point()[1:]
-    _foreign_pubkey = foreign_public_key
 
     return {
-        "public_key": str(_pubkey_bytes).encode('hex'),
-        "secret": str(_expanded_secret).encode('hex')
+        "public_key": binascii.hexlify(_pubkey_bytes),
+        "secret": binascii.hexlify(_expanded_secret)
     }
 
-def loadPublicKey(foreign_public_key, public_key_type=None):
+def load_public_key(foreign_public_key, public_key_type=None):
     """
     Initialize Crypto context with foreign public key in
     bytes / hexstring format.
@@ -100,6 +90,6 @@ def loadPublicKey(foreign_public_key, public_key_type=None):
     foreign_public_key = nums.public_key(_backend)
     return foreign_public_key
 
-public_key = sys.argv[1].decode("hex")
+public_key = binascii.unhexlify(sys.argv[1])
 
-print(json.dumps(cryptoSign(loadPublicKey(public_key))))
+print(json.dumps(crypto_sign(load_public_key(public_key))))

@@ -1,5 +1,5 @@
 var SimplePacket = require('./simple');
-var MessagePacket = require('./messagePack');
+var MessagePacket = require('./message');
 
 module.exports = function(type)
 {
@@ -22,15 +22,16 @@ module.exports = function(type)
         }
     }
 
-    // Load packet
     var packet_type = type.slice(0,2).toString('hex')
+    var structure = ''
+
     if(packet_type in Types){
         // We got a packet that we need to unpack
         var packet_value = type;
         type = Types[packet_type];
-        var structure = loadPacketStructure(type, packet_value)
+        structure = loadPacketStructure(type, packet_value)
     } else {
-        var structure = loadPacketStructure(type)
+        structure = loadPacketStructure(type)
     }
 
     return {
