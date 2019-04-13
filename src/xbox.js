@@ -93,6 +93,8 @@ module.exports = function(ip, certificate)
             var process = spawnSync("python", [__dirname+"/python/crypto.py", ecKey.pubKeyHex])
             object = JSON.parse(process.stdout);
 
+            console.log('exec:',object)
+
             // Load crypto data
             this.loadCrypto(object.public_key, object.secret);
 
