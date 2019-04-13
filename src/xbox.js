@@ -67,8 +67,6 @@ module.exports = function(ip, certificate)
 
         connect: function()
         {
-            var iv = this._generate_iv();
-
             // // Set liveid
             var pem = '-----BEGIN CERTIFICATE-----'+EOL+this.getCertificate().toString('base64').match(/.{0,64}/g).join('\n')+'-----END CERTIFICATE-----';
             var deviceCert = new jsrsasign.X509();
@@ -120,22 +118,6 @@ module.exports = function(ip, certificate)
             var sgcrypto = new SGCrypto();
             this._crypto = sgcrypto;
             this._crypto.load(Buffer.from(public_key, 'hex'), Buffer.from(shared_secret, 'hex'))
-        },
-
-        /* Private functions */
-
-        _generate_iv: function(seed)
-        {
-            if(seed != undefined)
-            {
-                var seeder = crypto.createCipher('aes-128-cbc', this._crypto_client_keys.aes_key, this._crypto_client_keys.aes_iv)
-                seeder.update(seed)
-                return seeder.final();
-            }
-
-            return crypto.randomBytes(16);
         }
-
-
     };
 }

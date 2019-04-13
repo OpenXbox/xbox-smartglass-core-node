@@ -10,7 +10,8 @@ NodeJS smartglass library for controlling a Xbox
 ## Dependencies
 
 - NPM
-- pip install cryptography
+- Python 2
+- `pip install cryptography`
 
 ## How to install
 
@@ -28,18 +29,24 @@ See the [examples](examples) folder for examples
 
 ## Changelog
 
+0.3.0:
+
+    - Refactored code
+    - Code coverage using Mocha and SonarQube
+    - Added examples to connect to the Xbox
+
 0.2.2:
 
-    No code changes. Integrated Travis CI.
+    - No code changes. Integrated Travis CI + Sonarqube
 
 0.2.1:
 
-    Fixed a bug that caused the connection to fail because the path to the python signing component was invalid
+    - Fixed a bug that caused the connection to fail because the path to the python signing component was invalid
 
 0.2.0:
 
-    Big update! xbox-smartglass-node-core can connect to the Xbox! For now only polling the status of the active app and tuning off the console
+    - Big update! xbox-smartglass-node-core can connect to the Xbox! For now only polling the status of the active app and tuning off the console
 
 0.1.3:
 
-    Fixed a problem where old callbacks were still used when init a new client
+    - Fixed a problem where old callbacks were still used when init a new client
