@@ -94,6 +94,5 @@ if(commander.boot == true)
         ip: commander.ip
     }, function(result){
         console.log('Turned off device');
-        sgClient._close_client()
     });
 }

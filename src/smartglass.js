@@ -67,10 +67,9 @@ module.exports = function()
 
         powerOff: function(options, callback)
         {
-            this.connect(options, callback);
+            this.connect(options, function(){
 
-            this._on_connect_response.push(function(response, device, smartglass){
-                var xbox = this._consoles[device.address];
+                var xbox = this._consoles[options.ip];
 
                 xbox.get_requestnum()
                 var poweroff = Packer('message.power_off');
@@ -78,9 +77,16 @@ module.exports = function()
                 var message = poweroff.pack(xbox);
 
                 this._send({
-                    ip: device.address,
+                    ip: options.ip,
                     port: 5050
                 }, message);
+
+                setTimeout(function(){
+                    this._close_client()
+                }.bind(this), 1000);
+
+
+                callback(true)
 
             }.bind(this));
         },
@@ -231,7 +237,7 @@ module.exports = function()
                         }, ack_message);
                     }
                     catch(error) {
-                        this._close_client()
+                        consolee.log('error', error)
                     }
 
                 }
@@ -279,8 +285,8 @@ module.exports = function()
 
         _close_client: function()
         {
-            if(this._client)
-                this._client.close();
+            this._client.unref();
+            this._client.close();
 
             this._on_discovery_response = [];
             this._on_connect_response = [];
