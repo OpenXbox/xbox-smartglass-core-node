@@ -92,7 +92,7 @@ module.exports = function(type, packet_data = false){
                     var array_count = packet_structure.readUInt16();
                     var array = []
 
-                    for(i = 0; i < array_count; i++) {
+                    for(var i = 0; i < array_count; i++) {
                         var array_structure = Packet[this.structure];
                         var item = {}
 
@@ -243,15 +243,15 @@ module.exports = function(type, packet_data = false){
     {
         flags = hexToBin(flags.toString('hex'));
 
+        var need_ack = false
+        var is_fragment = false;
+
         if(flags.slice(2, 3) == 1)
-            var need_ack = true;
-        else
-            var need_ack = false;
+            need_ack = true;
 
         if(flags.slice(3, 4) == 1)
-            var is_fragment = true;
-        else
-            var is_fragment = false;
+            is_fragment = true;
+
 
         var type = getMsgType(parseInt(flags.slice(4, 16), 2))
 
@@ -366,7 +366,7 @@ module.exports = function(type, packet_data = false){
                 decrypted_payload = PacketStructure(decrypted_payload)
 
                 this.structure = Packet[packet.name]
-                protected_structure = Packet[packet.name]
+                var protected_structure = Packet[packet.name]
                 packet['protected_payload'] = {}
 
                 for(name in protected_structure){
@@ -397,10 +397,6 @@ module.exports = function(type, packet_data = false){
             header.writeUInt32(device._source_participant_id) // source_participant_id
             header.writeBytes(setFlags(this.name)) // flags: readFlags(payload.readBytes(2)), //a01e
             header.writeBytes(this.channel_id) // channel_id
-
-            var payloadLength = PacketStructure();
-            payloadLength.writeUInt16(payload.toBuffer().length);
-            payloadLength = payloadLength.toBuffer();
 
             // Pad packet
             if(payload.toBuffer().length % 16 > 0)

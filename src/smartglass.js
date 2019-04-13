@@ -119,7 +119,7 @@ module.exports = function()
                     return;
 
                 var connectionResult = response.packet_decoded.protected_payload.connect_result;
-                var pairingState = response.packet_decoded.protected_payload.pairing_state;
+                //var pairingState = response.packet_decoded.protected_payload.pairing_state;
                 var participantId = response.packet_decoded.protected_payload.participant_id;
 
                 xbox.set_participantid(participantId);
@@ -215,16 +215,17 @@ module.exports = function()
         _receive: function(message, remote, client)
         {
             this._last_received_time = Math.floor(Date.now() / 1000)
-            var message = Packer(message);
+            message = Packer(message);
             // console.log('message', message)
             var response = message.unpack(this._consoles[remote.address]);
 
             // console.log('[smartglass:_receive] Got response: ', response);
             var type = response.name;
+            var func = '';
 
             if(response.packet_decoded.type != 'd00d')
             {
-                var func = '_on_' + type.toLowerCase();
+                func = '_on_' + type.toLowerCase();
             } else {
                 if(response.packet_decoded.target_participant_id != this._consoles[remote.address]._participantid){
                     console.log('[smartglass.js:_receive] Participantid does not match. Ignoring packet.')
@@ -254,13 +255,13 @@ module.exports = function()
 
                 }
 
-                var func = '_on_' + message.structure.packet_decoded.name.toLowerCase();
+                func = '_on_' + message.structure.packet_decoded.name.toLowerCase();
             }
 
             //console.log('[smartglass.js:_receive] '+func+' called');
             if(this[func] != undefined)
             {
-                for (trigger in this[func]){
+                for(var trigger in this[func]){
                     this[func][trigger](response, remote, client);
                 }
             } else {
@@ -276,12 +277,10 @@ module.exports = function()
             if(options.port == undefined)
                 console.log('smartglass._send: port missing');
 
-            //if(this._client.fd != null){
-                this._client.send(message, 0, message.length, options.port, options.ip, function(err, bytes) {
-                     //console.log('Sending packet to', options.ip);
-                });
 
-            //}
+            this._client.send(message, 0, message.length, options.port, options.ip, function(err, bytes) {
+                 //console.log('Sending packet to', options.ip);
+            });
         },
 
         _init_client: function()
