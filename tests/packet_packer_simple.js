@@ -1,17 +1,17 @@
 var assert = require('assert');
 var fs = require('fs');
-var Packer = require('../src/packet/packer');
+const Packer = require('../src/packet/packer');
 var Xbox = require('../src/xbox');
 
 var secret = Buffer.from('82bba514e6d19521114940bd65121af2'+'34c53654a8e67add7710b3725db44f77'+'30ed8e3da7015a09fe0f08e9bef3853c0506327eb77c9951769d923d863a2f5e', 'hex');
 var certificate = Buffer.from('041db1e7943878b28c773228ebdcfb05b985be4a386a55f50066231360785f61b60038caf182d712d86c8a28a0e7e2733a0391b1169ef2905e4e21555b432b262d', 'hex');
 
 var simple_packets = [
-    /// {'simple.discovery_request': 'tests/data/packets/discovery_request'},
-    // {'simple.discovery_response': 'tests/data/packets/discovery_response'},
+    {'simple.discovery_request': 'tests/data/packets/discovery_request'},
+    {'simple.discovery_response': 'tests/data/packets/discovery_response'},
     {'simple.connect_request': 'tests/data/packets/connect_request'},
     // {'simple.connect_response': 'tests/data/packets/connect_response'},
-    /// {'simple.poweron': 'tests/data/packets/poweron'}
+    {'simple.poweron': 'tests/data/packets/poweron'}
 ]
 
 var device = Xbox('127.0.0.1', certificate);

@@ -2,8 +2,6 @@ module.exports = function(packet)
 {
     if(packet == undefined)
         packet = Buffer.from('');
-    else
-        packet = packet;
 
     return {
         _packet: packet,
@@ -13,6 +11,11 @@ module.exports = function(packet)
         setOffset: function(offset)
         {
             this._offset = offset;
+        },
+
+        getOffset: function()
+        {
+            return this._offset;
         },
 
         writeSGString: function(data)
@@ -30,17 +33,14 @@ module.exports = function(packet)
             return this;
         },
 
-        readSGString: function(buffer = false)
+        readSGString: function()
         {
             var dataLength = this.readUInt16();
             var data = this._packet.slice(this._offset, this._offset+dataLength);
 
             this._offset = (this._offset+1+dataLength);
 
-            if(buffer == false)
-                return data;
-            else
-                return data;
+            return data;
         },
 
         writeBytes: function(data, type)
@@ -53,11 +53,13 @@ module.exports = function(packet)
 
         readBytes: function(count = false)
         {
+            var data =  '';
+
             if(count == false){
-                var data = this._packet.slice(this._offset);
+                data = this._packet.slice(this._offset);
                 this._offset = (this._totalLength);
             } else {
-                var data = this._packet.slice(this._offset, this._offset+count);
+                data = this._packet.slice(this._offset, this._offset+count);
                 this._offset = (this._offset+count);
             }
 
@@ -112,23 +114,11 @@ module.exports = function(packet)
             return data;
         },
 
-        // writeUInt64: function(data)
-        // {
-        //     var tempBuffer = Buffer.allocUnsafe(8);
-        //     tempBuffer.writeUIntBE(data, 8);
-        //     this._add(tempBuffer);
-        // },
-
         readUInt64: function()
         {
-            var n = this.readUInt32();
-            var low = this.readUInt32();
+            var data = this.readBytes(8)
 
-            var calc =  n * 4294967296.0 + low;
-            if (low < 0)
-                calc += 4294967296;
-
-            return calc;
+            return data
         },
 
         toBuffer: function()
@@ -144,12 +134,5 @@ module.exports = function(packet)
                 data
             ]);
         },
-
-        _readInt64BEasFloat(buffer, offset) {
-            var low = readInt32BE(buffer, offset + 4);
-            var n = readInt32BE(buffer, offset) * 4294967296.0 + low;
-            if (low < 0) n += 4294967296;
-            return n;
-        }
     };
 }

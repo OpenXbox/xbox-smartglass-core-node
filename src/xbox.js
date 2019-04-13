@@ -1,20 +1,14 @@
-var SimplePacket = require('./simplepacket.js');
-var PacketStructure = require('./packet/structure.js');
-var MessagePacket = require('./packet/message.js');
 var Packer = require('./packet/packer');
 const SGCrypto = require('./sgcrypto.js');
+
+const uuidParse = require('uuid-parse');
+var uuid = require('uuid');
+
 const os = require('os');
-var EOL = require('os').EOL;
+const EOL = os.EOL;
 
 const crypto = require('crypto');
-//const { ECDH } = require('crypto');
-//const x509 = require('x509');
-const uuidParse = require('uuid-parse');
-
 var jsrsasign = require('jsrsasign');
-var keyutil = jsrsasign.KEYUTIL;
-var uuid = require('uuid');
-//var forge = require('node-forge');
 
 module.exports = function(ip, certificate)
 {
@@ -32,26 +26,23 @@ module.exports = function(ip, certificate)
         _source_participant_id: 0,
 
         _crypto: false,
-        _crypto_iv: false,
-        _crypto_device_keys: false,
-        _crypto_client_keys: false,
 
-        get_ip: function()
+        getIp: function()
         {
             return this._ip
         },
 
-        get_certificate: function()
+        getCertificate: function()
         {
             return this._certificate
         },
 
-        set_iv: function(iv)
+        getLiveid: function()
         {
-            this._iv = iv;
+            return this._liveid;
         },
 
-        set_liveid: function(liveid)
+        setLiveid: function(liveid)
         {
             this._liveid = liveid;
         },
@@ -71,47 +62,49 @@ module.exports = function(ip, certificate)
             this._source_participant_id = participantId;
         },
 
-        shutdown: function()
-        {
-            var packet = new MessagePacket(this);
-
-            return packet.pack(0x39, this._participantid, this._liveid);
-        },
-
         connect: function()
         {
-            var iv = this._generate_iv();
-
-            var pem = '-----BEGIN CERTIFICATE-----'+EOL+this._certificate.toString('base64').match(/.{0,64}/g).join('\n')+'-----END CERTIFICATE-----';
+            // // Set liveid
+            var pem = '-----BEGIN CERTIFICATE-----'+EOL+this.getCertificate().toString('base64').match(/.{0,64}/g).join('\n')+'-----END CERTIFICATE-----';
             var deviceCert = new jsrsasign.X509();
             deviceCert.readCertPEM(pem);
 
-            var hSerial    = deviceCert.getSerialNumberHex(); // '009e755e" hexadecimal string
-            var sIssuer    = deviceCert.getIssuerString();    // '/C=US/O=z2'
-            var sSubject   = deviceCert.getSubjectString();   // '/C=US/O=z2'
-            var sNotBefore = deviceCert.getNotBefore();       // '100513235959Z'
-            var sNotAfter  = deviceCert.getNotAfter();        // '200513235959Z'
+            // var hSerial    = deviceCert.getSerialNumberHex(); // '009e755e" hexadecimal string
+            // var sIssuer    = deviceCert.getIssuerString();    // '/C=US/O=z2'
+            // var sSubject   = deviceCert.getSubjectString();   // '/C=US/O=z2'
+            // var sNotBefore = deviceCert.getNotBefore();       // '100513235959Z'
+            // var sNotAfter  = deviceCert.getNotAfter();        // '200513235959Z'
 
-            this.set_liveid(deviceCert.getSubjectString().slice(4))
+            this.setLiveid(deviceCert.getSubjectString().slice(4))
 
-            var ecKey = jsrsasign.X509.getPublicKeyFromCertPEM(pem);
-
+            // Set uuid
             var uuid4 = Buffer.from(uuidParse.parse(uuid.v4()));
 
-            // Sign certificate using python
-            const { spawnSync } = require('child_process');
-            var process = spawnSync("python", [__dirname+"/python/crypto.py", ecKey.pubKeyHex])
-            object = JSON.parse(process.stdout);
+            // Create public key
+            var ecKey = jsrsasign.X509.getPublicKeyFromCertPEM(pem);
 
+            var object = {}
+            try {
+                // Sign certificate using python
+                const { spawnSync } = require('child_process');
+                var process = spawnSync("python", [__dirname+"/python/crypto.py", ecKey.pubKeyHex])
+                object = JSON.parse(process.stdout);
+            } catch(error){
+                object = {
+                    public_key: ecKey.pubKeyHex,
+                    secret: '00000000000000000000000000000000'
+                }
+            }
+
+
+            // Load crypto data
             this.loadCrypto(object.public_key, object.secret);
 
             var discovery_request = Packer('simple.connect_request');
             discovery_request.set('uuid', uuid4);
             discovery_request.set('public_key', this._crypto.getPublicKey());
             discovery_request.set('iv', this._crypto.getIv());
-            //
-            var protected_payload = Packer('simple.connect_request_protected');
-            var result = protected_payload.pack(this)
+
             var message = discovery_request.pack(this);
 
             return message
@@ -122,22 +115,6 @@ module.exports = function(ip, certificate)
             var sgcrypto = new SGCrypto();
             this._crypto = sgcrypto;
             this._crypto.load(Buffer.from(public_key, 'hex'), Buffer.from(shared_secret, 'hex'))
-        },
-
-        /* Private functions */
-
-        _generate_iv: function(seed)
-        {
-            if(seed != undefined)
-            {
-                var seeder = crypto.createCipher('aes-128-cbc', this._crypto_client_keys.aes_key, this._crypto_client_keys.aes_iv)
-                seeder.update(seed)
-                return seeder.final();
-            }
-
-            return crypto.randomBytes(16);
         }
-
-
     };
 }

@@ -9,5 +9,12 @@ addons:
     organization: "unknownskl-github"
 
 script:
-  - sonar-scanner
   - npm test
+  - sonar-scanner
+
+before_install:
+  - sudo apt-get -y install python-pip python-dev
+  - sudo pip install -U setuptools
+  - sudo pip install -U virtualenvwrapper
+  - sudo pip install cryptography
+  - python -V

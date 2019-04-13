@@ -1,90 +1,25 @@
 # Xbox-Smartglass-Core-Node
-[![Build Status](https://travis-ci.org/unknownskl/xbox-smartglass-core-node.svg?branch=master)](https://travis-ci.org/unknownskl/xbox-smartglass-core-node)
+[![Build Status](https://travis-ci.org/unknownskl/xbox-smartglass-core-node.svg?branch=release/0.3.0)](https://travis-ci.org/unknownskl/xbox-smartglass-core-node)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=alert_status&branch=release/0.3.0)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=alert_status)
+[![Technical debt](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=sqale_index&branch=release/0.3.0)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=sqale_index)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=bugs&branch=release/0.3.0)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=bugs)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=coverage&branch=release/0.3.0)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=coverage)
 
 NodeJS smartglass library for controlling a Xbox
 
 ## Dependencies
 
 - NPM
+- Python 2
+- `pip install cryptography`
 
 ## How to install
 
-```npm install xbox-smartglass-core-node --save```
+`npm install xbox-smartglass-core-node --save`
 
 ## How to use
 
-### Discover consoles on network
-
-```
-Smartglass.discovery({
-    ip: '127.0.0.1' // Your consoles ip address (Optional)
-}, function(device, address){
-    console.log('- Device found: ' + device.device_name);
-    console.log('Address: '+ address.address + ':' + address.port);
-    console.log('LiveID: ' + device.device_certificate.subject.commonName);
-    console.log('Certificate valid: ' + device.device_certificate.notBefore + ' - ' + device.device_certificate.notAfter);
-    console.log('Certificate fingerprint: ' + device.device_certificate.fingerPrint);
-});
-```
-
-### Boot the Xbox console
-
-```
-Smartglass.power_on({
-    live_id: 'FD000000000000', // Put your console's live id here (Required)
-    tries: 4, // Number of packets too issue the boot command (Optional)
-    ip: '127.0.0.1' // Your consoles ip address (Optional)
-}, function(result){
-    if(result)
-        console.log('Device booted successfully');
-    else
-        console.log('Failed to boot device');
-});
-```
-
-### Shutdown the Xbox console
-
-```
-Smartglass.shutdown({
-    ip: '127.0.0.1'
-}, function(result){
-    if(result === true){
-        console.log('Xbox succesfully connected! Sending shutdown');
-    } else {
-        console.log('Failed to connect to xbox:', result);
-    }
-});
-```
-
-### Poll realtime information
-
-```
-var deviceStatus = {
-    current_app: false,
-    connection_status: false
-}
-
-var sgClient = Smartglass.connect({
-    ip: '127.0.0.1'
-}, function(result){
-    if(result === true){
-        console.log('Xbox succesfully connected!');
-    } else {
-        console.log('Failed to connect to xbox:', result);
-    }
-});
-
-sgClient._on_console_status.push(function(response, device, smartglass){
-    deviceStatus.connection_status = true
-
-    if(response.packet_decoded.protected_payload.apps[0] != undefined){
-        if(deviceStatus.current_app != response.packet_decoded.protected_payload.apps[0].aum_id){
-            deviceStatus.current_app = response.packet_decoded.protected_payload.apps[0].aum_id
-            console.log('Current active app:', deviceStatus)
-        }
-    }
-}.bind(deviceStatus));
-```
+See the [examples](examples) folder for examples
 
 ## Known Issues
 
@@ -94,18 +29,24 @@ sgClient._on_console_status.push(function(response, device, smartglass){
 
 ## Changelog
 
+0.3.0:
+
+    - Refactored code
+    - Code coverage using Mocha and SonarQube
+    - Added examples to connect to the Xbox
+
 0.2.2:
 
-    No code changes. Integrated Travis CI.
+    - No code changes. Integrated Travis CI + Sonarqube
 
 0.2.1:
 
-    Fixed a bug that caused the connection to fail because the path to the python signing component was invalid
+    - Fixed a bug that caused the connection to fail because the path to the python signing component was invalid
 
 0.2.0:
 
-    Big update! xbox-smartglass-node-core can connect to the Xbox! For now only polling the status of the active app and tuning off the console
+    - Big update! xbox-smartglass-node-core can connect to the Xbox! For now only polling the status of the active app and tuning off the console
 
 0.1.3:
 
-    Fixed a problem where old callbacks were still used when init a new client
+    - Fixed a problem where old callbacks were still used when init a new client
