@@ -77,7 +77,7 @@ module.exports = function(type, packet_data = false){
                     packet_structure.writeUInt16(this.value.length);
 
                     var array_structure = Packet[this.structure];
-                    for(index in this.value)
+                    for(var index in this.value)
                     {
                         for(var name in array_structure){
                             array_structure[name].value = this.value[index][name]
@@ -96,7 +96,7 @@ module.exports = function(type, packet_data = false){
                         var array_structure = Packet[this.structure];
                         var item = {}
 
-                        for(name in array_structure){
+                        for(var name in array_structure){
                             item[name] = array_structure[name].unpack(packet_structure)
                         }
 
