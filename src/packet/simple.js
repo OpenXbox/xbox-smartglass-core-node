@@ -166,11 +166,11 @@ module.exports = function(packet_format, packet_data = false){
                     this.structure[name].pack(payload)
 
                 } else {
-                    var protected_payload = new PacketStructure();
+                    var protected_payload = PacketStructure();
 
                     var protected_structure = Packet[packet_format+'_protected'];
 
-                    for(name_struct in protected_structure){
+                    for(var name_struct in protected_structure){
 
                         if(this.structure.protected_payload.value != undefined){
                             protected_structure[name_struct].value = this.structure.protected_payload.value[name_struct]
@@ -198,18 +198,20 @@ module.exports = function(packet_format, packet_data = false){
                 }
             }
 
+            var packet = '';
+
             if(this.name == 'poweron'){
-                var packet = this._pack(Buffer.from('DD02', 'hex'), payload.toBuffer(), '')
+                packet = this._pack(Buffer.from('DD02', 'hex'), payload.toBuffer(), '')
 
             } else if(this.name == 'discovery_request'){
-                var packet = this._pack(Buffer.from('DD00', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
+                packet = this._pack(Buffer.from('DD00', 'hex'), payload.toBuffer(), Buffer.from('0000', 'hex'))
 
             } else if(this.name == 'discovery_response'){
-                var packet = this._pack(Buffer.from('DD01', 'hex'), payload.toBuffer(), '2')
+                packet = this._pack(Buffer.from('DD01', 'hex'), payload.toBuffer(), '2')
 
             } else if(this.name == 'connect_request'){
 
-                var packet = this._pack(Buffer.from('CC00', 'hex'), payload.toBuffer(), Buffer.from('0002', 'hex'), protected_payload_length, protected_payload_length_real)
+                packet = this._pack(Buffer.from('CC00', 'hex'), payload.toBuffer(), Buffer.from('0002', 'hex'), protected_payload_length, protected_payload_length_real)
 
                 // Sign protected payload
                 var protected_payload_hash = device._crypto._sign(packet);
@@ -219,7 +221,7 @@ module.exports = function(packet_format, packet_data = false){
                 ]);
 
             } else if(this.name == 'connect_response'){
-                var packet = this._pack(Buffer.from('CC01', 'hex'), payload.toBuffer(), '2')
+                packet = this._pack(Buffer.from('CC01', 'hex'), payload.toBuffer(), '2')
 
             // } else if(this.name == 'connect_request_protected'){
             //     // Pad packet
@@ -247,9 +249,10 @@ module.exports = function(packet_format, packet_data = false){
 
         _pack: function(type, payload, version, protected_payload_length = false, protected_payload_length_real = 0)
         {
+            var payload_length = PacketStructure();
+
             if(protected_payload_length !== false)
             {
-                var payload_length = PacketStructure();
                 payload_length.writeUInt16(payload.length-protected_payload_length_real);
                 payload_length = payload_length.toBuffer();
 
@@ -266,8 +269,6 @@ module.exports = function(packet_format, packet_data = false){
                 ]);
 
             } else {
-
-                var payload_length = PacketStructure();
                 payload_length.writeUInt16(payload.length);
                 payload_length = payload_length.toBuffer();
 

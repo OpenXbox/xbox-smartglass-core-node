@@ -88,6 +88,7 @@ module.exports = function(ip, certificate)
             // Create public key
             var ecKey = jsrsasign.X509.getPublicKeyFromCertPEM(pem);
 
+            var object = {}
             try {
                 // Sign certificate using python
                 const { spawnSync } = require('child_process');
