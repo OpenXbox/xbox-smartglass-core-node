@@ -22,7 +22,7 @@ CURVE_MAP = {
 
 PUBLIC_KEY_TYPE_MAP = {v: k for k, v in CURVE_MAP.items()}
 
-def cryptoSign(foreign_public_key, privkey=None, pubkey=None):
+def CryptoSign(foreign_public_key, privkey=None, pubkey=None):
     if not isinstance(foreign_public_key, ec.EllipticCurvePublicKey):
         raise ValueError("Unsupported public key format, \
             expected EllipticCurvePublicKey")
@@ -63,7 +63,7 @@ def cryptoSign(foreign_public_key, privkey=None, pubkey=None):
         "secret": binascii.hexlify(_expanded_secret)
     }
 
-def loadPublicKey(foreign_public_key, public_key_type=None):
+def LoadPublicKey(foreign_public_key, public_key_type=None):
     """
     Initialize Crypto context with foreign public key in
     bytes / hexstring format.
@@ -100,4 +100,4 @@ def loadPublicKey(foreign_public_key, public_key_type=None):
 
 public_key = binascii.unhexlify(sys.argv[1])
 
-print(json.dumps(cryptoSign(loadPublicKey(public_key))))
+print(json.dumps(CryptoSign(LoadPublicKey(public_key))))

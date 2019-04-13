@@ -79,7 +79,7 @@ module.exports = function(type, packet_data = false){
                     var array_structure = Packet[this.structure];
                     for(index in this.value)
                     {
-                        for(name in array_structure){
+                        for(var name in array_structure){
                             array_structure[name].value = this.value[index][name]
                             packet_structure = array_structure[name].pack(packet_structure)
                         }
@@ -117,7 +117,7 @@ module.exports = function(type, packet_data = false){
                     packet_structure.writeUInt32(this.value.length);
 
                     var array_structure = Packet[this.structure];
-                    for(index in this.value)
+                    for(var index in this.value)
                     {
                         for(name in array_structure){
                             array_structure[name].value = this.value[index][name]
@@ -132,7 +132,7 @@ module.exports = function(type, packet_data = false){
                     var array_count = packet_structure.readUInt32();
                     var array = []
 
-                    for(i = 0; i < array_count; i++) {
+                    for(var i = 0; i < array_count; i++) {
                         var array_structure = Packet[this.structure];
                         var item = {}
 
