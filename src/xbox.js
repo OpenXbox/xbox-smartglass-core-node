@@ -88,11 +88,17 @@ module.exports = function(ip, certificate)
             // Create public key
             var ecKey = jsrsasign.X509.getPublicKeyFromCertPEM(pem);
 
-            // Sign certificate using python
-            const { spawnSync } = require('child_process');
-            var process = spawnSync("python", [__dirname+"/python/crypto.py", ecKey.pubKeyHex])
-                        console.log('exec:',process.stdout.toString())
-            object = JSON.parse(process.stdout);
+            try {
+                // Sign certificate using python
+                const { spawnSync } = require('child_process');
+                var process = spawnSync("python", [__dirname+"/python/crypto.py", ecKey.pubKeyHex])
+                object = JSON.parse(process.stdout);
+            } catch(error){
+                object = {
+                    public_key: ecKey.pubKeyHex,
+                    secret: '00000000000000000000000000000000'
+                }
+            }
 
 
             // Load crypto data
