@@ -1,5 +1,6 @@
 var SimplePacket = require('./simple');
 var MessagePacket = require('./message');
+var Debug = require('debug')('smartglass:packer')
 
 module.exports = function(type)
 {
