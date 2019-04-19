@@ -1,6 +1,7 @@
 var PacketStructure = require('./structure');
 var Packer = require('./packer');
 var hexToBin = require('hex-to-binary');
+var Debug = require('debug')('smartglass:packet_message')
 
 module.exports = function(type, packet_data = false){
     var Type = {
@@ -325,6 +326,7 @@ module.exports = function(type, packet_data = false){
         },
 
         set: function(key, value, subkey = false){
+            Debug('['+this.name+']', 'Set:', key, '=', value)
             if(subkey == false){
                 this.structure[key].value = value
             } else {
@@ -354,6 +356,8 @@ module.exports = function(type, packet_data = false){
             packet.protected_payload = Buffer.from(packet.protected_payload.slice(0, -32));
             packet.signature = packet.protected_payload.slice(-32)
 
+            Debug('Unpacking message:', this.name);
+
             // Lets decrypt the data when the payload is encrypted
             if(packet.protected_payload != undefined){
                 var key = device._crypto._encrypt(this.packet_data.slice(0, 16), device._crypto.getIv());
@@ -377,6 +381,8 @@ module.exports = function(type, packet_data = false){
         },
 
         pack: function(device){
+            Debug('Packing message:', this.name);
+
             var payload = PacketStructure()
 
             for(name in this.structure){

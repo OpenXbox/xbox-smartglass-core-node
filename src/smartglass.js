@@ -1,6 +1,7 @@
 const dgram = require('dgram');
 const Packer = require('./packet/packer');
 const Xbox = require('./xbox');
+var Debug = require('debug')('smartglass:client')
 
 module.exports = function()
 {
@@ -19,6 +20,7 @@ module.exports = function()
         {
             this._init_client();
 
+            Debug('Crafting discovery_request packet');
             var discovery_packet = Packer('simple.discovery_request')
             var message  = discovery_packet.pack()
 
@@ -95,15 +97,18 @@ module.exports = function()
         {
             this._init_client();
 
+            Debug('Crafting discovery_request packet');
             var discovery_request = Packer('simple.discovery_request');
             var message = discovery_request.pack();
 
             var timeout = setTimeout(function(){
-                console.log('Connection timout of 10 sec.. Closing client.')
+                Debug('Timeout after 10 seconds. Could not connect to xbox');
+                console.log('Connection timout of 10 sec.. Closing client')
                 this._close_client()
             }.bind(this), 10000);
 
             this._on_discovery_response.push(function(response, device, smartglass){
+                Debug('Xbox found on network');
                 var xbox = Xbox(device.address, response.packet_decoded.certificate);
                 var message = xbox.connect();
 
@@ -214,14 +219,18 @@ module.exports = function()
             if(response.packet_decoded.type != 'd00d')
             {
                 func = '_on_' + type.toLowerCase();
+                Debug('Received message. Call: '+func+'()');
             } else {
                 if(response.packet_decoded.target_participant_id != this._consoles[remote.address]._participantid){
                     console.log('[smartglass.js:_receive] Participantid does not match. Ignoring packet.')
                     return;
                 }
 
-                if(response.packet_decoded.flags.need_ack == true){
+                func = '_on_' + message.structure.packet_decoded.name.toLowerCase();
+                Debug('Received message. Call: '+func+'()');
 
+                if(response.packet_decoded.flags.need_ack == true){
+                    Debug('Packet needs to be acknowledged. Sending response');
                     var xbox = this._consoles[remote.address]
                     xbox._request_num = response.packet_decoded.sequence_number
 
@@ -241,8 +250,6 @@ module.exports = function()
                     }
 
                 }
-
-                func = '_on_' + message.structure.packet_decoded.name.toLowerCase();
             }
 
             if(this[func] != undefined)
@@ -258,12 +265,13 @@ module.exports = function()
         _send: function(options, message)
         {
             this._client.send(message, 0, message.length, options.port, options.ip, function(err, bytes) {
-                 //console.log('Sending packet to', options.ip);
+                 Debug('Sending packet to client: '+options.ip+':'+options.port);
             });
         },
 
         _init_client: function()
         {
+            Debug('Initialize new smartglass client');
             this._on_discovery_response = [];
             this._on_connect_response = [];
             this._on_console_status = [];
@@ -277,7 +285,7 @@ module.exports = function()
             }.bind(this));
 
             this._client.on('close', function() {
-                // console.log('Client UDP socket closed : BYE!')
+                Debug('UDP socket closed.');
             });
 
             return this._client;
@@ -285,6 +293,7 @@ module.exports = function()
 
         _close_client: function()
         {
+            Debug('Client closed');
             this._client.unref();
             this._client.close();
 
