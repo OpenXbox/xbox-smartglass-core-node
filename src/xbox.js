@@ -1,14 +1,12 @@
 var Packer = require('./packet/packer');
 const SGCrypto = require('./sgcrypto.js');
-
 const uuidParse = require('uuid-parse');
 var uuid = require('uuid');
-
 const os = require('os');
 const EOL = os.EOL;
-
 const crypto = require('crypto');
 var jsrsasign = require('jsrsasign');
+var Debug = require('debug')('smartglass:xbox')
 
 module.exports = function(ip, certificate)
 {
@@ -83,6 +81,8 @@ module.exports = function(ip, certificate)
             // Create public key
             var ecKey = jsrsasign.X509.getPublicKeyFromCertPEM(pem);
 
+            Debug('Starting python process');
+
             var object = {}
             try {
                 // Sign certificate using python
@@ -96,10 +96,13 @@ module.exports = function(ip, certificate)
                 }
             }
 
+            Debug('Process output:', object);
+
 
             // Load crypto data
             this.loadCrypto(object.public_key, object.secret);
 
+            Debug('Sending connect_request to xbox');
             var discovery_request = Packer('simple.connect_request');
             discovery_request.set('uuid', uuid4);
             discovery_request.set('public_key', this._crypto.getPublicKey());
@@ -112,6 +115,9 @@ module.exports = function(ip, certificate)
 
         loadCrypto: function(public_key, shared_secret)
         {
+            Debug('Loading crypto:');
+            Debug('- Public key:', public_key);
+            Debug('- Shared secret:', shared_secret);
             var sgcrypto = new SGCrypto();
             this._crypto = sgcrypto;
             this._crypto.load(Buffer.from(public_key, 'hex'), Buffer.from(shared_secret, 'hex'))

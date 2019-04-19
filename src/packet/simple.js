@@ -1,5 +1,6 @@
 var PacketStructure = require('./structure');
 var Packer = require('./packer');
+var Debug = require('debug')('smartglass:packet_simple')
 
 module.exports = function(packet_format, packet_data = false){
     var Type = {
@@ -131,8 +132,9 @@ module.exports = function(packet_format, packet_data = false){
 
             if(packet.type == 'dd02'){
                 this.name = 'poweron'
-
             }
+
+            Debug('Unpacking message:', this.name);
 
             // Lets decrypt the data when the payload is encrypted
             if(packet.protected_payload != undefined){
@@ -159,6 +161,7 @@ module.exports = function(packet_format, packet_data = false){
         },
 
         pack: function(device = false){
+            Debug('Packing message:', this.name);
             var payload = PacketStructure()
 
             for(name in this.structure){

@@ -1,10 +1,14 @@
 {
   "name": "xbox-smartglass-core-node",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "NodeJS smartglass library for controlling a Xbox",
   "main": "src/smartglass.js",
   "scripts": {
-    "test": "nyc --reporter=html --reporter=lcov --reporter=text ./node_modules/mocha/bin/mocha tests/"
+    "test": "nyc --reporter=html --reporter=lcov --reporter=text ./node_modules/mocha/bin/mocha tests/",
+    "discovery": "DEBUG=smartglass:* ./examples/discovery.js",
+    "connect": "DEBUG=smartglass:* ./examples/connect.js",
+    "poweron": "DEBUG=smartglass:* ./examples/poweron.js",
+    "poweroff": "DEBUG=smartglass:* ./examples/poweroff.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +30,7 @@
   ],
   "dependencies": {
     "commander": "^2.20.0",
+    "debug": "^4.1.1",
     "hex-to-binary": "^1.0.1",
     "jsrsasign": "^8.0.12",
     "uuid": "^3.3.2",
