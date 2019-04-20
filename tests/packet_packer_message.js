@@ -10,7 +10,8 @@ var packets = [
     {'message.console_status': 'tests/data/packets/console_status'},
     {'message.power_off': 'tests/data/packets/poweroff'},
     {'message.acknowledgement': 'tests/data/packets/acknowledge'},
-    {'message.local_join': 'tests/data/packets/local_join'}
+    {'message.local_join': 'tests/data/packets/local_join'},
+    {'message.disconnect': 'tests/data/packets/disconnect'}
 ]
 
 var device = Xbox('127.0.0.1', certificate);
@@ -117,6 +118,28 @@ describe('packet/packer/message', function(){
         assert.deepStrictEqual(message.packet_decoded.protected_payload.os_major_version, 42)
         assert.deepStrictEqual(message.packet_decoded.protected_payload.os_minor_version, 0)
         assert.deepStrictEqual(message.packet_decoded.protected_payload.display_name, 'package.name.here')
+    });
+
+    it('should unpack a disconnect packet', function(){
+        var data_packet = fs.readFileSync('tests/data/packets/disconnect')
+
+        var poweroff_request = Packer(data_packet)
+        var message = poweroff_request.unpack(device)
+        console.log(message)
+
+        assert.deepStrictEqual(message.type, 'message')
+        assert.deepStrictEqual(message.packet_decoded.sequence_number, 57)
+        assert.deepStrictEqual(message.packet_decoded.source_participant_id, 31)
+        assert.deepStrictEqual(message.packet_decoded.target_participant_id, 0)
+
+        assert.deepStrictEqual(message.packet_decoded.flags.version, '2')
+        assert.deepStrictEqual(message.packet_decoded.flags.need_ack, false)
+        assert.deepStrictEqual(message.packet_decoded.flags.is_fragment, false)
+        assert.deepStrictEqual(message.packet_decoded.flags.type, 'disconnect')
+        assert.deepStrictEqual(message.packet_decoded.channel_id, Buffer.from('\x00\x00\x00\x00\x00\x00\x00\x00'))
+
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.reason, 0)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.error_code, 0)
     });
 
     describe('should repack messages correctly', function(){
