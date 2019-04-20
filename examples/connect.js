@@ -3,12 +3,14 @@ var Smartglass = require('../src/smartglass');
 
 var deviceStatus = {
     current_app: false,
-    connection_status: false
+    connection_status: false,
+    client: false
 }
 
-var sgClient = Smartglass()
-sgClient.connect({
-    ip: '192.168.2.5'
+deviceStatus.client = Smartglass()
+
+deviceStatus.client.connect({
+    ip: '192.168.2.52'
 }, function(result){
     if(result === true){
         console.log('Xbox succesfully connected!');
@@ -17,7 +19,7 @@ sgClient.connect({
     }
 });
 
-sgClient._on_console_status.push(function(response, device, smartglass){
+deviceStatus.client._on_console_status.push(function(response, device, smartglass){
     deviceStatus.connection_status = true
 
     if(response.packet_decoded.protected_payload.apps[0] != undefined){
@@ -27,3 +29,22 @@ sgClient._on_console_status.push(function(response, device, smartglass){
         }
     }
 }.bind(deviceStatus));
+
+deviceStatus.client._on_timeout.push(function(){
+    deviceStatus.connection_status = false
+    console.log('Connection timed out. Retry...')
+
+    deviceStatus.client.connect({
+        ip: '192.168.2.5'
+    }, function(result){
+        if(result === true){
+            console.log('Xbox succesfully connected!');
+        } else {
+            console.log('Failed to connect to xbox:', result);
+        }
+    });
+}.bind(deviceStatus));
+
+setInterval(function(){
+    console.log('connection_status:', deviceStatus.connection_status)
+}.bind(deviceStatus), 5000)
