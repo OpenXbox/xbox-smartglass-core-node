@@ -9,6 +9,7 @@ module.exports = function()
         _consoles: [],
         _client: false,
         _last_received_time: false,
+        _is_broadcast: true,
 
         _on_discovery_response: [],
         _on_connect_response: [],
@@ -16,8 +17,13 @@ module.exports = function()
         _on_console_status: [],
         _on_acknowledge: [],
 
-        discovery: function(options, callback)
+        discovery: function(options = false, callback)
         {
+            if(options.ip == undefined){
+                options.ip = '255.255.255.255'
+                this._is_broadcast = true
+            }
+
             this._init_client();
 
             Debug('Crafting discovery_request packet');
@@ -279,6 +285,11 @@ module.exports = function()
 
             this._client = dgram.createSocket('udp4');
             this._client.bind();
+
+            this._client.on('listening', function(message, remote){
+                if(this._is_broadcast == true)
+                    this._client.setBroadcast(true);
+            }.bind(this))
 
             this._client.on('message', function(message, remote){
                 this._receive(message, remote, this);
