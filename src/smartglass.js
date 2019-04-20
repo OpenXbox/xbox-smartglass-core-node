@@ -9,9 +9,11 @@ module.exports = function()
         _consoles: [],
         _client: false,
         _last_received_time: false,
-        _is_broadcast: true,
+        _is_broadcast: false,
         _ip: false,
         _interval_timeout: false,
+
+        _on_timeout: [],
 
         _on_discovery_response: [],
         _on_connect_response: [],
@@ -104,6 +106,9 @@ module.exports = function()
         connect: function(options, callback)
         {
             this._init_client();
+            this._on_discovery_response = [];
+            this._on_connect_response = [];
+            clearInterval(this._interval_timeout)
             this._ip = options.ip
 
             Debug('Crafting discovery_request packet');
@@ -111,9 +116,12 @@ module.exports = function()
             var message = discovery_request.pack();
 
             var timeout = setTimeout(function(){
-                Debug('Timeout after 10 seconds. Could not connect to xbox');
-                console.log('Connection timout of 10 sec.. Closing client')
-                this._close_client()
+                Debug('Connection failed after 10 sec. Call: _on_timeout()')
+                for(var trigger in this._on_timeout){
+                    this._on_timeout[trigger]();
+                }
+
+                //this._close_client()
             }.bind(this), 10000);
 
             this._on_discovery_response.push(function(response, device, smartglass){
@@ -157,8 +165,12 @@ module.exports = function()
                     this._interval_timeout = setInterval(function(){
                         if((Math.floor(Date.now() / 1000))-this._last_received_time > 30)
                         {
-                            console.log('No message for the last 30 seconds. Timeout...')
-                            this._init_client()
+                            Debug('Connection timeout after 30 sec. Call: _on_timeout()')
+                            for(var trigger in this._on_timeout){
+                                this._on_timeout[trigger]();
+                            }
+
+                            //this._close_client()
                             return;
                         }
 
@@ -300,10 +312,6 @@ module.exports = function()
         _init_client: function()
         {
             Debug('Initialize new smartglass client');
-            this._on_discovery_response = [];
-            this._on_connect_response = [];
-            this._on_console_status = [];
-            this._on_acknowledge = [];
 
             this._client = dgram.createSocket('udp4');
             this._client.bind();
@@ -329,7 +337,6 @@ module.exports = function()
             Debug('Client closed');
 
             clearInterval(this._interval_timeout)
-            this._client.unref();
             this._client.close();
 
             this._on_discovery_response = [];
