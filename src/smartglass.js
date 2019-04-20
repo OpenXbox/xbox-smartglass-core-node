@@ -17,7 +17,7 @@ module.exports = function()
         _on_console_status: [],
         _on_acknowledge: [],
 
-        discovery: function(options = false, callback)
+        discovery: function(options, callback)
         {
             if(options.ip == undefined){
                 options.ip = '255.255.255.255'
