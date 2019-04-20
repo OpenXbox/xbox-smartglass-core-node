@@ -125,7 +125,6 @@ describe('packet/packer/message', function(){
 
         var poweroff_request = Packer(data_packet)
         var message = poweroff_request.unpack(device)
-        console.log(message)
 
         assert.deepStrictEqual(message.type, 'message')
         assert.deepStrictEqual(message.packet_decoded.sequence_number, 57)
