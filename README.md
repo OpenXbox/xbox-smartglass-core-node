@@ -32,6 +32,7 @@ See the [examples](examples) folder for examples
 0.3.2
 
     - Fixed discovery on network
+    - Added disconnect function (See [examples/connect_and_disconnect.js](examples/connect_and_disconnect.js))
 
 0.3.1
 
