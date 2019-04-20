@@ -10,6 +10,8 @@ module.exports = function()
         _client: false,
         _last_received_time: false,
         _is_broadcast: true,
+        _ip: false,
+        _interval_timeout: false,
 
         _on_discovery_response: [],
         _on_connect_response: [],
@@ -102,6 +104,7 @@ module.exports = function()
         connect: function(options, callback)
         {
             this._init_client();
+            this._ip = options.ip
 
             Debug('Crafting discovery_request packet');
             var discovery_request = Packer('simple.discovery_request');
@@ -119,11 +122,11 @@ module.exports = function()
                 var message = xbox.connect();
 
                 this._send({
-                    'ip': device.address,
+                    'ip': this._ip,
                     'port': device.port
                 }, message);
 
-                this._consoles[device.address] = xbox;
+                this._consoles[this._ip] = xbox;
             }.bind(this));
 
             this._on_connect_response.push(function(callback, timeout, response, remote){
@@ -147,11 +150,11 @@ module.exports = function()
                     var message = local_join.pack(xbox);
 
                     this._send({
-                        ip: remote.address,
+                        ip: this._ip,
                         port: 5050
                     }, message);
 
-                    setInterval(function(){
+                    this._interval_timeout = setInterval(function(){
                         if((Math.floor(Date.now() / 1000))-this._last_received_time > 30)
                         {
                             console.log('No message for the last 30 seconds. Timeout...')
@@ -164,7 +167,7 @@ module.exports = function()
                         var ack_message = ack.pack(xbox)
 
                         this._send({
-                            ip: remote.address,
+                            ip: this._ip,
                             port: 5050
                         }, ack_message);
 
@@ -201,11 +204,30 @@ module.exports = function()
             }.bind(this));
 
             this._send({
-                ip: options.ip,
+                ip: this._ip,
                 port: 5050
             }, message);
 
             return this;
+        },
+
+        disconnect: function()
+        {
+            var xbox = this._consoles[this._ip];
+
+            xbox.get_requestnum()
+
+            var disconnect = Packer('message.disconnect')
+            disconnect.set('reason', 4)
+            disconnect.set('error_code', 0)
+            var disconnect_message = disconnect.pack(xbox)
+
+            this._send({
+                ip: this._ip,
+                port: 5050
+            }, disconnect_message);
+
+            this._close_client()
         },
 
         getConsoles: function()
@@ -305,6 +327,8 @@ module.exports = function()
         _close_client: function()
         {
             Debug('Client closed');
+
+            clearInterval(this._interval_timeout)
             this._client.unref();
             this._client.close();
 

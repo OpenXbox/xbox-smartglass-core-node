@@ -7,6 +7,7 @@
     "test": "nyc --reporter=html --reporter=lcov --reporter=text ./node_modules/mocha/bin/mocha tests/",
     "discovery": "DEBUG=smartglass:* ./examples/discovery.js",
     "connect": "DEBUG=smartglass:* ./examples/connect.js",
+    "connect_disconnect": "DEBUG=smartglass:* ./examples/connect_and_disconnect.js",
     "poweron": "DEBUG=smartglass:* ./examples/poweron.js",
     "poweroff": "DEBUG=smartglass:* ./examples/poweroff.js"
   },
