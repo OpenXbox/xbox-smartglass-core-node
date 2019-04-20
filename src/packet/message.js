@@ -188,6 +188,10 @@ module.exports = function(type, packet_data = false){
             os_minor_version: Type.uInt32('2'),
             display_name: Type.sgString('Xbox-Smartglass-Node'),
         },
+        disconnect: {
+            reason: Type.uInt32('1'),
+            error_code: Type.uInt32('0')
+        },
     };
 
     function getMsgType(type)
@@ -212,7 +216,7 @@ module.exports = function(type, packet_data = false){
             0x27: "StartChannelResponse",
             0x28: "StopChannel",
             0x29: "System",
-            0x2A: "Disconnect",
+            0x2A: "disconnect",
             0x2E: "TitleTouch",
             0x2F: "Accelerometer",
             0x30: "Gyrometer",
@@ -284,7 +288,7 @@ module.exports = function(type, packet_data = false){
             0x27: "StartChannelResponse",
             0x28: "StopChannel",
             0x29: "System",
-            0x2A: "Disconnect",
+            disconnect: Buffer.from('802a', 'hex'),
             0x2E: "TitleTouch",
             0x2F: "Accelerometer",
             0x30: "Gyrometer",
