@@ -68,12 +68,12 @@ smartglassEmitter.on('_on_connect_response', function(message, xbox, remote, sma
         xbox._connection_status = true;
 
         var local_join = Packer('message.local_join');
-        var message = local_join.pack(xbox);
+        var join_message = local_join.pack(xbox);
 
         smartglass._send({
             ip: remote.address,
             port: 5050
-        }, message);
+        }, join_message);
 
         smartglass._interval_timeout = setInterval(function(){
             Debug('Check timeout: Last packet was '+((Math.floor(Date.now() / 1000))-this._last_received_time+' seconds ago'))
