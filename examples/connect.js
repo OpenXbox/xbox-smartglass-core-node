@@ -10,7 +10,7 @@ var deviceStatus = {
 deviceStatus.client = Smartglass()
 
 deviceStatus.client.connect({
-    ip: '192.168.2.52'
+    ip: '192.168.2.5'
 }, function(result){
     if(result === true){
         console.log('Xbox succesfully connected!');
@@ -19,21 +19,23 @@ deviceStatus.client.connect({
     }
 });
 
-deviceStatus.client._on_console_status.push(function(response, device, smartglass){
+deviceStatus.client.on('_on_console_status', function(message, xbox, remote, smartglass){
     deviceStatus.connection_status = true
 
-    if(response.packet_decoded.protected_payload.apps[0] != undefined){
-        if(deviceStatus.current_app != response.packet_decoded.protected_payload.apps[0].aum_id){
-            deviceStatus.current_app = response.packet_decoded.protected_payload.apps[0].aum_id
+    if(message.packet_decoded.protected_payload.apps[0] != undefined){
+        if(deviceStatus.current_app != message.packet_decoded.protected_payload.apps[0].aum_id){
+            deviceStatus.current_app = message.packet_decoded.protected_payload.apps[0].aum_id
             console.log('Current active app:', deviceStatus)
         }
     }
 }.bind(deviceStatus));
 
-deviceStatus.client._on_timeout.push(function(){
+deviceStatus.client.on('_on_timeout', function(message, xbox, remote, smartglass){
     deviceStatus.connection_status = false
-    console.log('Connection timed out. Retry...')
+    console.log('Connection timed out.')
+    clearInterval(interval)
 
+    deviceStatus.client = Smartglass()
     deviceStatus.client.connect({
         ip: '192.168.2.5'
     }, function(result){
@@ -43,8 +45,8 @@ deviceStatus.client._on_timeout.push(function(){
             console.log('Failed to connect to xbox:', result);
         }
     });
-}.bind(deviceStatus));
+}.bind(deviceStatus, interval));
 
-setInterval(function(){
+var interval = setInterval(function(){
     console.log('connection_status:', deviceStatus.connection_status)
 }.bind(deviceStatus), 5000)
