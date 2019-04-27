@@ -17,19 +17,19 @@ sgClient.connect({
     }
 });
 
-sgClient._on_console_status.push(function(response, device, smartglass){
+sgClient.on('_on_console_status', function(message, xbox, remote, smartglass){
     deviceStatus.connection_status = true
 
-    if(response.packet_decoded.protected_payload.apps[0] != undefined){
-        if(deviceStatus.current_app != response.packet_decoded.protected_payload.apps[0].aum_id){
-            deviceStatus.current_app = response.packet_decoded.protected_payload.apps[0].aum_id
+    if(message.packet_decoded.protected_payload.apps[0] != undefined){
+        if(deviceStatus.current_app != message.packet_decoded.protected_payload.apps[0].aum_id){
+            deviceStatus.current_app = message.packet_decoded.protected_payload.apps[0].aum_id
             console.log('Current active app:', deviceStatus)
         }
     }
 }.bind(deviceStatus));
 
-sgClient._on_console_status.push(function(response, device, smartglass){
+sgClient.on('_on_console_status', function(message, xbox, remote, smartglass){
     deviceStatus.connection_status = false
     console.log('Sending disconnect to console...')
-    sgClient.disconnect()
+    smartglass.disconnect()
 }.bind(deviceStatus));

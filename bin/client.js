@@ -13,7 +13,7 @@ commander
   .option('-d, --discover', 'Discover Xbox on the network')
   .option('-c, --connect', 'Connect to Xbox console')
   .option('-s, --shutdown', 'Shutdown Xbox console')
-  .option('-i, --ip <ip>', 'Xbox One IP address', ADDR_BROADCAST)
+  .option('-i, --ip <ip>', 'Xbox One IP address')
   .option('-l, --live_id <live_id>', 'Xbox One live id (Example: FD000000000000)')
   .option('-t, --tries <tries>', 'Timeout inn seconds (Default: 5)', 5)
   .version(pkgInfo['version'])
@@ -47,12 +47,14 @@ if(commander.boot == true)
     console.log('Trying to discover devices...');
     sgClient.discovery({
         ip: commander.ip
-    }, function(device, address){
-        console.log('- Device found: ' + device.name);
-        console.log('  Address: '+ address.address + ':' + address.port);
-        // console.log('LiveID: ' + device.device_certificate.subject.commonName);
-        // console.log('Certificate valid: ' + device.device_certificate.notBefore + ' - ' + device.device_certificate.notAfter);
-        // console.log('Certificate fingerprint: ' + device.device_certificate.fingerPrint);
+    }, function(consoles){
+        for(var xbox in consoles){
+            console.log('- Device found: ' + consoles[xbox].message.name);
+            console.log('  Address: '+ consoles[xbox].remote.address + ':' + consoles[xbox].remote.port);
+        }
+        if(consoles.length == 0){
+            console.log('No consoles found on the network')
+        }
     });
 
 } else if(commander.connect)
@@ -71,16 +73,16 @@ if(commander.boot == true)
         connection_status: false
     }
 
-    sgClient._on_console_status.push(function(response, device, smartglass){
+    sgClient.on('_on_console_status', function(message, xbox, remote, smartglass){
         deviceStatus.connection_status = true
 
-        if(response.packet_decoded.protected_payload.apps[0] != undefined){
-            if(deviceStatus.current_app != response.packet_decoded.protected_payload.apps[0].aum_id){
-                deviceStatus.current_app = response.packet_decoded.protected_payload.apps[0].aum_id
+        if(message.packet_decoded.protected_payload.apps[0] != undefined){
+            if(deviceStatus.current_app != message.packet_decoded.protected_payload.apps[0].aum_id){
+                deviceStatus.current_app = message.packet_decoded.protected_payload.apps[0].aum_id
                 console.log('Current active apps:')
-                for(var app in response.packet_decoded.protected_payload.apps)
+                for(var app in message.packet_decoded.protected_payload.apps)
                 {
-                    console.log('- aum:', response.packet_decoded.protected_payload.apps[app].aum_id)
+                    console.log('- aum:', message.packet_decoded.protected_payload.apps[app].aum_id)
                 }
             }
         }
