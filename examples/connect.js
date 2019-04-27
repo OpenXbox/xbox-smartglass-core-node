@@ -48,5 +48,5 @@ deviceStatus.client.on('_on_timeout', function(message, xbox, remote, smartglass
 }.bind(deviceStatus, interval));
 
 var interval = setInterval(function(){
-    console.log('connection_status:', deviceStatus.connection_status)
+    console.log('connection_status:', deviceStatus.client._connection_status)
 }.bind(deviceStatus), 5000)

@@ -16,6 +16,8 @@ module.exports = function()
         _ip: false,
         _interval_timeout: false,
 
+        _connection_status: false,
+
         discovery: function(options, callback)
         {
             if(options.ip == undefined){
@@ -116,33 +118,39 @@ module.exports = function()
             this.discovery({
                 ip: this._ip
             }, function(consoles){
-                Debug('Console is online. Lets connect...')
-                clearTimeout(this._interval_timeout)
+                if(consoles.length > 0){
+                    Debug('Console is online. Lets connect...')
+                    clearTimeout(this._interval_timeout)
 
-                this._getSocket();
+                    this._getSocket();
 
-                var xbox = Xbox(consoles[0].remote.address, consoles[0].message.certificate);
-                var message = xbox.connect();
+                    var xbox = Xbox(consoles[0].remote.address, consoles[0].message.certificate);
+                    var message = xbox.connect();
 
-                this._send({
-                    'ip': consoles[0].remote.address,
-                    'port': consoles[0].remote.port
-                }, message);
+                    this._send({
+                        'ip': consoles[0].remote.address,
+                        'port': consoles[0].remote.port
+                    }, message);
 
-                this._consoles[this._ip] = xbox;
+                    this._consoles[this._ip] = xbox;
 
-                smartglassEvent.on('_on_connect_response', function(message, xbox, remote, smartglass){
-                    if(message.packet_decoded.protected_payload.connect_result == '0'){
-                        Debug('Console is connected')
-                    } else {
-                        Debug('Error during connect.')
-                    }
-                    callback()
-                })
+                    smartglassEvent.on('_on_connect_response', function(message, xbox, remote, smartglass){
+                        if(message.packet_decoded.protected_payload.connect_result == '0'){
+                            Debug('Console is connected')
+                            this._connection_status = true
+                        } else {
+                            Debug('Error during connect.')
+                        }
+                        callback()
+                    }.bind(this))
 
-                smartglassEvent.on('_on_timeout', function(message, xbox, remote, smartglass){
-                    Debug('Client timeout...')
-                })
+                    smartglassEvent.on('_on_timeout', function(message, xbox, remote, smartglass){
+                        this._connection_status = false
+                        Debug('Client timeout...')
+                    }.bind(this))
+                } else {
+                    Debug('Device is offline...')
+                }
 
             }.bind(this))
         },
