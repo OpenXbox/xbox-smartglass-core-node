@@ -16,9 +16,9 @@ module.exports = function()
                     Debug('Channel status is false, opening channel SystemInput');
 
                     var channel_request = Packer('message.start_channel_request')
-                    channel_request.set('channel_request_id', 0);
+                    channel_request.set('channel_request_id', 1);
                     channel_request.set('title_id', 0);
-                    channel_request.set('service', Buffer.from('fa20b8ca66fb46e0adb60b978a59d35f', 'hex'));
+                    channel_request.set('service', Buffer.from('48a9ca24eb6d4e128c43d57469edd3cd', 'hex'));
                     channel_request.set('activity_id', 0);
 
                     var message  = channel_request.pack(xbox)
@@ -38,6 +38,10 @@ module.exports = function()
                         } else {
                             Debug('Could not open channel: SystemInput');
                         }
+                    }.bind(this));
+
+                    this._smartglass.on('_on_media_state', function(message, xbox, remote){
+                        console.log('MEDIA STATE', message.packet_decoded.protected_payload)
                     }.bind(this));
 
                     this._smartglass._send({
@@ -69,20 +73,20 @@ module.exports = function()
                 }, message);
 
 
-                var timestamp = new Date().getTime()
-
-                var gamepad = Packer('message.gamepad')
-                gamepad.set('timestamp', Buffer.from('000'+timestamp.toString(), 'hex'))
-                gamepad.set('buttons', 0);
-                gamepad.setChannel(this._channel_id)
-                console.log(gamepad.structure.structure)
-                var message  = gamepad.pack(this._xbox)
-
-                this._xbox.get_requestnum()
-                this._smartglass._send({
-                    ip: this._smartglass._ip,
-                    port: 5050
-                }, message);
+                // var timestamp = new Date().getTime()
+                //
+                // var gamepad = Packer('message.gamepad')
+                // gamepad.set('timestamp', Buffer.from('000'+timestamp.toString(), 'hex'))
+                // gamepad.set('buttons', 0);
+                // gamepad.setChannel(this._channel_id)
+                // console.log(gamepad.structure.structure)
+                // var message  = gamepad.pack(this._xbox)
+                //
+                // this._xbox.get_requestnum()
+                // this._smartglass._send({
+                //     ip: this._smartglass._ip,
+                //     port: 5050
+                // }, message);
             }
         }
     }

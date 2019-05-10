@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 var Smartglass = require('../src/smartglass');
-var SystemImputChannel = require('../src/channels/systeminput');
+var SystemInputChannel = require('../src/channels/systeminput');
+var SystemMediaChannel = require('../src/channels/systemmedia');
 
 var deviceStatus = {
     current_app: false,
@@ -15,7 +16,8 @@ deviceStatus.client.connect({
 }, function(result){
     if(result === true){
         console.log('Xbox succesfully connected!');
-        deviceStatus.client.addManager('system_input', SystemImputChannel())
+        deviceStatus.client.addManager('system_input', SystemInputChannel())
+        // deviceStatus.client.addManager('system_media', SystemMediaChannel())
 
         setTimeout(function(){
             console.log('Send nexus button')
