@@ -1,12 +1,16 @@
 const dgram = require('dgram');
 const Packer = require('./packet/packer');
 const Xbox = require('./xbox');
-var Debug = require('debug')('smartglass:client')
-const smartglassEvent = require('./events')
 
 module.exports = function()
 {
+    var id = Math.floor(Math.random() * (999 - 1)) + 1;
+    var Debug = require('debug')('smartglass:client-'+id)
+
+    var smartglassEvent = require('./events')
+
     return {
+        _client_id: id,
         _consoles: [],
         _socket: false,
         _events: smartglassEvent,
@@ -27,7 +31,7 @@ module.exports = function()
 
             this._getSocket()
 
-            Debug('Crafting discovery_request packet');
+            Debug('['+this._client_id+'] Crafting discovery_request packet');
             var discovery_packet = Packer('simple.discovery_request')
             var message  = discovery_packet.pack()
 
@@ -45,10 +49,11 @@ module.exports = function()
                 port: 5050
             }, message);
 
-            this._interval_timeout = setTimeout(function(client){
-                client._closeClient();
+            this._interval_timeout = setTimeout(function(){
+                Debug('Discovery timeout after 2 sec')
+                this._closeClient();
                 callback(consoles_found);
-            }, 1000, this);
+            }.bind(this), 2000);
         },
 
         powerOn: function(options, callback)
@@ -119,7 +124,7 @@ module.exports = function()
                 ip: this._ip
             }, function(consoles){
                 if(consoles.length > 0){
-                    Debug('Console is online. Lets connect...')
+                    Debug('['+this._client_id+'] Console is online. Lets connect...')
                     clearTimeout(this._interval_timeout)
 
                     this._getSocket();
@@ -136,22 +141,24 @@ module.exports = function()
 
                     smartglassEvent.on('_on_connect_response', function(message, xbox, remote, smartglass){
                         if(message.packet_decoded.protected_payload.connect_result == '0'){
-                            Debug('Console is connected')
+                            Debug('['+this._client_id+'] Console is connected')
                             this._connection_status = true
+                            callback(true)
                         } else {
-                            Debug('Error during connect.')
+                            Debug('['+this._client_id+'] Error during connect.')
+                            this._connection_status = false
+                            callback(false)
                         }
-                        callback()
                     }.bind(this))
 
                     smartglassEvent.on('_on_timeout', function(message, xbox, remote, smartglass){
-                        this._connection_status = false
-                        Debug('Client timeout...')
+                        Debug('['+this._client_id+'] Client timeout...')
                     }.bind(this))
                 } else {
-                    Debug('Device is offline...')
+                    Debug('['+this._client_id+'] Device is offline...')
+                    this._connection_status = false
+                    callback(false)
                 }
-
             }.bind(this))
         },
 
@@ -181,14 +188,19 @@ module.exports = function()
 
         _getSocket: function()
         {
-            Debug('Get active socket');
+            Debug('['+this._client_id+'] Get active socket');
 
             this._socket = dgram.createSocket('udp4');
             this._socket.bind();
 
             this._socket.on('listening', function(message, remote){
-                if(this._is_broadcast == true)
-                    this._socket.setBroadcast(true);
+                //if(this._is_broadcast == true)
+                //    this._socket.setBroadcast(true);
+            }.bind(this))
+
+            this._socket.on('error', function(error){
+                Debug('Socket Error:')
+                Debug(error)
             }.bind(this))
 
             this._socket.on('message', function(message, remote){
@@ -198,15 +210,15 @@ module.exports = function()
             }.bind(this));
 
             this._socket.on('close', function() {
-                Debug('UDP socket closed.');
-            });
+                Debug('['+this._client_id+'] UDP socket closed.');
+            }.bind(this));
 
             return this._socket;
         },
 
         _closeClient:  function()
         {
-            Debug('Client closed');
+            Debug('['+this._client_id+'] Client closed');
 
             clearInterval(this._interval_timeout)
             if(this._socket != false){
@@ -218,9 +230,11 @@ module.exports = function()
 
         _send: function(options, message)
         {
-            this._socket.send(message, 0, message.length, options.port, options.ip, function(err, bytes) {
-                 Debug('Sending packet to client: '+options.ip+':'+options.port);
-            });
+            if(this._socket != false)
+                this._socket.send(message, 0, message.length, options.port, options.ip, function(err, bytes) {
+                     Debug('['+this._client_id+'] Sending packet to client: '+options.ip+':'+options.port);
+                     Debug(message.toString('hex'))
+                }.bind(this));
         },
     }
 }
