@@ -211,8 +211,8 @@ module.exports = function()
             this._socket.bind();
 
             this._socket.on('listening', function(message, remote){
-                //if(this._is_broadcast == true)
-                //    this._socket.setBroadcast(true);
+                if(this._is_broadcast == true)
+                   this._socket.setBroadcast(true);
             }.bind(this))
 
             this._socket.on('error', function(error){

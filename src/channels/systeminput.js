@@ -9,6 +9,20 @@ module.exports = function()
         _smartglass: false,
         _xbox: false,
 
+        _button_map: {
+            a: 16,
+            b: 32,
+            x: 64,
+            y: 128,
+            up: 256,
+            left: 1024,
+            right: 2048,
+            down: 512,
+            nexus: 2,
+            view: 4,
+            menu: 8,
+        },
+
         load: function(smartglass){
             this._smartglass = smartglass
             this._smartglass.on('_on_console_status', function(message, xbox, remote, smartglass){
@@ -53,36 +67,42 @@ module.exports = function()
             if(this._channel_status == true){
                 Debug('Send button: '+button);
 
-                var timestamp = new Date().getTime()
+                if(this._button_map[button] != undefined){
+                    var timestamp = new Date().getTime()
 
-                var gamepad = Packer('message.gamepad')
-                gamepad.set('timestamp', Buffer.from('000'+timestamp.toString(), 'hex'))
-                gamepad.set('buttons', 32);
-                gamepad.setChannel(this._channel_id)
-                console.log(gamepad.structure.structure)
-                var message  = gamepad.pack(this._xbox)
+                    var gamepad = Packer('message.gamepad')
+                    gamepad.set('timestamp', Buffer.from('000'+timestamp.toString(), 'hex'))
+                    gamepad.set('buttons', this._button_map[button]);
+                    gamepad.setChannel(this._channel_id)
+                    var message  = gamepad.pack(this._xbox)
 
-                this._xbox.get_requestnum()
-                this._smartglass._send({
-                    ip: this._smartglass._ip,
-                    port: 5050
-                }, message);
+                    this._xbox.get_requestnum()
+                    this._smartglass._send({
+                        ip: this._smartglass._ip,
+                        port: 5050
+                    }, message);
 
 
-                var timestamp = new Date().getTime()
+                    setTimeout(function(){
 
-                var gamepad = Packer('message.gamepad')
-                gamepad.set('timestamp', Buffer.from('000'+timestamp.toString(), 'hex'))
-                gamepad.set('buttons', 0);
-                gamepad.setChannel(this._channel_id)
-                console.log(gamepad.structure.structure)
-                var message  = gamepad.pack(this._xbox)
+                        var timestamp = new Date().getTime()
 
-                this._xbox.get_requestnum()
-                this._smartglass._send({
-                    ip: this._smartglass._ip,
-                    port: 5050
-                }, message);
+                        var gamepad = Packer('message.gamepad')
+                        gamepad.set('timestamp', Buffer.from('000'+timestamp.toString(), 'hex'))
+                        gamepad.set('buttons', 0);
+                        gamepad.setChannel(this._channel_id)
+                        var message  = gamepad.pack(this._xbox)
+
+                        this._xbox.get_requestnum()
+                        this._smartglass._send({
+                            ip: this._smartglass._ip,
+                            port: 5050
+                        }, message);
+                    }.bind(this), 250)
+
+                } else {
+                    Debug('Failed to send button. Reason: Unknown '+button);
+                }
             }
         }
     }

@@ -26,6 +26,7 @@ smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
 
         if(response.packet_decoded.flags.need_ack == true){
             Debug('Packet needs to be acknowledged. Sending response');
+            Debug(response.packet_decoded)
             xbox._request_num = response.packet_decoded.sequence_number
 
             var ack = Packer('message.acknowledge')
