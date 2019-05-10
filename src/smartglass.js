@@ -20,6 +20,8 @@ module.exports = function()
         _ip: false,
         _interval_timeout: false,
 
+        _managers: {},
+
         _connection_status: false,
 
         discovery: function(options, callback)
@@ -184,6 +186,21 @@ module.exports = function()
             }, disconnect_message);
 
             this._closeClient()
+        },
+
+        addManager: function(name, manager)
+        {
+            Debug('Loaded manager: '+name)
+            this._managers[name] = manager
+            this._managers[name].load(this)
+        },
+
+        getManager: function(name)
+        {
+            if(this._managers[name] != undefined)
+                return this._managers[name]
+            else
+                return false
         },
 
         _getSocket: function()

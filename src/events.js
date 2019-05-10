@@ -34,6 +34,7 @@ smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
             var ack_message = ack.pack(xbox)
 
             try {
+                xbox.get_requestnum()
                 smartglass._send({
                     ip: remote.address,
                     port: 5050

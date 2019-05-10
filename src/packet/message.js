@@ -176,6 +176,27 @@ module.exports = function(type, packet_data = false){
         _acknowledge_list: {
             id: Type.uInt32('0'),
         },
+        start_channel_request: {
+            channel_request_id: Type.uInt32('0'),
+            title_id: Type.uInt32('0'),
+            service: Type.bytes(16, ''),
+            activity_id: Type.uInt32('0'),
+        },
+        start_channel_response: {
+            channel_request_id: Type.uInt32('0'),
+            target_channel_id: Type.bytes(8, ''),
+            result: Type.uInt32('0'),
+        },
+        gamepad: {
+            timestamp: Type.bytes(8, ''),
+            buttons: Type.uInt16('0'),
+            left_trigger: Type.uInt32('0'),
+            right_trigger: Type.uInt32('0'),
+            left_thumbstick_x: Type.uInt32('0'),
+            left_thumbstick_y: Type.uInt32('0'),
+            right_thumbstick_x: Type.uInt32('0'),
+            right_thumbstick_y: Type.uInt32('0'),
+        },
         local_join: {
             client_type: Type.uInt16('3'),
             native_width: Type.uInt16('1080'),
@@ -212,8 +233,8 @@ module.exports = function(type, packet_data = false){
             0x21: "TitleTextSelection",
             0x22: "MirroringRequest",
             0x23: "TitleLaunch",
-            0x26: "StartChannelRequest",
-            0x27: "StartChannelResponse",
+            0x26: "start_channel_request",
+            0x27: "start_channel_response",
             0x28: "StopChannel",
             0x29: "System",
             0x2A: "disconnect",
@@ -231,7 +252,7 @@ module.exports = function(type, packet_data = false){
             0xF01: "MediaCommand",
             0xF02: "MediaCommandResult",
             0xF03: "MediaState",
-            0xF0A: "Gamepad",
+            0xF0A: "gamepad",
             0xF2B: "SystemTextConfiguration",
             0xF2C: "SystemTextInput",
             0xF2E: "SystemTouch",
@@ -284,8 +305,8 @@ module.exports = function(type, packet_data = false){
             0x21: "TitleTextSelection",
             0x22: "MirroringRequest",
             0x23: "TitleLaunch",
-            0x26: "StartChannelRequest",
-            0x27: "StartChannelResponse",
+            start_channel_request: Buffer.from('a026', 'hex'),
+            start_channel_response: Buffer.from('a027', 'hex'),
             0x28: "StopChannel",
             0x29: "System",
             disconnect: Buffer.from('802a', 'hex'),
@@ -303,7 +324,7 @@ module.exports = function(type, packet_data = false){
             0xF01: "MediaCommand",
             0xF02: "MediaCommandResult",
             0xF03: "MediaState",
-            0xF0A: "Gamepad",
+            gamepad: Buffer.from('a039', 'hex'),
             0xF2B: "SystemTextConfiguration",
             0xF2C: "SystemTextInput",
             0xF2E: "SystemTouch",
@@ -326,6 +347,7 @@ module.exports = function(type, packet_data = false){
         channel_id: Buffer.from('\x00\x00\x00\x00\x00\x00\x00\x00'),
 
         setChannel: function(channel){
+            Debug('Set channel to: '+channel.toString('hex'))
             this.channel_id = Buffer.from(channel)
         },
 
