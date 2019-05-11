@@ -24,8 +24,24 @@ deviceStatus.client.connect({
             deviceStatus.client.getManager('system_input').sendCommand('nexus');
 
             setTimeout(function(){
-                deviceStatus.client.getManager('system_input').sendCommand('nexus');
+                deviceStatus.client.getManager('system_input').sendCommand('down');
             }.bind(deviceStatus), 1000)
+
+            setTimeout(function(){
+                deviceStatus.client.getManager('system_input').sendCommand('up');
+            }.bind(deviceStatus), 2000)
+
+            setTimeout(function(){
+                deviceStatus.client.getManager('system_input').sendCommand('left');
+            }.bind(deviceStatus), 3000)
+
+            setTimeout(function(){
+                deviceStatus.client.getManager('system_input').sendCommand('right');
+            }.bind(deviceStatus), 4000)
+
+            setTimeout(function(){
+                deviceStatus.client.getManager('system_input').sendCommand('nexus');
+            }.bind(deviceStatus), 5000)
         }.bind(deviceStatus), 5000)
     } else {
         console.log('Failed to connect to xbox:', result);
