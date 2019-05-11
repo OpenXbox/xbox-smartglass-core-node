@@ -21,11 +21,11 @@ deviceStatus.client.connect({
 
         setTimeout(function(){
             console.log('Send nexus button')
-            deviceStatus.client.getManager('system_input').sendCommand('a');
+            deviceStatus.client.getManager('system_input').sendCommand('nexus');
 
-            // setTimeout(function(){
-            //     deviceStatus.client.getManager('system_input').sendCommand('b');
-            // }.bind(deviceStatus), 1000)
+            setTimeout(function(){
+                deviceStatus.client.getManager('system_input').sendCommand('nexus');
+            }.bind(deviceStatus), 1000)
         }.bind(deviceStatus), 5000)
     } else {
         console.log('Failed to connect to xbox:', result);
