@@ -31,7 +31,9 @@ See the [examples](examples) folder for examples
 
 0.4.1
 
-    - TBD
+    - Added gamepad control
+    - Media status implemented
+    - Improved stability in connection
 
 0.4.0
 
