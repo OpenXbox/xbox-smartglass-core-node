@@ -35,8 +35,9 @@ module.exports = function()
                     channel_request.set('service', Buffer.from('fa20b8ca66fb46e0adb60b978a59d35f', 'hex'));
                     channel_request.set('activity_id', 0);
 
+                    // xbox.get_requestnum()
+                    this._smartglass._consoles[this._smartglass._ip].get_requestnum()
                     var message  = channel_request.pack(xbox)
-                    xbox.get_requestnum()
 
                     Debug('Send data: '+message.toString('hex'));
 
@@ -74,9 +75,11 @@ module.exports = function()
                     gamepad.set('timestamp', Buffer.from('000'+timestamp.toString(), 'hex'))
                     gamepad.set('buttons', this._button_map[button]);
                     gamepad.setChannel(this._channel_id)
-                    var message  = gamepad.pack(this._xbox)
 
-                    this._xbox.get_requestnum()
+                    this._smartglass._consoles[this._smartglass._ip].get_requestnum()
+                    // this._smartglass._consoles[this._smartglass._ip].get_requestnum()
+                    var message  = gamepad.pack(this._smartglass._consoles[this._smartglass._ip])
+
                     this._smartglass._send({
                         ip: this._smartglass._ip,
                         port: 5050
@@ -91,9 +94,10 @@ module.exports = function()
                         gamepad.set('timestamp', Buffer.from('000'+timestamp.toString(), 'hex'))
                         gamepad.set('buttons', 0);
                         gamepad.setChannel(this._channel_id)
-                        var message  = gamepad.pack(this._xbox)
 
-                        this._xbox.get_requestnum()
+                        this._smartglass._consoles[this._smartglass._ip].get_requestnum()
+                        var message  = gamepad.pack(this._smartglass._consoles[this._smartglass._ip])
+
                         this._smartglass._send({
                             ip: this._smartglass._ip,
                             port: 5050
@@ -103,6 +107,8 @@ module.exports = function()
                 } else {
                     Debug('Failed to send button. Reason: Unknown '+button);
                 }
+            } else {
+                Debug('Failed to send button. Reason: Channel not created');
             }
         }
     }

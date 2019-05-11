@@ -21,8 +21,8 @@ module.exports = function()
                     channel_request.set('service', Buffer.from('48a9ca24eb6d4e128c43d57469edd3cd', 'hex'));
                     channel_request.set('activity_id', 0);
 
-                    var message  = channel_request.pack(xbox)
                     xbox.get_requestnum()
+                    var message  = channel_request.pack(xbox)
 
                     Debug('Send data: '+message.toString('hex'));
 
@@ -64,9 +64,9 @@ module.exports = function()
                 gamepad.set('buttons', 32);
                 gamepad.setChannel(this._channel_id)
                 console.log(gamepad.structure.structure)
+                this._xbox.get_requestnum()
                 var message  = gamepad.pack(this._xbox)
 
-                this._xbox.get_requestnum()
                 this._smartglass._send({
                     ip: this._smartglass._ip,
                     port: 5050

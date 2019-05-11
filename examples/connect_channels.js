@@ -21,16 +21,16 @@ deviceStatus.client.connect({
 
         setTimeout(function(){
             console.log('Send nexus button')
-            deviceStatus.client.getManager('system_input').sendCommand('nexus');
+            deviceStatus.client.getManager('system_input').sendCommand('a');
 
             // setTimeout(function(){
             //     deviceStatus.client.getManager('system_input').sendCommand('b');
             // }.bind(deviceStatus), 1000)
-        }.bind(deviceStatus), 1000)
+        }.bind(deviceStatus), 5000)
     } else {
         console.log('Failed to connect to xbox:', result);
     }
-});
+}.bind(deviceStatus));
 
 deviceStatus.client.on('_on_timeout', function(message, xbox, remote, smartglass){
     deviceStatus.connection_status = false
