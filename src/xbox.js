@@ -51,6 +51,7 @@ module.exports = function(ip, certificate)
 
             this._request_num++;
 
+            Debug('this._request_num set to '+this._request_num)
             return num;
         },
 

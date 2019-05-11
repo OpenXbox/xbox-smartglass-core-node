@@ -46,6 +46,9 @@ module.exports = function(type)
         },
         unpack: function(device = undefined){
             return structure.unpack(device)
+        },
+        setChannel: function(channel){
+            this.structure.setChannel(channel)
         }
     }
 }

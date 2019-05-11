@@ -26,12 +26,14 @@ smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
 
         if(response.packet_decoded.flags.need_ack == true){
             Debug('Packet needs to be acknowledged. Sending response');
-            xbox._request_num = response.packet_decoded.sequence_number
+            Debug(response.packet_decoded)
 
             var ack = Packer('message.acknowledge')
             ack.set('low_watermark', response.packet_decoded.sequence_number)
-            ack.structure.structure.processed_list.value.push({id: response.packet_decoded.sequence_number})
-            var ack_message = ack.pack(xbox)
+                ack.structure.structure.processed_list.value.push({id: response.packet_decoded.sequence_number})
+            smartglass._consoles[smartglass._ip].get_requestnum()
+            Debug(ack.structure.structure.processed_list)
+            var ack_message = ack.pack(smartglass._consoles[smartglass._ip])
 
             try {
                 smartglass._send({
@@ -42,6 +44,8 @@ smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
             catch(error) {
                 Debug('error', error)
             }
+
+        } else {
 
         }
     }
