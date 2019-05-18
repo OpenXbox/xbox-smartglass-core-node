@@ -23,25 +23,34 @@ deviceStatus.client.connect({
             console.log('Send nexus button')
             deviceStatus.client.getManager('system_input').sendCommand('nexus');
 
-            // setTimeout(function(){
-            //     deviceStatus.client.getManager('system_input').sendCommand('down');
-            // }.bind(deviceStatus), 1000)
-            //
-            // setTimeout(function(){
-            //     deviceStatus.client.getManager('system_input').sendCommand('up');
-            // }.bind(deviceStatus), 2000)
-            //
-            // setTimeout(function(){
-            //     deviceStatus.client.getManager('system_input').sendCommand('left');
-            // }.bind(deviceStatus), 3000)
-            //
-            // setTimeout(function(){
-            //     deviceStatus.client.getManager('system_input').sendCommand('right');
-            // }.bind(deviceStatus), 4000)
+            setTimeout(function(){
+                deviceStatus.client.getManager('system_input').sendCommand('down');
+            }.bind(deviceStatus), 1000)
+
+            setTimeout(function(){
+                deviceStatus.client.getManager('system_input').sendCommand('up');
+            }.bind(deviceStatus), 2000)
+
+            setTimeout(function(){
+                deviceStatus.client.getManager('system_input').sendCommand('left');
+            }.bind(deviceStatus), 3000)
+
+            setTimeout(function(){
+                deviceStatus.client.getManager('system_input').sendCommand('right');
+            }.bind(deviceStatus), 4000)
+
+            setTimeout(function(){
+                deviceStatus.client.getManager('system_media').sendCommand('pause');
+            }.bind(deviceStatus), 500)
 
             setTimeout(function(){
                 deviceStatus.client.getManager('system_input').sendCommand('nexus');
-            }.bind(deviceStatus), 1000)
+            }.bind(deviceStatus), 5000)
+
+            setTimeout(function(){
+                deviceStatus.client.getManager('system_media').sendCommand('play');
+            }.bind(deviceStatus), 2500)
+
         }.bind(deviceStatus), 5000)
     } else {
         console.log('Failed to connect to xbox:', result);
