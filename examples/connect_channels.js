@@ -16,32 +16,32 @@ deviceStatus.client.connect({
 }, function(result){
     if(result === true){
         console.log('Xbox succesfully connected!');
-        deviceStatus.client.addManager('system_input', SystemInputChannel())
-        // deviceStatus.client.addManager('system_media', SystemMediaChannel())
+        deviceStatus.client.addManager('system_input', SystemInputChannel(0))
+        deviceStatus.client.addManager('system_media', SystemMediaChannel(1))
 
         setTimeout(function(){
             console.log('Send nexus button')
             deviceStatus.client.getManager('system_input').sendCommand('nexus');
 
-            setTimeout(function(){
-                deviceStatus.client.getManager('system_input').sendCommand('down');
-            }.bind(deviceStatus), 1000)
-
-            setTimeout(function(){
-                deviceStatus.client.getManager('system_input').sendCommand('up');
-            }.bind(deviceStatus), 2000)
-
-            setTimeout(function(){
-                deviceStatus.client.getManager('system_input').sendCommand('left');
-            }.bind(deviceStatus), 3000)
-
-            setTimeout(function(){
-                deviceStatus.client.getManager('system_input').sendCommand('right');
-            }.bind(deviceStatus), 4000)
+            // setTimeout(function(){
+            //     deviceStatus.client.getManager('system_input').sendCommand('down');
+            // }.bind(deviceStatus), 1000)
+            //
+            // setTimeout(function(){
+            //     deviceStatus.client.getManager('system_input').sendCommand('up');
+            // }.bind(deviceStatus), 2000)
+            //
+            // setTimeout(function(){
+            //     deviceStatus.client.getManager('system_input').sendCommand('left');
+            // }.bind(deviceStatus), 3000)
+            //
+            // setTimeout(function(){
+            //     deviceStatus.client.getManager('system_input').sendCommand('right');
+            // }.bind(deviceStatus), 4000)
 
             setTimeout(function(){
                 deviceStatus.client.getManager('system_input').sendCommand('nexus');
-            }.bind(deviceStatus), 5000)
+            }.bind(deviceStatus), 1000)
         }.bind(deviceStatus), 5000)
     } else {
         console.log('Failed to connect to xbox:', result);
