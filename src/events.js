@@ -26,13 +26,12 @@ smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
 
         if(response.packet_decoded.flags.need_ack == true){
             Debug('Packet needs to be acknowledged. Sending response');
-            Debug(response.packet_decoded)
+            //Debug(response.packet_decoded)
 
             var ack = Packer('message.acknowledge')
             ack.set('low_watermark', response.packet_decoded.sequence_number)
                 ack.structure.structure.processed_list.value.push({id: response.packet_decoded.sequence_number})
             smartglass._consoles[smartglass._ip].get_requestnum()
-            Debug(ack.structure.structure.processed_list)
             var ack_message = ack.pack(smartglass._consoles[smartglass._ip])
 
             try {
@@ -80,10 +79,11 @@ smartglassEmitter.on('_on_connect_response', function(message, xbox, remote, sma
         }, join_message);
 
         smartglass._interval_timeout = setInterval(function(){
-            Debug('Check timeout: Last packet was '+((Math.floor(Date.now() / 1000))-this._last_received_time+' seconds ago'))
             var seconds_ago = (Math.floor(Date.now() / 1000))-this._last_received_time
 
             if(seconds_ago == 10 || seconds_ago == 20){
+                Debug('Check timeout: Last packet was '+((Math.floor(Date.now() / 1000))-this._last_received_time+' seconds ago'))
+
                 xbox.get_requestnum()
                 var ack = Packer('message.acknowledge')
                 ack.set('low_watermark', xbox._request_num)
