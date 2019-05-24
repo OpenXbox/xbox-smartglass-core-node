@@ -53,7 +53,7 @@ module.exports = function(channel_request_id)
                         // console.log('Got channel response!', message)
                         this._xbox = xbox;
 
-                        console.log(message.packet_decoded.protected_payload)
+                        // console.log(message.packet_decoded.protected_payload)
 
                         if(message.packet_decoded.protected_payload.channel_request_id == this._channel_request_id)
                         {
@@ -97,7 +97,7 @@ module.exports = function(channel_request_id)
                 this._media_request_id++
 
                 media_command.setChannel(this._channel_id)
-                console.log(media_command.structure.structure)
+                // console.log(media_command.structure.structure)
                 this._xbox.get_requestnum()
                 var message  = media_command.pack(this._xbox)
 
