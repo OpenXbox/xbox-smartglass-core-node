@@ -91,6 +91,8 @@ module.exports = function(ip, certificate)
                 var process = spawnSync("python", [__dirname+"/python/crypto.py", ecKey.pubKeyHex])
                 object = JSON.parse(process.stdout);
             } catch(error){
+                console.log('Error signing key. Python 2 is probably missing (See dependencies: https://github.com/unknownskl/xbox-smartglass-core-node)');
+                
                 object = {
                     public_key: ecKey.pubKeyHex,
                     secret: '00000000000000000000000000000000'

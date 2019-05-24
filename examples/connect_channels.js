@@ -16,8 +16,8 @@ deviceStatus.client.connect({
 }, function(result){
     if(result === true){
         console.log('Xbox succesfully connected!');
-        deviceStatus.client.addManager('system_input', SystemInputChannel())
-        // deviceStatus.client.addManager('system_media', SystemMediaChannel())
+        deviceStatus.client.addManager('system_input', SystemInputChannel(0))
+        deviceStatus.client.addManager('system_media', SystemMediaChannel(1))
 
         setTimeout(function(){
             console.log('Send nexus button')
@@ -40,8 +40,17 @@ deviceStatus.client.connect({
             }.bind(deviceStatus), 4000)
 
             setTimeout(function(){
+                deviceStatus.client.getManager('system_media').sendCommand('pause');
+            }.bind(deviceStatus), 500)
+
+            setTimeout(function(){
                 deviceStatus.client.getManager('system_input').sendCommand('nexus');
             }.bind(deviceStatus), 5000)
+
+            setTimeout(function(){
+                deviceStatus.client.getManager('system_media').sendCommand('play');
+            }.bind(deviceStatus), 2500)
+
         }.bind(deviceStatus), 5000)
     } else {
         console.log('Failed to connect to xbox:', result);

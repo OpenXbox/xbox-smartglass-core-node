@@ -1,11 +1,12 @@
 var Debug = require('debug')('smartglass:channel_system_input')
 const Packer = require('../packet/packer');
 
-module.exports = function()
+module.exports = function(channel_request_id)
 {
     return {
         _channel_status: false,
         _channel_id: 0,
+        _channel_request_id: channel_request_id,
         _smartglass: false,
         _xbox: false,
 
@@ -30,7 +31,7 @@ module.exports = function()
                     Debug('Channel status is false, opening channel SystemInput');
 
                     var channel_request = Packer('message.start_channel_request')
-                    channel_request.set('channel_request_id', 0);
+                    channel_request.set('channel_request_id', this._channel_request_id);
                     channel_request.set('title_id', 0);
                     channel_request.set('service', Buffer.from('fa20b8ca66fb46e0adb60b978a59d35f', 'hex'));
                     channel_request.set('activity_id', 0);
@@ -42,16 +43,19 @@ module.exports = function()
                     Debug('Send data: '+message.toString('hex'));
 
                     this._smartglass.on('_on_start_channel_response', function(message, xbox, remote){
-                        console.log('Got channel response!', message)
+                        // console.log('Got channel response!', message)
                         this._xbox = xbox;
 
-                        if(message.packet_decoded.protected_payload.result == 0)
+                        if(message.packet_decoded.protected_payload.channel_request_id == this._channel_request_id)
                         {
-                            Debug('Channel ready: SystemInput');
-                            this._channel_status = true
-                            this._channel_id = message.packet_decoded.protected_payload.target_channel_id
-                        } else {
-                            Debug('Could not open channel: SystemInput');
+                            if(message.packet_decoded.protected_payload.result == 0)
+                            {
+                                Debug('Channel ready: SystemInput');
+                                this._channel_status = true
+                                this._channel_id = message.packet_decoded.protected_payload.target_channel_id
+                            } else {
+                                Debug('Could not open channel: SystemInput');
+                            }
                         }
                     }.bind(this));
 

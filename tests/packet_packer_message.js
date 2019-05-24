@@ -15,7 +15,8 @@ var packets = [
     {'message.start_channel_request': 'tests/data/packets/start_channel_request'},
     {'message.start_channel_response': 'tests/data/packets/disconnect'},
     {'message.gamepad': 'tests/data/packets/gamepad'},
-    {'message.media_state': 'tests/data/packets/media_state'}
+    {'message.media_state': 'tests/data/packets/media_state'},
+    {'message.media_command': 'tests/data/packets/media_command'}
 ]
 
 var device = Xbox('127.0.0.1', certificate);
@@ -244,13 +245,36 @@ describe('packet/packer/message', function(){
         assert.deepStrictEqual(message.packet_decoded.protected_payload.rate, 0)
     });
 
+    it('should unpack a media_command packet', function(){
+        var data_packet = fs.readFileSync('tests/data/packets/media_command')
+
+        var poweroff_request = Packer(data_packet)
+        var message = poweroff_request.unpack(device)
+
+        assert.deepStrictEqual(message.type, 'message')
+        assert.deepStrictEqual(message.packet_decoded.sequence_number, 597)
+        assert.deepStrictEqual(message.packet_decoded.source_participant_id, 32)
+        assert.deepStrictEqual(message.packet_decoded.target_participant_id, 0)
+
+        assert.deepStrictEqual(message.packet_decoded.flags.version, '2')
+        assert.deepStrictEqual(message.packet_decoded.flags.need_ack, true)
+        assert.deepStrictEqual(message.packet_decoded.flags.is_fragment, false)
+        assert.deepStrictEqual(message.packet_decoded.flags.type, 'media_command')
+        assert.deepStrictEqual(message.packet_decoded.channel_id, Buffer.from('0000000000000099', 'hex'))
+
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.request_id, Buffer.from('0000000000000000', 'hex'))
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.title_id, 274278798)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.command, 256)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.seek_position, undefined) // Should be tested when implemented
+    });
+
     describe('should repack messages correctly', function(){
         packets.forEach(function(element, packetType){
             for (var name in element) break;
 
             it('should repack a valid '+name+' packet', function(){
                 var data_packet = fs.readFileSync(element[name])
-                console.log('d_packet', data_packet.toString('hex'));
+                // console.log('d_packet', data_packet.toString('hex'));
 
                 var response = Packer(data_packet)
                 var message = response.unpack(device)
@@ -262,7 +286,7 @@ describe('packet/packer/message', function(){
                 device._source_participant_id = message.packet_decoded.source_participant_id
 
                 var repacked = message.pack(device)
-                console.log('repacked', repacked.toString('hex'));
+                // console.log('repacked', repacked.toString('hex'));
 
                 assert.deepStrictEqual(data_packet, Buffer.from(repacked))
             });
