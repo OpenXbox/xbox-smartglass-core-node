@@ -16,7 +16,8 @@ var packets = [
     {'message.start_channel_response': 'tests/data/packets/disconnect'},
     {'message.gamepad': 'tests/data/packets/gamepad'},
     {'message.media_state': 'tests/data/packets/media_state'},
-    {'message.media_command': 'tests/data/packets/media_command'}
+    {'message.media_command': 'tests/data/packets/media_command'},
+    {'message.json': 'tests/data/packets/json'}
 ]
 
 var device = Xbox('127.0.0.1', certificate);
@@ -266,6 +267,26 @@ describe('packet/packer/message', function(){
         assert.deepStrictEqual(message.packet_decoded.protected_payload.title_id, 274278798)
         assert.deepStrictEqual(message.packet_decoded.protected_payload.command, 256)
         assert.deepStrictEqual(message.packet_decoded.protected_payload.seek_position, undefined) // Should be tested when implemented
+    });
+
+    it('should unpack a json packet', function(){
+        var data_packet = fs.readFileSync('tests/data/packets/json')
+
+        var poweroff_request = Packer(data_packet)
+        var message = poweroff_request.unpack(device)
+
+        assert.deepStrictEqual(message.type, 'message')
+        assert.deepStrictEqual(message.packet_decoded.sequence_number, 11)
+        assert.deepStrictEqual(message.packet_decoded.source_participant_id, 31)
+        assert.deepStrictEqual(message.packet_decoded.target_participant_id, 0)
+
+        assert.deepStrictEqual(message.packet_decoded.flags.version, '2')
+        assert.deepStrictEqual(message.packet_decoded.flags.need_ack, true)
+        assert.deepStrictEqual(message.packet_decoded.flags.is_fragment, false)
+        assert.deepStrictEqual(message.packet_decoded.flags.type, 'json')
+        assert.deepStrictEqual(message.packet_decoded.channel_id, Buffer.from('0000000000000097', 'hex'))
+
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.json, '{"msgid":"2ed6c0fd.2","request":"GetConfiguration"}')
     });
 
     describe('should repack messages correctly', function(){

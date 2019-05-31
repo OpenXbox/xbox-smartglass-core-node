@@ -234,6 +234,9 @@ module.exports = function(type, packet_data = false){
             os_minor_version: Type.uInt32('2'),
             display_name: Type.sgString('Xbox-Smartglass-Node'),
         },
+        json: {
+            json: Type.sgString('{}')
+        },
         disconnect: {
             reason: Type.uInt32('1'),
             error_code: Type.uInt32('0')
@@ -250,7 +253,7 @@ module.exports = function(type, packet_data = false){
             0x19: "AuxilaryStream",
             0x1A: "ActiveSurfaceChange",
             0x1B: "Navigate",
-            0x1C: "Json",
+            0x1C: "json",
             0x1D: "Tunnel",
             0x1E: "console_status",
             0x1F: "TitleTextConfiguration",
@@ -322,7 +325,7 @@ module.exports = function(type, packet_data = false){
             0x19: "AuxilaryStream",
             0x1A: "ActiveSurfaceChange",
             0x1B: "Navigate",
-            0x1C: "Json",
+            json: Buffer.from('a01c', 'hex'),
             0x1D: "Tunnel",
             console_status: Buffer.from('a01e', 'hex'),
             0x1F: "TitleTextConfiguration",
