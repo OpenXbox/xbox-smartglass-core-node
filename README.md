@@ -1,5 +1,5 @@
 # Xbox-Smartglass-Core-Node
-[![Build Status](https://travis-ci.org/unknownskl/xbox-smartglass-core-node.svg?branch=release/0.4.3)](https://travis-ci.org/unknownskl/xbox-smartglass-core-node)
+[![Build Status](https://travis-ci.org/OpenXbox/xbox-smartglass-core-node.svg?branch=release/0.4.3)](https://travis-ci.org/OpenXbox/xbox-smartglass-core-node)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=alert_status&branch=release/0.4.3)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=alert_status)
 [![Technical debt](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=sqale_index&branch=release/0.4.3)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=sqale_index)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=bugs&branch=release/0.4.3)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=bugs)
