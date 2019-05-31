@@ -45,7 +45,7 @@ module.exports = function(channel_request_id)
                     channel_request.set('activity_id', 0);
 
                     xbox.get_requestnum()
-                    var message  = channel_request.pack(xbox)
+                    var channel_message  = channel_request.pack(xbox)
 
                     Debug('Send data: '+message.toString('hex'));
 
@@ -77,7 +77,7 @@ module.exports = function(channel_request_id)
                     this._smartglass._send({
                         ip: remote.address,
                         port: 5050
-                    }, message);
+                    }, channel_message);
                 }
             }.bind(this));
         },
@@ -86,7 +86,6 @@ module.exports = function(channel_request_id)
             // Send
             if(this._channel_status == true){
                 Debug('Send media command: '+button);
-                var timestamp = new Date().getTime()
 
                 var media_command = Packer('message.media_command')
                 var request_id = "0000000000000000"
@@ -97,7 +96,6 @@ module.exports = function(channel_request_id)
                 this._media_request_id++
 
                 media_command.setChannel(this._channel_id)
-                // console.log(media_command.structure.structure)
                 this._xbox.get_requestnum()
                 var message  = media_command.pack(this._xbox)
 

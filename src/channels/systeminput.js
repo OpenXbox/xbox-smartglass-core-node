@@ -38,7 +38,7 @@ module.exports = function(channel_request_id)
 
                     // xbox.get_requestnum()
                     this._smartglass._consoles[this._smartglass._ip].get_requestnum()
-                    var message  = channel_request.pack(xbox)
+                    var channel_message  = channel_request.pack(xbox)
 
                     Debug('Send data: '+message.toString('hex'));
 
@@ -62,7 +62,7 @@ module.exports = function(channel_request_id)
                     this._smartglass._send({
                         ip: remote.address,
                         port: 5050
-                    }, message);
+                    }, channel_message);
                 }
             }.bind(this));
         },
