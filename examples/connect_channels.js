@@ -2,6 +2,7 @@
 var Smartglass = require('../src/smartglass');
 var SystemInputChannel = require('../src/channels/systeminput');
 var SystemMediaChannel = require('../src/channels/systemmedia');
+var TvRemoteChannel = require('../src/channels/tvremote');
 
 var deviceStatus = {
     current_app: false,
@@ -18,6 +19,7 @@ deviceStatus.client.connect({
         console.log('Xbox succesfully connected!');
         deviceStatus.client.addManager('system_input', SystemInputChannel(0))
         deviceStatus.client.addManager('system_media', SystemMediaChannel(1))
+        deviceStatus.client.addManager('tv_remote', TvRemoteChannel(2))
 
         setTimeout(function(){
             console.log('Send nexus button')
@@ -28,12 +30,20 @@ deviceStatus.client.connect({
             }.bind(deviceStatus), 1000)
 
             setTimeout(function(){
+                deviceStatus.client.getManager('tv_remote').sendIrCommand('btn.vol_up');
+            }.bind(deviceStatus), 1500)
+
+            setTimeout(function(){
                 deviceStatus.client.getManager('system_input').sendCommand('up');
             }.bind(deviceStatus), 2000)
 
             setTimeout(function(){
                 deviceStatus.client.getManager('system_input').sendCommand('left');
             }.bind(deviceStatus), 3000)
+
+            setTimeout(function(){
+                deviceStatus.client.getManager('tv_remote').sendIrCommand('btn.vol_down');
+            }.bind(deviceStatus), 3500)
 
             setTimeout(function(){
                 deviceStatus.client.getManager('system_input').sendCommand('right');

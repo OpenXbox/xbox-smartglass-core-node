@@ -44,8 +44,6 @@ smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
                 Debug('error', error)
             }
 
-        } else {
-
         }
     }
 
