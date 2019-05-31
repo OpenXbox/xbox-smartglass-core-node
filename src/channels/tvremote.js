@@ -97,7 +97,7 @@ module.exports = function(channel_request_id)
 
         sendIrCommand: function(button_id, device_id = null){
             if(this._channel_status == true){
-                Debug('Send button: '+button);
+                Debug('Send button: '+button_id);
 
                 this._message_num++
                 var msgId = '2ed6c0fd.'+this._message_num;
