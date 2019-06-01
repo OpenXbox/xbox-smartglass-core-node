@@ -15,7 +15,7 @@ var simple_packets = [
 ]
 
 var device = Xbox('127.0.0.1', certificate);
-device.loadCrypto(certificate.toString('hex'), secret.toString('hex'));
+device.setSharedSecret(secret.toString('hex'));
 
 describe('packet/packer', function(){
 

@@ -82,28 +82,9 @@ module.exports = function(ip, certificate)
             // Create public key
             var ecKey = jsrsasign.X509.getPublicKeyFromCertPEM(pem);
 
-            Debug('Starting python process');
-
-            var object = {}
-            try {
-                // Sign certificate using python
-                const { spawnSync } = require('child_process');
-                var process = spawnSync("python", [__dirname+"/python/crypto.py", ecKey.pubKeyHex])
-                object = JSON.parse(process.stdout);
-            } catch(error){
-                console.log('Error signing key. Python 2 is probably missing (See dependencies: https://github.com/unknownskl/xbox-smartglass-core-node)');
-                
-                object = {
-                    public_key: ecKey.pubKeyHex,
-                    secret: '00000000000000000000000000000000'
-                }
-            }
-
-            Debug('Process output:', object);
-
-
-            // Load crypto data
-            this.loadCrypto(object.public_key, object.secret);
+            var sgcrypto = new SGCrypto();
+            this._crypto = sgcrypto;
+            this._crypto.load(ecKey.pubKeyHex);
 
             Debug('Sending connect_request to xbox');
             var discovery_request = Packer('simple.connect_request');
@@ -116,14 +97,12 @@ module.exports = function(ip, certificate)
             return message
         },
 
-        loadCrypto: function(public_key, shared_secret)
+        setSharedSecret: function(shared_secret)
         {
-            Debug('Loading crypto:');
-            Debug('- Public key:', public_key);
-            Debug('- Shared secret:', shared_secret);
             var sgcrypto = new SGCrypto();
             this._crypto = sgcrypto;
-            this._crypto.load(Buffer.from(public_key, 'hex'), Buffer.from(shared_secret, 'hex'))
+
+            this._crypto.fromSharedSecret(shared_secret);
         }
     };
 }

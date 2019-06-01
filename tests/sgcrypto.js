@@ -11,7 +11,7 @@ describe('sgcrypto', function(){
 
     it('should return an encryption key', function(){
         var clientCrypto = sgCrypto();
-        clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');
+        clientCrypto.fromSharedSecret('0123456789012345678901234567890123456789012345678901234567890123');
         var encryptionKey = clientCrypto.getEncryptionKey();
 
         assert.deepStrictEqual(encryptionKey, Buffer.from('0123456789012345'));
@@ -19,7 +19,7 @@ describe('sgcrypto', function(){
 
     it('should return a secret', function(){
         var clientCrypto = sgCrypto();
-        clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');
+        clientCrypto.fromSharedSecret('0123456789012345678901234567890123456789012345678901234567890123');
         var secret = clientCrypto.getSecret();
 
         assert.deepStrictEqual(secret, Buffer.from('0123456789012345678901234567890123456789012345678901234567890123'));
@@ -27,7 +27,7 @@ describe('sgcrypto', function(){
 
     it('should return a hmac', function(){
         var clientCrypto = sgCrypto();
-        clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');
+        clientCrypto.fromSharedSecret('0123456789012345678901234567890123456789012345678901234567890123');
         var hmac = clientCrypto.getHmac();
 
         assert.deepStrictEqual(hmac, Buffer.from('23456789012345678901234567890123'));
@@ -35,7 +35,7 @@ describe('sgcrypto', function(){
 
     it('should generate a static iv with a secret', function(){
         var clientCrypto = sgCrypto();
-        clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');
+        clientCrypto.fromSharedSecret('0123456789012345678901234567890123456789012345678901234567890123');
 
         var static_iv = clientCrypto.getIv();
 
@@ -45,7 +45,7 @@ describe('sgcrypto', function(){
 
     it('should encrypt a string', function(){
         var clientCrypto = sgCrypto();
-        clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');
+        clientCrypto.fromSharedSecret('0123456789012345678901234567890123456789012345678901234567890123');
 
         var key = clientCrypto.getIv();
         var encoded_string = clientCrypto._encrypt(Buffer.from('Test String\x00\x00\x00\x00\x00'), key);
@@ -55,7 +55,7 @@ describe('sgcrypto', function(){
 
     it('should decode an encrypted string', function(){
         var clientCrypto = sgCrypto();
-        clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');
+        clientCrypto.fromSharedSecret('0123456789012345678901234567890123456789012345678901234567890123');
 
         var key = clientCrypto.getIv();
         var encoded_string = clientCrypto._encrypt(Buffer.from('Test String\x00\x00\x00\x00\x00'), key);
@@ -65,7 +65,7 @@ describe('sgcrypto', function(){
 
     it('should encrypt a string with iv', function(){
         var clientCrypto = sgCrypto();
-        clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');
+        clientCrypto.fromSharedSecret('0123456789012345678901234567890123456789012345678901234567890123');
 
         var iv = clientCrypto.getIv();
         var key = Buffer.from('000102030405060708090A0B0C0D0E0F', 'hex');
@@ -77,7 +77,7 @@ describe('sgcrypto', function(){
 
     it('should decode an encrypted string with iv', function(){
         var clientCrypto = sgCrypto();
-        clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');
+        clientCrypto.fromSharedSecret('0123456789012345678901234567890123456789012345678901234567890123');
 
         var key = clientCrypto.getIv();
         var iv = Buffer.from('000102030405060708090A0B0C0D0E0F', 'hex');

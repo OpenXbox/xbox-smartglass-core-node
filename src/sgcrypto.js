@@ -1,28 +1,49 @@
 const crypto = require('crypto');
+const ecp256 = crypto.createECDH("prime256v1");
+const sha512 = crypto.createHash("sha512");
+
+var Salt_pre = new Buffer("D637F1AAE2F0418C", "hex");
+var Salt_post = new Buffer("A8F81A574E228AB7", "hex");
 
 module.exports = function()
 {
     return {
         pubkey: Buffer.from('', 'hex'),
+        foreign_pubkey: Buffer.from('', 'hex'),
         secret: Buffer.from('', 'hex'),
         encryptionkey: false,
         iv: false,
         hash_key: false,
 
-        load: function(pubkey, secret)
+        load: function(console_pubkey)
         {
-            if(pubkey != undefined && secret != undefined)
-            {
-                this.pubkey = Buffer.from(pubkey);
-                this.secret = Buffer.from(secret);
-            }
+            this.foreign_pubkey = Buffer.from(console_pubkey, 'hex');
+
+            // Generate own keypair
+            ecp256.generateKeys(null, "uncompressed");
+            this.pubkey = ecp256.getPublicKey();
+
+            // Derive shared secret from foreign pubkey
+            var derived_secret = ecp256.computeSecret(this.foreign_pubkey);
+            // Salt shared secret
+            derived_secret = Salt_pre + derived_secret + Salt_post;
+            // Hash shared secret
+            derived_secret = sha512.digest(derived_secret);
+
+            fromSharedSecret(derived_secret);
+        },
+
+        fromSharedSecret: function(shared_secret)
+        {
+            shared_secret = Buffer.from(shared_secret, 'hex');
 
             var data = {
-        		'aes_key': Buffer.from(this.secret.slice(0, 16)),
-        		'aes_iv': Buffer.from(this.secret.slice(16, 32)),
-        		'hmac_key': Buffer.from(this.secret.slice(32))
+        		'aes_key': Buffer.from(shared_secret.slice(0, 16)),
+        		'aes_iv': Buffer.from(shared_secret.slice(16, 32)),
+        		'hmac_key': Buffer.from(shared_secret.slice(32))
         	};
 
+            this.secret = shared_secret;
             this.iv = data.aes_iv;
             this.hash_key = data.hmac_key;
             this.encryptionkey = data.aes_key;
