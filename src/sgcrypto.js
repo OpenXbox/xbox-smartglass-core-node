@@ -1,6 +1,5 @@
 const crypto = require('crypto');
 const ecp256 = crypto.createECDH("prime256v1");
-const sha512 = crypto.createHash("sha512");
 
 var Salt_pre = new Buffer("D637F1AAE2F0418C", "hex");
 var Salt_post = new Buffer("A8F81A574E228AB7", "hex");
@@ -28,7 +27,9 @@ module.exports = function()
             // Salt shared secret
             derived_secret = Salt_pre + derived_secret + Salt_post;
             // Hash shared secret
-            derived_secret = sha512.digest(derived_secret);
+            var sha512 = crypto.createHash("sha512");
+            sha512.update(derived_secret);
+            derived_secret = sha512.digest();
 
             fromSharedSecret(derived_secret);
         },
