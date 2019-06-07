@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.4
+
+    -  Removed cli client from package
+
+## 0.4.3
+
+    - Added IR commands to control the tv and stb using the xbox (volume, channel, etc..)
+
 ## 0.4.2
 
     - Added media control (play/pause)
