@@ -4,6 +4,29 @@ var hexToBin = require('hex-to-binary');
 var Debug = require('debug')('smartglass:packet_message')
 
 module.exports = function(type, packet_data = false){
+    var Playback_Status = {
+        0:  'Closed',
+        1:  'Changing',
+        2:  'Stopped',
+        3:  'Playing',
+        4:  'Paused'
+    }
+
+    var Media_Types = {
+        0: 'No Media',
+        1: 'Music',
+        2: 'Video',
+        3: 'Image',
+        4: 'Conversation',
+        5: 'Game'
+    }
+
+    var Sound_Status = {
+        0: 'Muted',
+        1: 'Low',
+        2: 'Full'
+    }
+
     var Type = {
         uInt32: function(value){
             return {
@@ -146,6 +169,19 @@ module.exports = function(type, packet_data = false){
                     return this.value;
                 }
             }
+        },
+        mapper: function(map, item){
+            return {
+                item: item,
+                value: false,
+                pack: function(packet_structure){
+                    return item.pack(packet_structure);
+                },
+                unpack: function(packet_structure){
+                    this.value = item.unpack(packet_structure);
+                    return map[this.value]
+                }
+            }
         }
     }
 
@@ -201,10 +237,10 @@ module.exports = function(type, packet_data = false){
             title_id: Type.uInt32('0'),
             aum_id: Type.sgString(),
             asset_id: Type.sgString(),
-            media_type: Type.uInt16('0'),
-            sound_level: Type.uInt16('0'),
+            media_type: Type.mapper(Media_Types, Type.uInt16('0')),
+            sound_level: Type.mapper(Sound_Status, Type.uInt16('0')),
             enabled_commands: Type.uInt32('0'),
-            playback_status: Type.uInt16('0'),
+            playback_status: Type.mapper(Playback_Status, Type.uInt16('0')),
             rate: Type.uInt32('0'),
             position: Type.bytes(8, ''),
             media_start: Type.bytes(8, ''),
