@@ -37,7 +37,7 @@ module.exports = function(channel_request_id)
                     channel_request.set('activity_id', 0);
 
                     // xbox.get_requestnum()
-                    this._smartglass._consoles[this._smartglass._ip].get_requestnum()
+                    this._smartglass._console.get_requestnum()
                     var channel_message  = channel_request.pack(xbox)
 
                     Debug('Send data: '+message.toString('hex'));
@@ -59,10 +59,7 @@ module.exports = function(channel_request_id)
                         }
                     }.bind(this));
 
-                    this._smartglass._send({
-                        ip: remote.address,
-                        port: 5050
-                    }, channel_message);
+                    this._smartglass._send(channel_message);
                 }
             }.bind(this));
         },
@@ -80,14 +77,11 @@ module.exports = function(channel_request_id)
                     gamepad.set('buttons', this._button_map[button]);
                     gamepad.setChannel(this._channel_id)
 
-                    this._smartglass._consoles[this._smartglass._ip].get_requestnum()
+                    this._smartglass._console.get_requestnum()
                     // this._smartglass._consoles[this._smartglass._ip].get_requestnum()
-                    var message  = gamepad.pack(this._smartglass._consoles[this._smartglass._ip])
+                    var message  = gamepad.pack(this._smartglass._console)
 
-                    this._smartglass._send({
-                        ip: this._smartglass._ip,
-                        port: 5050
-                    }, message);
+                    this._smartglass._send(message);
 
 
                     setTimeout(function(){
@@ -99,13 +93,10 @@ module.exports = function(channel_request_id)
                         gamepad.set('buttons', 0);
                         gamepad.setChannel(this._channel_id)
 
-                        this._smartglass._consoles[this._smartglass._ip].get_requestnum()
-                        var message  = gamepad.pack(this._smartglass._consoles[this._smartglass._ip])
+                        this._smartglass._console.get_requestnum()
+                        var message  = gamepad.pack(this._smartglass._console)
 
-                        this._smartglass._send({
-                            ip: this._smartglass._ip,
-                            port: 5050
-                        }, message);
+                        this._smartglass._send(message);
                     }.bind(this), 250)
 
                 } else {

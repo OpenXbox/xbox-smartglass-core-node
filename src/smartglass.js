@@ -11,7 +11,7 @@ module.exports = function()
 
     return {
         _client_id: id,
-        _consoles: [],
+        _console: false,
         _socket: false,
         _events: smartglassEvent,
 
@@ -23,6 +23,7 @@ module.exports = function()
         _managers: {},
 
         _connection_status: false,
+        _current_app: false,
 
         discovery: function(callback, ip)
         {
@@ -57,6 +58,11 @@ module.exports = function()
             }.bind(this), 2000);
         },
 
+        getActiveApp: function()
+        {
+            return this._current_app
+        },
+
         powerOn: function(options, callback)
         {
             this._getSocket();
@@ -68,10 +74,7 @@ module.exports = function()
             var try_num = 0;
             var sendBoot = function(client, callback)
             {
-                client._send({
-                    ip: options.ip,
-                    port: 5050
-                }, message);
+                client._send(message);
 
                 try_num = try_num+1;
                 if(try_num <= options.tries)
@@ -130,7 +133,6 @@ module.exports = function()
 
                     this._send(message);
 
-                    this._consoles[this._ip] = xbox; // @TODO: Remove once switched
                     this._console = xbox
 
                     smartglassEvent.on('_on_connect_response', function(message, xbox, remote, smartglass){

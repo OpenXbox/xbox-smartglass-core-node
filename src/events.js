@@ -31,8 +31,8 @@ smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
             var ack = Packer('message.acknowledge')
             ack.set('low_watermark', response.packet_decoded.sequence_number)
                 ack.structure.structure.processed_list.value.push({id: response.packet_decoded.sequence_number})
-            smartglass._consoles[smartglass._ip].get_requestnum()
-            var ack_message = ack.pack(smartglass._consoles[smartglass._ip])
+            smartglass._console.get_requestnum()
+            var ack_message = ack.pack(smartglass._console)
 
             try {
                 smartglass._send(ack_message);
@@ -92,6 +92,18 @@ smartglassEmitter.on('_on_connect_response', function(message, xbox, remote, sma
                 return;
             }
         }.bind(smartglass, message, xbox, remote), 1000)
+    }
+});
+
+
+smartglassEmitter.on('_on_console_status', function(message, xbox, remote, smartglass){
+    smartglass.connection_status = true
+
+    if(message.packet_decoded.protected_payload.apps[0] != undefined){
+        if(smartglass._current_app != message.packet_decoded.protected_payload.apps[0].aum_id){
+            smartglass._current_app = message.packet_decoded.protected_payload.apps[0].aum_id
+            console.log('Current active app:', smartglass._current_app)
+        }
     }
 });
 

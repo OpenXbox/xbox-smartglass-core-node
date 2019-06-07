@@ -1,4 +1,4 @@
-var Debug = require('debug')('smartglass:channel_system_input')
+var Debug = require('debug')('smartglass:channel_system_media')
 const Packer = require('../packet/packer');
 
 module.exports = function(channel_request_id)
@@ -64,7 +64,7 @@ module.exports = function(channel_request_id)
                                 this._channel_id = message.packet_decoded.protected_payload.target_channel_id
 
                                 this._smartglass.on('_on_media_state', function(message, xbox, remote){
-                                    console.log('MEDIA STATE', message.packet_decoded.protected_payload)
+                                    //console.log('MEDIA STATE', message.packet_decoded.protected_payload)
                                     this._media_state = message.packet_decoded.protected_payload
                                 }.bind(this));
 
@@ -74,10 +74,7 @@ module.exports = function(channel_request_id)
                         }
                     }.bind(this));
 
-                    this._smartglass._send({
-                        ip: remote.address,
-                        port: 5050
-                    }, channel_message);
+                    this._smartglass._send(channel_message);
                 }
             }.bind(this));
         },
@@ -99,10 +96,7 @@ module.exports = function(channel_request_id)
                 this._xbox.get_requestnum()
                 var message  = media_command.pack(this._xbox)
 
-                this._smartglass._send({
-                    ip: this._smartglass._ip,
-                    port: 5050
-                }, message);
+                this._smartglass._send(message);
             }
         }
     }
