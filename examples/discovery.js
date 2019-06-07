@@ -2,9 +2,7 @@
 var Smartglass = require('../src/smartglass');
 
 var sgClient = Smartglass()
-sgClient.discovery({
-    //ip: '192.168.2.5'
-}, function(consoles){
+sgClient.discovery(function(consoles){
     for(var xbox in consoles){
         console.log('- Device found: ' + consoles[xbox].message.name);
         console.log('  Address: '+ consoles[xbox].remote.address + ':' + consoles[xbox].remote.port);

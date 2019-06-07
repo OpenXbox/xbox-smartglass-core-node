@@ -19,6 +19,15 @@ NodeJS smartglass library for controlling a Xbox
 
 `npm install xbox-smartglass-core-node --save`
 
+## Api available
+
+    var sgClient =  Smartglass()
+
+| Name | arguments | Comments |
+|------|-----------|----------|
+| .discovery(`callback(consoles)`, `ip`) | `(Required)` `callback`: Callback function with consoles returned as array <br>`(Optional)` `ip`: IP address of the xbox | Detects xbox consoles  on the network |
+| .connect(`ip`, `callback()`) | `(Optional)` `ip`: IP address of the xbox <br> `(Required)` `callback`: Callback function with the status returned | Connects to the xbox console |
+
 ## How to use
 
 See the [examples](examples) folder for examples

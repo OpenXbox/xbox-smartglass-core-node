@@ -35,10 +35,7 @@ smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
             var ack_message = ack.pack(smartglass._consoles[smartglass._ip])
 
             try {
-                smartglass._send({
-                    ip: remote.address,
-                    port: 5050
-                }, ack_message);
+                smartglass._send(ack_message);
             }
             catch(error) {
                 Debug('error', error)
@@ -71,10 +68,7 @@ smartglassEmitter.on('_on_connect_response', function(message, xbox, remote, sma
         var local_join = Packer('message.local_join');
         var join_message = local_join.pack(xbox);
 
-        smartglass._send({
-            ip: remote.address,
-            port: 5050
-        }, join_message);
+        smartglass._send(join_message);
 
         smartglass._interval_timeout = setInterval(function(){
             var seconds_ago = (Math.floor(Date.now() / 1000))-this._last_received_time
@@ -87,10 +81,7 @@ smartglassEmitter.on('_on_connect_response', function(message, xbox, remote, sma
                 ack.set('low_watermark', xbox._request_num)
                 var ack_message = ack.pack(xbox)
 
-                this._send({
-                    ip: remote.address,
-                    port: 5050
-                }, ack_message);
+                this._send(ack_message);
             }
 
             if(seconds_ago > 30){
@@ -98,7 +89,6 @@ smartglassEmitter.on('_on_connect_response', function(message, xbox, remote, sma
                 smartglass._events.emit('_on_timeout', message, xbox, remote, this)
 
                 smartglass._closeClient()
-                clearInterval(this._interval_timeout)
                 return;
             }
         }.bind(smartglass, message, xbox, remote), 1000)

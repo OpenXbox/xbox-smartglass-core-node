@@ -12,9 +12,7 @@ var deviceStatus = {
 
 deviceStatus.client = Smartglass()
 
-deviceStatus.client.connect({
-    ip: '192.168.2.5'
-}, function(result){
+deviceStatus.client.connect('192.168.2.5', function(result){
     if(result === true){
         console.log('Xbox succesfully connected!');
         deviceStatus.client.addManager('system_input', SystemInputChannel(0))
