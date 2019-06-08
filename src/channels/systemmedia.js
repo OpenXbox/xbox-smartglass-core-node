@@ -47,7 +47,7 @@ module.exports = function(channel_request_id)
                     xbox.get_requestnum()
                     var channel_message  = channel_request.pack(xbox)
 
-                    Debug('Send data: '+message.toString('hex'));
+                    Debug('Send data: '+channel_message.toString('hex'));
 
                     this._smartglass.on('_on_start_channel_response', function(message, xbox, remote){
                         // console.log('Got channel response!', message)

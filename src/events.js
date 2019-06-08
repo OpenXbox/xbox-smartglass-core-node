@@ -97,8 +97,6 @@ smartglassEmitter.on('_on_connect_response', function(message, xbox, remote, sma
 
 
 smartglassEmitter.on('_on_console_status', function(message, xbox, remote, smartglass){
-    smartglass.connection_status = true
-
     if(message.packet_decoded.protected_payload.apps[0] != undefined){
         if(smartglass._current_app != message.packet_decoded.protected_payload.apps[0].aum_id){
             smartglass._current_app = message.packet_decoded.protected_payload.apps[0].aum_id

@@ -63,9 +63,20 @@ module.exports = function()
             return this._current_app
         },
 
+        isConnected: function()
+        {
+            return this._connection_status
+        },
+
         powerOn: function(options, callback)
         {
             this._getSocket();
+
+            if(options.tries == undefined){
+                options.tries =  5;
+            }
+
+            this._ip = options.ip
 
             var poweron_packet = Packer('simple.poweron')
             poweron_packet.set('liveid', options.live_id)
@@ -83,22 +94,23 @@ module.exports = function()
                 } else {
                     client._closeClient();
 
-                    client.discovery(options, function(consoles){
+                    client.discovery(function(consoles){
                         client._closeClient();
                         if(consoles.length  >  0){
                             callback(true)
                         } else {
                             callback(false)
                         }
-                    })
+                    }, options.ip)
                 }
             }
             setTimeout(sendBoot, 1000, this, callback);
         },
 
-        powerOff: function(options, callback)
+        powerOff: function(callback)
         {
-            this.connect(options, function(){
+            if(this.isConnected() == true){
+
                 var xbox = this._console;
 
                 xbox.get_requestnum()
@@ -114,7 +126,10 @@ module.exports = function()
 
                 callback(true)
 
-            }.bind(this));
+            } else {
+                callback(false)
+                return
+            }
         },
 
         connect: function(ip, callback)
@@ -237,10 +252,14 @@ module.exports = function()
 
         },
 
-        _send: function(message)
+        _send: function(message, ip)
         {
+            if(ip == undefined){
+                ip = this._ip
+            }
+
             if(this._socket != false)
-                this._socket.send(message, 0, message.length, 5050, this._ip, function(err, bytes) {
+                this._socket.send(message, 0, message.length, 5050, ip, function(err, bytes) {
                      Debug('['+this._client_id+'] Sending packet to client: '+this._ip+':'+5050);
                      Debug(message.toString('hex'))
                 }.bind(this));
