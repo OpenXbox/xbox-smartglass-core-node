@@ -82,13 +82,13 @@ module.exports = function(ip, certificate)
             // Create public key
             var ecKey = jsrsasign.X509.getPublicKeyFromCertPEM(pem);
 
-            Debug('Starting python process');
+            Debug('Signing public key: '+ecKey.pubKeyHex);
 
 
             this._crypto = new SGCrypto();
-            object = this._crypto.signPublicKey(ecKey.pubKeyHex)
+            var object = this._crypto.signPublicKey(ecKey.pubKeyHex)
 
-            Debug('Process output:', object);
+            Debug('Crypto output:', object);
 
 
             // Load crypto data

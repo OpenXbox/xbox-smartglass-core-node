@@ -77,7 +77,7 @@ smartglassEmitter.on('_on_connect_response', function(message, xbox, remote, sma
         smartglass._interval_timeout = setInterval(function(){
             var seconds_ago = (Math.floor(Date.now() / 1000))-this._last_received_time
 
-            if(seconds_ago == 10 || seconds_ago == 20){
+            if(seconds_ago == 5 || seconds_ago == 10){
                 Debug('Check timeout: Last packet was '+((Math.floor(Date.now() / 1000))-this._last_received_time+' seconds ago'))
 
                 xbox.get_requestnum()
@@ -88,8 +88,8 @@ smartglassEmitter.on('_on_connect_response', function(message, xbox, remote, sma
                 this._send(ack_message);
             }
 
-            if(seconds_ago > 30){
-                Debug('Connection timeout after 30 sec. Call: _on_timeout()')
+            if(seconds_ago > 15){
+                Debug('Connection timeout after 15 sec. Call: _on_timeout()')
                 smartglass._events.emit('_on_timeout', message, xbox, remote, this)
 
                 smartglass._closeClient()

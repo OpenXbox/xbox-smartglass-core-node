@@ -11,9 +11,7 @@ NodeJS smartglass library for controlling a Xbox
 
 ## Dependencies
 
-- NPM
-- Python 2
-- `pip install cryptography`
+- NodeJS >= 11.0
 
 ## How to install
 
