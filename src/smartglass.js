@@ -21,6 +21,7 @@ module.exports = function()
         _interval_timeout: false,
 
         _managers: {},
+        _managers_num: 0,
 
         _connection_status: false,
         _current_app: false,
@@ -196,9 +197,10 @@ module.exports = function()
 
         addManager: function(name, manager)
         {
-            Debug('Loaded manager: '+name)
+            this._managers_num++
+            Debug('Loaded manager: '+name + '('+this._managers_num+')')
             this._managers[name] = manager
-            this._managers[name].load(this)
+            this._managers[name].load(this, this._managers_num)
         },
 
         getManager: function(name)

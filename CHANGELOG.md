@@ -1,8 +1,9 @@
 # Changelog
 
-## 0.4.4
+## 0.5.0
 
-    -  Removed cli client from package
+    - Removed cli client from package
+    - Big update to the API interface of Smartglass (Massive breaking changes)
 
 ## 0.4.3
 

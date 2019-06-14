@@ -3,6 +3,10 @@ const smartglassEmitter = new EventEmitter();
 const Packer = require('./packet/packer')
 var Debug = require('debug')('smartglass:events')
 
+smartglassEmitter.on('newListener', function(event, listener){
+    Debug('+ New listener: '+event+'()');
+})
+
 smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
 
     message = Packer(message);
@@ -100,7 +104,7 @@ smartglassEmitter.on('_on_console_status', function(message, xbox, remote, smart
     if(message.packet_decoded.protected_payload.apps[0] != undefined){
         if(smartglass._current_app != message.packet_decoded.protected_payload.apps[0].aum_id){
             smartglass._current_app = message.packet_decoded.protected_payload.apps[0].aum_id
-            console.log('Current active app:', smartglass._current_app)
+            // console.log('Current active app:', smartglass._current_app)
         }
     }
 });

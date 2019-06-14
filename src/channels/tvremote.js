@@ -1,17 +1,18 @@
 var Debug = require('debug')('smartglass:channel_tv_remote')
 const Packer = require('../packet/packer');
 
-module.exports = function(channel_request_id)
+module.exports = function()
 {
     return {
         _channel_status: false,
         _channel_id: 0,
-        _channel_request_id: channel_request_id,
+        _channel_request_id: -1,
         _smartglass: false,
         _xbox: false,
         _message_num: 1,
 
-        load: function(smartglass){
+        load: function(smartglass, manager_id){
+            this._channel_request_id = manager_id
             this._smartglass = smartglass
             this._smartglass.on('_on_console_status', function(message, xbox, remote, smartglass){
                 if(this._channel_status == false){
@@ -22,6 +23,7 @@ module.exports = function(channel_request_id)
                     channel_request.set('title_id', 0);
                     channel_request.set('service', Buffer.from('d451e3b360bb4c71b3dbf994b1aca3a7', 'hex'));
                     channel_request.set('activity_id', 0);
+                    Debug('Send channel request on channel #'+this._channel_request_id);
 
                     this._smartglass._console.get_requestnum()
                     var message  = channel_request.pack(xbox)

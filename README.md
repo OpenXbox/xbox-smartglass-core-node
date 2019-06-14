@@ -26,35 +26,59 @@ NodeJS smartglass library for controlling a Xbox
 
 | Name | arguments | Comments |
 |------|-----------|----------|
-| .discovery(`callback(consoles)`, `ip`) | `(Required)` `callback`: Callback function with consoles returned as array <br>`(Optional)` `ip`: IP address of the xbox | Detects xbox consoles  on the network |
-| .connect(`ip`, `callback()`) | `(Required)` `ip`: IP address of the xbox <br> `(Required)` `callback`: Callback function with the status returned | Connects to the xbox console |
-| .getCurrentApp() | `none` | Returns the current active app |
-| .isConnected() | `none` | Returns the current connection status as boolean |
-| .powerOn(`options`, `callback(status)`) | `(Required)` `options`: {`ip`: '127.0.0.1', `liveid`: 'FD000000000'} <br> `(Required)` `callback`: Callback function with the status returned | Returns the current active app |
-| .powerOff(`callback(status)`) | `(Required)` `callback`: Callback function with the status returned | Shutdown xbox (need to connect first) |
+| discovery(`callback(consoles)`, `ip`) | `(Required)` `callback`: Callback function with consoles returned as array <br>`(Optional)` `ip`: IP address of the xbox | Detects xbox consoles  on the network |
+| connect(`ip`, `callback()`) | `(Required)` `ip`: IP address of the xbox <br> `(Required)` `callback`: Callback function with the status returned | Connects to the xbox console |
+| getCurrentApp() | `none` | Returns the current active app |
+| isConnected() | `none` | Returns the current connection status as boolean |
+| powerOn(`options`, `callback(status)`) | `(Required)` `options`: {`ip`: '127.0.0.1', `liveid`: 'FD000000000'} <br> `(Required)` `callback`: Callback function with the status returned | Returns the current active app |
+| powerOff(`callback(status)`) | `(Required)` `callback`: Callback function with the status returned | Shutdown xbox (need to connect first) |
 
 
     const Smartglass = require('xbox-smartglass-core-node')
-    var SystemInputChannel = require('xbox-smartglass-core-node/src/channels/systeminput');
-    var SystemMediaChannel = require('xbox-smartglass-core-node/src/channels/systemmedia');
-    var TvRemoteChannel = require('xbox-smartglass-core-node/src/channels/tvremote');
+    var SystemInputChannel = require('xbox-smartglass-core-node/src/channels/systeminput')
+    var SystemMediaChannel = require('xbox-smartglass-core-node/src/channels/systemmedia')
+    var TvRemoteChannel = require('xbox-smartglass-core-node/src/channels/tvremote')
 
     var sgClient =  Smartglass()
-    sgClient.addManager('system_input', SystemInputChannel(0))
-    sgClient.addManager('system_media', SystemMediaChannel(1))
-    sgClient.addManager('tv_remote', TvRemoteChannel(2))
+    sgClient.addManager('system_input', SystemInputChannel())
+    sgClient.addManager('system_media', SystemMediaChannel())
+    sgClient.addManager('tv_remote', TvRemoteChannel())
 
 ####  SystemInputChannel
 
-TBD
+    const Smartglass = require('xbox-smartglass-core-node')
+    var SystemInputChannel = require('xbox-smartglass-core-node/src/channels/systeminput');
+
+    var sgClient =  Smartglass()
+    sgClient.addManager('system_input', SystemInputChannel())
+
+    sgClient.getManager('system_input').sendCommand('nexus');
+    sgClient.getManager('system_input').sendCommand('left');
+    sgClient.getManager('system_input').sendCommand('a');
 
 ####  SystemMediaChannel
 
-TBD
+    const Smartglass = require('xbox-smartglass-core-node')
+    var SystemMediaChannel = require('xbox-smartglass-core-node/src/channels/systemmedia');
+
+    var sgClient =  Smartglass()
+    sgClient.addManager('system_media', SystemMediaChannel())
+
+    sgClient.getManager('system_media').sendCommand('play')
+    sgClient.getManager('system_media').sendCommand('pause')
+    var media_state = sgClient.getManager('system_media').getState()
+
 
 ####  TvRemoteChannel
 
-TBD
+    const Smartglass = require('xbox-smartglass-core-node')
+    var TvRemoteChannel = require('xbox-smartglass-core-node/src/channels/tvremote');
+
+    var sgClient =  Smartglass()
+    sgClient.addManager('tv_remote', TvRemoteChannel())
+
+    sgClient.getManager('tv_remote').sendCommand('btn.vol_up');
+    sgClient.getManager('tv_remote').sendCommand('btn.vol_down');
 
 ## How to use
 
@@ -62,8 +86,6 @@ See the [examples](examples) folder for examples
 
 ## Known Issues
 
-- Broadcasting does not work properly yet.
-- Callback when sending a power_on command always returns true for now.
 - Protocol can be broken sometimes.
 
 ## Changelog

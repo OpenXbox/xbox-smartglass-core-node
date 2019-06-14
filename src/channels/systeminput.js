@@ -1,12 +1,12 @@
 var Debug = require('debug')('smartglass:channel_system_input')
 const Packer = require('../packet/packer');
 
-module.exports = function(channel_request_id)
+module.exports = function()
 {
     return {
         _channel_status: false,
         _channel_id: 0,
-        _channel_request_id: channel_request_id,
+        _channel_request_id: -1,
         _smartglass: false,
         _xbox: false,
 
@@ -24,7 +24,8 @@ module.exports = function(channel_request_id)
             menu: 8,
         },
 
-        load: function(smartglass){
+        load: function(smartglass, manager_id){
+            this._channel_request_id = manager_id
             this._smartglass = smartglass
             this._smartglass.on('_on_console_status', function(message, xbox, remote, smartglass){
                 if(this._channel_status == false){
@@ -35,6 +36,7 @@ module.exports = function(channel_request_id)
                     channel_request.set('title_id', 0);
                     channel_request.set('service', Buffer.from('fa20b8ca66fb46e0adb60b978a59d35f', 'hex'));
                     channel_request.set('activity_id', 0);
+                    Debug('+ Send channel request on channel #'+this._channel_request_id);
 
                     // xbox.get_requestnum()
                     this._smartglass._console.get_requestnum()
@@ -103,7 +105,7 @@ module.exports = function(channel_request_id)
                     Debug('Failed to send button. Reason: Unknown '+button);
                 }
             } else {
-                Debug('Failed to send button. Reason: Channel not created');
+                Debug('Failed to send button. Reason: Channel not opened');
             }
         }
     }
