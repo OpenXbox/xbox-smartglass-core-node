@@ -41,6 +41,37 @@ module.exports = function()
             return this.hash_key;
         },
 
+        signPublicKey: function(public_key)
+        {
+            const crypto = require('crypto');
+            var sha512 = crypto.createHash("sha512");
+
+            var EC = require('elliptic').ec;
+            var ec = new EC('p256');
+
+            // Generate keys
+            var key1 = ec.genKeyPair();
+            var key2 = ec.keyFromPublic(public_key, 'hex')
+            var public_key_client = key2
+
+            var shared1 = key1.derive(key2.getPublic());
+            var derived_secret = Buffer.from(shared1.toString(16), 'hex')
+
+            var public_key_client = key1.getPublic('hex')
+
+            var pre_salt = Buffer.from('d637f1aae2f0418c', 'hex')
+            var post_salt = Buffer.from('a8f81a574e228ab7', 'hex')
+            derived_secret = Buffer.from(pre_salt.toString('hex')+derived_secret.toString('hex')+post_salt.toString('hex'), 'hex')
+            // Hash shared secret
+            var sha = sha512.update(derived_secret);
+            derived_secret = sha.digest();
+
+            return {
+                public_key: public_key_client.toString('hex').slice(2),
+                secret: derived_secret.toString('hex')
+            }
+        },
+
         getPublicKey: function()
         {
             return this.pubkey;
