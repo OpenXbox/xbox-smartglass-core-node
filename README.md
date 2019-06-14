@@ -75,8 +75,8 @@ NodeJS smartglass library for controlling a Xbox
     var sgClient =  Smartglass()
     sgClient.addManager('tv_remote', TvRemoteChannel())
 
-    sgClient.getManager('tv_remote').sendCommand('btn.vol_up');
-    sgClient.getManager('tv_remote').sendCommand('btn.vol_down');
+    sgClient.getManager('tv_remote').sendIrCommand('btn.vol_up');
+    sgClient.getManager('tv_remote').sendIrCommand('btn.vol_down');
 
 ## How to use
 
