@@ -1,6 +1,6 @@
 {
   "name": "xbox-smartglass-core-node",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "description": "NodeJS smartglass library for controlling a Xbox",
   "main": "src/smartglass.js",
   "scripts": {
@@ -18,9 +18,6 @@
   },
   "author": "UnknownSKL (Jim Kroon)",
   "license": "MIT",
-  "bin": {
-    "smartglass-client": "./bin/client.js"
-  },
   "bugs": {
     "url": "https://github.com/unknownskl/xbox-smartglass-core-node/issues"
   },
@@ -33,6 +30,7 @@
   "dependencies": {
     "commander": "^2.20.0",
     "debug": "^4.1.1",
+    "elliptic": "^6.4.1",
     "hex-to-binary": "^1.0.1",
     "jsrsasign": "^8.0.12",
     "uuid": "^3.3.2",

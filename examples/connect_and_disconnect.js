@@ -7,9 +7,7 @@ var deviceStatus = {
 }
 
 var sgClient = Smartglass()
-sgClient.connect({
-    ip: '192.168.2.5'
-}, function(result){
+sgClient.connect('192.168.2.5', function(result){
     if(result === true){
         console.log('Xbox succesfully connected!');
     } else {

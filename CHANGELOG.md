@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0
+
+    - Removed cli client from package
+    - Big update to the API interface of Smartglass (Massive breaking changes)
+
+## 0.4.3
+
+    - Added IR commands to control the tv and stb using the xbox (volume, channel, etc..)
+
 ## 0.4.2
 
     - Added media control (play/pause)

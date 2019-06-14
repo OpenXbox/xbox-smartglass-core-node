@@ -1,12 +1,12 @@
 var Debug = require('debug')('smartglass:channel_system_input')
 const Packer = require('../packet/packer');
 
-module.exports = function(channel_request_id)
+module.exports = function()
 {
     return {
         _channel_status: false,
         _channel_id: 0,
-        _channel_request_id: channel_request_id,
+        _channel_request_id: -1,
         _smartglass: false,
         _xbox: false,
 
@@ -24,7 +24,8 @@ module.exports = function(channel_request_id)
             menu: 8,
         },
 
-        load: function(smartglass){
+        load: function(smartglass, manager_id){
+            this._channel_request_id = manager_id
             this._smartglass = smartglass
             this._smartglass.on('_on_console_status', function(message, xbox, remote, smartglass){
                 if(this._channel_status == false){
@@ -35,9 +36,10 @@ module.exports = function(channel_request_id)
                     channel_request.set('title_id', 0);
                     channel_request.set('service', Buffer.from('fa20b8ca66fb46e0adb60b978a59d35f', 'hex'));
                     channel_request.set('activity_id', 0);
+                    Debug('+ Send channel request on channel #'+this._channel_request_id);
 
                     // xbox.get_requestnum()
-                    this._smartglass._consoles[this._smartglass._ip].get_requestnum()
+                    this._smartglass._console.get_requestnum()
                     var channel_message  = channel_request.pack(xbox)
 
                     Debug('Send data: '+message.toString('hex'));
@@ -59,10 +61,7 @@ module.exports = function(channel_request_id)
                         }
                     }.bind(this));
 
-                    this._smartglass._send({
-                        ip: remote.address,
-                        port: 5050
-                    }, channel_message);
+                    this._smartglass._send(channel_message);
                 }
             }.bind(this));
         },
@@ -80,14 +79,11 @@ module.exports = function(channel_request_id)
                     gamepad.set('buttons', this._button_map[button]);
                     gamepad.setChannel(this._channel_id)
 
-                    this._smartglass._consoles[this._smartglass._ip].get_requestnum()
+                    this._smartglass._console.get_requestnum()
                     // this._smartglass._consoles[this._smartglass._ip].get_requestnum()
-                    var message  = gamepad.pack(this._smartglass._consoles[this._smartglass._ip])
+                    var message  = gamepad.pack(this._smartglass._console)
 
-                    this._smartglass._send({
-                        ip: this._smartglass._ip,
-                        port: 5050
-                    }, message);
+                    this._smartglass._send(message);
 
 
                     setTimeout(function(){
@@ -99,20 +95,17 @@ module.exports = function(channel_request_id)
                         gamepad.set('buttons', 0);
                         gamepad.setChannel(this._channel_id)
 
-                        this._smartglass._consoles[this._smartglass._ip].get_requestnum()
-                        var message  = gamepad.pack(this._smartglass._consoles[this._smartglass._ip])
+                        this._smartglass._console.get_requestnum()
+                        var message  = gamepad.pack(this._smartglass._console)
 
-                        this._smartglass._send({
-                            ip: this._smartglass._ip,
-                            port: 5050
-                        }, message);
+                        this._smartglass._send(message);
                     }.bind(this), 250)
 
                 } else {
                     Debug('Failed to send button. Reason: Unknown '+button);
                 }
             } else {
-                Debug('Failed to send button. Reason: Channel not created');
+                Debug('Failed to send button. Reason: Channel not opened');
             }
         }
     }

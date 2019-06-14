@@ -9,9 +9,7 @@ var deviceStatus = {
 
 deviceStatus.client = Smartglass()
 
-deviceStatus.client.connect({
-    ip: '192.168.2.5'
-}, function(result){
+deviceStatus.client.connect('192.168.2.5', function(result){
     if(result === true){
         console.log('Xbox succesfully connected!');
     } else {
@@ -36,9 +34,7 @@ deviceStatus.client.on('_on_timeout', function(message, xbox, remote, smartglass
     clearInterval(interval)
 
     deviceStatus.client = Smartglass()
-    deviceStatus.client.connect({
-        ip: '192.168.2.5'
-    }, function(result){
+    deviceStatus.client.connect('192.168.2.5', function(result){
         if(result === true){
             console.log('Xbox succesfully connected!');
         } else {

@@ -2,12 +2,18 @@
 var Smartglass = require('../src/smartglass');
 
 var sgClient = Smartglass()
-sgClient.powerOff({
-    ip: '192.168.2.5'
-}, function(result){
+
+sgClient.connect('192.168.2.5', function(result){
     if(result === true){
-        console.log('Send poweroff command');
+        console.log('Xbox succesfully connected!');
+
+        setTimeout(function(){
+            sgClient.powerOff(function(status){
+                console.log('Shutdown succes!')
+            })
+        }.bind(sgClient), 1000)
+
     } else {
-        console.log('Failed to shutdown xbox:', result);
+        console.log('Failed to connect to xbox:', result);
     }
 });
