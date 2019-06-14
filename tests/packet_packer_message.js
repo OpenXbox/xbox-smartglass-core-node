@@ -239,10 +239,10 @@ describe('packet/packer/message', function(){
         assert.deepStrictEqual(message.packet_decoded.protected_payload.title_id, 274278798)
         assert.deepStrictEqual(message.packet_decoded.protected_payload.aum_id, 'AIVDE_s9eep9cpjhg6g!App')
         assert.deepStrictEqual(message.packet_decoded.protected_payload.asset_id, '')
-        assert.deepStrictEqual(message.packet_decoded.protected_payload.media_type, 0)
-        assert.deepStrictEqual(message.packet_decoded.protected_payload.sound_level, 2)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.media_type, 'No Media')
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.sound_level, 'Full')
         assert.deepStrictEqual(message.packet_decoded.protected_payload.enabled_commands, 33758)
-        assert.deepStrictEqual(message.packet_decoded.protected_payload.playback_status, 2)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.playback_status, 'Stopped')
         assert.deepStrictEqual(message.packet_decoded.protected_payload.rate, 0)
     });
 

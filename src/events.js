@@ -3,6 +3,10 @@ const smartglassEmitter = new EventEmitter();
 const Packer = require('./packet/packer')
 var Debug = require('debug')('smartglass:events')
 
+smartglassEmitter.on('newListener', function(event, listener){
+    Debug('+ New listener: '+event+'()');
+})
+
 smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
 
     message = Packer(message);
@@ -31,14 +35,11 @@ smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
             var ack = Packer('message.acknowledge')
             ack.set('low_watermark', response.packet_decoded.sequence_number)
                 ack.structure.structure.processed_list.value.push({id: response.packet_decoded.sequence_number})
-            smartglass._consoles[smartglass._ip].get_requestnum()
-            var ack_message = ack.pack(smartglass._consoles[smartglass._ip])
+            smartglass._console.get_requestnum()
+            var ack_message = ack.pack(smartglass._console)
 
             try {
-                smartglass._send({
-                    ip: remote.address,
-                    port: 5050
-                }, ack_message);
+                smartglass._send(ack_message);
             }
             catch(error) {
                 Debug('error', error)
@@ -71,15 +72,12 @@ smartglassEmitter.on('_on_connect_response', function(message, xbox, remote, sma
         var local_join = Packer('message.local_join');
         var join_message = local_join.pack(xbox);
 
-        smartglass._send({
-            ip: remote.address,
-            port: 5050
-        }, join_message);
+        smartglass._send(join_message);
 
         smartglass._interval_timeout = setInterval(function(){
             var seconds_ago = (Math.floor(Date.now() / 1000))-this._last_received_time
 
-            if(seconds_ago == 10 || seconds_ago == 20){
+            if(seconds_ago == 5 || seconds_ago == 10){
                 Debug('Check timeout: Last packet was '+((Math.floor(Date.now() / 1000))-this._last_received_time+' seconds ago'))
 
                 xbox.get_requestnum()
@@ -87,21 +85,27 @@ smartglassEmitter.on('_on_connect_response', function(message, xbox, remote, sma
                 ack.set('low_watermark', xbox._request_num)
                 var ack_message = ack.pack(xbox)
 
-                this._send({
-                    ip: remote.address,
-                    port: 5050
-                }, ack_message);
+                this._send(ack_message);
             }
 
-            if(seconds_ago > 30){
-                Debug('Connection timeout after 30 sec. Call: _on_timeout()')
+            if(seconds_ago > 15){
+                Debug('Connection timeout after 15 sec. Call: _on_timeout()')
                 smartglass._events.emit('_on_timeout', message, xbox, remote, this)
 
                 smartglass._closeClient()
-                clearInterval(this._interval_timeout)
                 return;
             }
         }.bind(smartglass, message, xbox, remote), 1000)
+    }
+});
+
+
+smartglassEmitter.on('_on_console_status', function(message, xbox, remote, smartglass){
+    if(message.packet_decoded.protected_payload.apps[0] != undefined){
+        if(smartglass._current_app != message.packet_decoded.protected_payload.apps[0].aum_id){
+            smartglass._current_app = message.packet_decoded.protected_payload.apps[0].aum_id
+            // console.log('Current active app:', smartglass._current_app)
+        }
     }
 });
 

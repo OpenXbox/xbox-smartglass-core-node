@@ -11,7 +11,7 @@ module.exports = function()
 
     return {
         _client_id: id,
-        _consoles: [],
+        _console: false,
         _socket: false,
         _events: smartglassEvent,
 
@@ -21,14 +21,18 @@ module.exports = function()
         _interval_timeout: false,
 
         _managers: {},
+        _managers_num: 0,
 
         _connection_status: false,
+        _current_app: false,
 
-        discovery: function(options, callback)
+        discovery: function(callback, ip)
         {
-            if(options.ip == undefined){
-                options.ip = '255.255.255.255'
+            if(ip == undefined){
+                this._ip = '255.255.255.255'
                 this._is_broadcast = true
+            } else {
+                this._ip  = ip
             }
 
             this._getSocket()
@@ -46,10 +50,7 @@ module.exports = function()
                 })
             });
 
-            this._send({
-                ip: options.ip,
-                port: 5050
-            }, message);
+            this._send(message);
 
             this._interval_timeout = setTimeout(function(){
                 Debug('Discovery timeout after 2 sec')
@@ -58,9 +59,25 @@ module.exports = function()
             }.bind(this), 2000);
         },
 
+        getActiveApp: function()
+        {
+            return this._current_app
+        },
+
+        isConnected: function()
+        {
+            return this._connection_status
+        },
+
         powerOn: function(options, callback)
         {
             this._getSocket();
+
+            if(options.tries == undefined){
+                options.tries =  5;
+            }
+
+            this._ip = options.ip
 
             var poweron_packet = Packer('simple.poweron')
             poweron_packet.set('liveid', options.live_id)
@@ -69,10 +86,7 @@ module.exports = function()
             var try_num = 0;
             var sendBoot = function(client, callback)
             {
-                client._send({
-                    ip: options.ip,
-                    port: 5050
-                }, message);
+                client._send(message);
 
                 try_num = try_num+1;
                 if(try_num <= options.tries)
@@ -81,33 +95,31 @@ module.exports = function()
                 } else {
                     client._closeClient();
 
-                    client.discovery(options, function(consoles){
+                    client.discovery(function(consoles){
                         client._closeClient();
                         if(consoles.length  >  0){
                             callback(true)
                         } else {
                             callback(false)
                         }
-                    })
+                    }, options.ip)
                 }
             }
             setTimeout(sendBoot, 1000, this, callback);
         },
 
-        powerOff: function(options, callback)
+        powerOff: function(callback)
         {
-            this.connect(options, function(){
-                var xbox = this._consoles[options.ip];
+            if(this.isConnected() == true){
+
+                var xbox = this._console;
 
                 xbox.get_requestnum()
                 var poweroff = Packer('message.power_off');
                 poweroff.set('liveid', xbox._liveid)
                 var message = poweroff.pack(xbox);
 
-                this._send({
-                    ip: options.ip,
-                    port: 5050
-                }, message);
+                this._send(message);
 
                 setTimeout(function(){
                     this.disconnect()
@@ -115,16 +127,17 @@ module.exports = function()
 
                 callback(true)
 
-            }.bind(this));
+            } else {
+                callback(false)
+                return
+            }
         },
 
-        connect: function(options, callback)
+        connect: function(ip, callback)
         {
-            this._ip = options.ip
+            this._ip = ip
 
-            this.discovery({
-                ip: this._ip
-            }, function(consoles){
+            this.discovery(function(consoles){
                 if(consoles.length > 0){
                     Debug('['+this._client_id+'] Console is online. Lets connect...')
                     clearTimeout(this._interval_timeout)
@@ -134,12 +147,9 @@ module.exports = function()
                     var xbox = Xbox(consoles[0].remote.address, consoles[0].message.certificate);
                     var message = xbox.connect();
 
-                    this._send({
-                        'ip': consoles[0].remote.address,
-                        'port': consoles[0].remote.port
-                    }, message);
+                    this._send(message);
 
-                    this._consoles[this._ip] = xbox;
+                    this._console = xbox
 
                     smartglassEvent.on('_on_connect_response', function(message, xbox, remote, smartglass){
                         if(message.packet_decoded.protected_payload.connect_result == '0'){
@@ -161,7 +171,7 @@ module.exports = function()
                     this._connection_status = false
                     callback(false)
                 }
-            }.bind(this))
+            }.bind(this), this._ip)
         },
 
         on: function(name,  callback)
@@ -171,7 +181,7 @@ module.exports = function()
 
         disconnect: function()
         {
-            var xbox = this._consoles[this._ip];
+            var xbox = this._console;
 
             xbox.get_requestnum()
 
@@ -180,19 +190,17 @@ module.exports = function()
             disconnect.set('error_code', 0)
             var disconnect_message = disconnect.pack(xbox)
 
-            this._send({
-                ip: this._ip,
-                port: 5050
-            }, disconnect_message);
+            this._send(disconnect_message);
 
             this._closeClient()
         },
 
         addManager: function(name, manager)
         {
-            Debug('Loaded manager: '+name)
+            this._managers_num++
+            Debug('Loaded manager: '+name + '('+this._managers_num+')')
             this._managers[name] = manager
-            this._managers[name].load(this)
+            this._managers[name].load(this, this._managers_num)
         },
 
         getManager: function(name)
@@ -222,7 +230,7 @@ module.exports = function()
 
             this._socket.on('message', function(message, remote){
                 this._last_received_time = Math.floor(Date.now() / 1000)
-                var xbox = this._consoles[remote.address]
+                var xbox = this._console
                 smartglassEvent.emit('receive', message, xbox, remote, this);
             }.bind(this));
 
@@ -236,6 +244,7 @@ module.exports = function()
         _closeClient:  function()
         {
             Debug('['+this._client_id+'] Client closed');
+            this._connection_status = false
 
             clearInterval(this._interval_timeout)
             if(this._socket != false){
@@ -245,11 +254,15 @@ module.exports = function()
 
         },
 
-        _send: function(options, message)
+        _send: function(message, ip)
         {
+            if(ip == undefined){
+                ip = this._ip
+            }
+
             if(this._socket != false)
-                this._socket.send(message, 0, message.length, options.port, options.ip, function(err, bytes) {
-                     Debug('['+this._client_id+'] Sending packet to client: '+options.ip+':'+options.port);
+                this._socket.send(message, 0, message.length, 5050, ip, function(err, bytes) {
+                     Debug('['+this._client_id+'] Sending packet to client: '+this._ip+':'+5050);
                      Debug(message.toString('hex'))
                 }.bind(this));
         },

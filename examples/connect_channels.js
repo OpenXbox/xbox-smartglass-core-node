@@ -12,14 +12,19 @@ var deviceStatus = {
 
 deviceStatus.client = Smartglass()
 
-deviceStatus.client.connect({
-    ip: '192.168.2.5'
-}, function(result){
+deviceStatus.client.connect('192.168.2.5', function(result){
     if(result === true){
         console.log('Xbox succesfully connected!');
-        deviceStatus.client.addManager('system_input', SystemInputChannel(0))
-        deviceStatus.client.addManager('system_media', SystemMediaChannel(1))
-        deviceStatus.client.addManager('tv_remote', TvRemoteChannel(2))
+        deviceStatus.client.addManager('system_input', SystemInputChannel())
+        deviceStatus.client.addManager('system_media', SystemMediaChannel())
+        deviceStatus.client.addManager('tv_remote', TvRemoteChannel())
+
+        // deviceStatus.client.on('_on_console_status', function(message, xbox, remote){
+        //     // console.log('CONSOLE STATE', message.packet_decoded.protected_payload)
+        //     // console.log(message.packet_decoded.protected_payload)
+        //     console.log(deviceStatus.client.getActiveApp())
+        //     //deviceStatus.client.getManager('system_input').sendCommand('nexus');
+        // });
 
         setTimeout(function(){
             console.log('Send nexus button')
@@ -55,6 +60,9 @@ deviceStatus.client.connect({
 
             setTimeout(function(){
                 deviceStatus.client.getManager('system_input').sendCommand('nexus');
+
+                console.log(deviceStatus.client.getActiveApp())
+                console.log(deviceStatus.client.getManager('system_media').getState())
             }.bind(deviceStatus), 5000)
 
             setTimeout(function(){
@@ -73,9 +81,7 @@ deviceStatus.client.on('_on_timeout', function(message, xbox, remote, smartglass
     clearInterval(interval)
 
     deviceStatus.client = Smartglass()
-    deviceStatus.client.connect({
-        ip: '192.168.2.5'
-    }, function(result){
+    deviceStatus.client.connect('192.168.2.5', function(result){
         if(result === true){
             console.log('Xbox succesfully connected!');
         } else {
