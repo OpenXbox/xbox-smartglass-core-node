@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+    - Implemented support for JSON fragments (for TvRemote configuration)
+
 ## 0.5.0
 
     - Removed cli client from package
