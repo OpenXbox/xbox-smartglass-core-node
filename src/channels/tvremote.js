@@ -11,6 +11,8 @@ module.exports = function()
         _xbox: false,
         _message_num: 1,
 
+        _configuration: {},
+
         load: function(smartglass, manager_id){
             this._channel_request_id = manager_id
             this._smartglass = smartglass
@@ -58,13 +60,24 @@ module.exports = function()
                 if(response.response == "Error"){
                     console.log('Got Error:', response)
                 } else {
-                    console.log(response)
+
+                    // console.log('json response',response)
+
+                    if(response.response == 'GetConfiguration'){
+                        Debug('Got TvRemote Configuration')
+                        this._configuration = response.params
+                    }
+
                 }
 
             }.bind(this))
         },
 
         getConfiguration: function(){
+            return this._configuration
+        },
+
+        requestConfiguration: function(){
             if(this._channel_status == true){
                 Debug('Get configuration');
 
@@ -87,7 +100,7 @@ module.exports = function()
                 this._smartglass._send(config_request_packed);
 
             } else {
-               Debug('Channel not ready: TtRemote')
+               Debug('Channel not ready: TvRemote')
            }
         },
 
@@ -116,7 +129,7 @@ module.exports = function()
 
                 this._smartglass._send(sendkey_request_packed);
             } else {
-                Debug('Channel not ready: TtRemote')
+                Debug('Channel not ready: TvRemote')
             }
         }
     }

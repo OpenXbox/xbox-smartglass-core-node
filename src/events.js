@@ -48,6 +48,66 @@ smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
         }
     }
 
+    if(func == '_on_json')
+    {
+        // console.log('ON JSON')
+        var json_message = JSON.parse(response.packet_decoded.protected_payload.json)
+        // console.log(json_message);
+
+        // Check if JSON is fragmented
+        if(json_message.datagram_id != undefined){
+            Debug('_on_json is fragmented #'+json_message.datagram_id)
+            if(xbox._fragments[json_message.datagram_id] == undefined){
+                // Prepare buffer for JSON
+                xbox._fragments[json_message.datagram_id] = {
+
+                    getValue: function(){
+                        var buffer = Buffer.from('');
+
+                        for(partial in this.partials){
+                            buffer = Buffer.concat([
+                                buffer,
+                                Buffer.from(this.partials[partial])
+                            ])
+                        }
+
+                        var buffer = Buffer(buffer.toString(), 'base64')
+                        return buffer
+                    },
+                    isValid: function(){
+                        var json = this.getValue()
+                        // console.log('fragment', fragment.toString())
+                        // var json = Buffer(fragment.toString(), 'base64')
+                        // console.log('valid check: ', json.toString())
+
+                        try {
+                            JSON.parse(json.toString());
+                        } catch (e) {
+                            return false;
+                        }
+
+                        return true
+                    },
+                    partials: {}
+                }
+            }
+
+            xbox._fragments[json_message.datagram_id].partials[json_message.fragment_offset] = json_message.fragment_data
+
+            if(xbox._fragments[json_message.datagram_id].isValid() == true){
+                Debug('_on_json: Completed fragmented packet')
+                var json_response = response
+                json_response.packet_decoded.protected_payload.json = xbox._fragments[json_message.datagram_id].getValue().toString()
+
+                smartglassEmitter.emit('_on_json', json_response, xbox, remote, smartglass)
+
+                xbox._fragments[json_message.datagram_id] = undefined
+            }
+
+            func = '_on_json_fragment'
+        }
+    }
+
     Debug('Emit event:', func)
     smartglassEmitter.emit(func, response, xbox, remote, smartglass)
 })

@@ -23,6 +23,8 @@ module.exports = function(ip, certificate)
         _target_participant_id: 0,
         _source_participant_id: 0,
 
+        _fragments: {},
+
         _crypto: false,
 
         getIp: function()
