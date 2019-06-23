@@ -34,8 +34,7 @@
     "hex-to-binary": "^1.0.1",
     "jsrsasign": "^8.0.12",
     "uuid": "^3.3.2",
-    "uuid-parse": "^1.1.0",
-    "x509": "^0.3.4"
+    "uuid-parse": "^1.1.0"
   },
   "devDependencies": {
     "mocha": "^5.2.0",
