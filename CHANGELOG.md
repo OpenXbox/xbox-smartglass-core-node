@@ -3,6 +3,7 @@
 ## 0.5.1
 
     - Implemented support for JSON fragments (for TvRemote configuration)
+    - Compatibility for NodeJS 12 by removing the x509 package
 
 ## 0.5.0
 
