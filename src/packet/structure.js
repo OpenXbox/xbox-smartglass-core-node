@@ -129,7 +129,7 @@ module.exports = function(packet)
         /* Private functions */
         _add(data)
         {
-            this._packet = new Buffer.concat([
+            this._packet = Buffer.concat([
                 this._packet,
                 data
             ]);
