@@ -190,11 +190,12 @@ module.exports = function()
 
                         smartglassEvent.on('_on_timeout', function(message, xbox, remote, smartglass){
                             Debug('['+this._client_id+'] Client timeout...')
+                            reject(false)
                         }.bind(this))
                     } else {
                         Debug('['+this._client_id+'] Device is offline...')
                         this._connection_status = false
-                        callback(false)
+                        reject(false)
                     }
                 }.bind(this), function(error){
                     reject(error)
