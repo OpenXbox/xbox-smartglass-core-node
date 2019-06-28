@@ -3,6 +3,7 @@
 ## 0.6.0
 
     - Smartglass class rewritten to support promises (API breaking changes)
+    - Performance improvements
 
 ## 0.5.1
 
