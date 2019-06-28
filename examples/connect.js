@@ -9,21 +9,18 @@ var deviceStatus = {
 
 deviceStatus.client = Smartglass()
 
-deviceStatus.client.connect('192.168.2.5', function(result){
-    if(result === true){
-        console.log('Xbox succesfully connected!');
-    } else {
-        console.log('Failed to connect to xbox:', result);
-    }
+deviceStatus.client.connect('192.168.2.5').then(function(){
+    console.log('Xbox succesfully connected!');
+    deviceStatus.connection_status = true
+}, function(error){
+    console.log('Failed to connect to xbox:', error);
 });
 
 deviceStatus.client.on('_on_console_status', function(message, xbox, remote, smartglass){
-    deviceStatus.connection_status = true
-
     if(message.packet_decoded.protected_payload.apps[0] != undefined){
         if(deviceStatus.current_app != message.packet_decoded.protected_payload.apps[0].aum_id){
             deviceStatus.current_app = message.packet_decoded.protected_payload.apps[0].aum_id
-            console.log('Current active app:', deviceStatus)
+            console.log('xbox: Current active app:', deviceStatus)
         }
     }
 }.bind(deviceStatus));
@@ -34,12 +31,10 @@ deviceStatus.client.on('_on_timeout', function(message, xbox, remote, smartglass
     clearInterval(interval)
 
     deviceStatus.client = Smartglass()
-    deviceStatus.client.connect('192.168.2.5', function(result){
-        if(result === true){
-            console.log('Xbox succesfully connected!');
-        } else {
-            console.log('Failed to connect to xbox:', result);
-        }
+    deviceStatus.client.connect('192.168.2.5').then(function(){
+        console.log('Xbox succesfully connected!');
+    }, function(error){
+        console.log('Failed to connect to xbox:', result);
     });
 }.bind(deviceStatus, interval));
 

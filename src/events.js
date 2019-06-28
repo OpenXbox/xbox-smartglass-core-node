@@ -34,7 +34,8 @@ smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
 
             var ack = Packer('message.acknowledge')
             ack.set('low_watermark', response.packet_decoded.sequence_number)
-                ack.structure.structure.processed_list.value.push({id: response.packet_decoded.sequence_number})
+            // xbox._request_num = response.packet_decoded.sequence_number+1
+            ack.structure.structure.processed_list.value.push({id: response.packet_decoded.sequence_number})
             smartglass._console.get_requestnum()
             var ack_message = ack.pack(smartglass._console)
 

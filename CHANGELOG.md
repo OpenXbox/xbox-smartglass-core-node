@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.0
+
+    - Smartglass class rewritten to support promises (API breaking changes)
+    - Performance improvements
+
 ## 0.5.1
 
     - Implemented support for JSON fragments (for TvRemote configuration)
