@@ -11,7 +11,7 @@ NodeJS smartglass library for controlling a Xbox
 
 ## Dependencies
 
-- NodeJS >= 11.x
+- NodeJS >= 10.x
 
 ## How to install
 
