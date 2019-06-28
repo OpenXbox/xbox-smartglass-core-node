@@ -225,10 +225,10 @@ module.exports = function()
 
         addManager: function(name, manager)
         {
-            this._managers_num++
             Debug('Loaded manager: '+name + '('+this._managers_num+')')
             this._managers[name] = manager
             this._managers[name].load(this, this._managers_num)
+            this._managers_num++
         },
 
         getManager: function(name)

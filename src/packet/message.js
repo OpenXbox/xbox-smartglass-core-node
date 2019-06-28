@@ -411,8 +411,8 @@ module.exports = function(type, packet_data = false){
         channel_id: Buffer.from('\x00\x00\x00\x00\x00\x00\x00\x00'),
 
         setChannel: function(channel){
-            Debug('Set channel to: '+channel.toString('hex'))
-            this.channel_id = Buffer.from(channel)
+            Debug('Set channel to: '+channel.toString())
+            this.channel_id = Buffer.from(''+channel)
         },
 
         set: function(key, value, subkey = false){
