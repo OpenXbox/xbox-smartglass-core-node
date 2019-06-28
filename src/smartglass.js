@@ -26,7 +26,7 @@ module.exports = function()
         _connection_status: false,
         _current_app: false,
 
-        discovery: function(callback, ip)
+        discovery: function(ip)
         {
             if(ip == undefined){
                 this._ip = '255.255.255.255'
@@ -43,20 +43,22 @@ module.exports = function()
 
             var consoles_found = []
 
-            smartglassEvent.on('_on_discovery_response', function(message, xbox, remote){
-                consoles_found.push({
-                    message: message.packet_decoded,
-                    remote: remote
-                })
-            });
+            return new Promise(function(resolve, reject) {
+                smartglassEvent.on('_on_discovery_response', function(message, xbox, remote){
+                    consoles_found.push({
+                        message: message.packet_decoded,
+                        remote: remote
+                    })
+                });
 
-            this._send(message);
+                this._send(message);
 
-            this._interval_timeout = setTimeout(function(){
-                Debug('Discovery timeout after 2 sec')
-                this._closeClient();
-                callback(consoles_found);
-            }.bind(this), 2000);
+                this._interval_timeout = setTimeout(function(){
+                    Debug('Discovery timeout after 2 sec')
+                    this._closeClient();
+                    resolve(consoles_found)
+                }.bind(this), 2000);
+            }.bind(this))
         },
 
         getActiveApp: function()
