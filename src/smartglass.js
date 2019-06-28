@@ -35,27 +35,36 @@ module.exports = function()
                 this._ip  = ip
             }
 
-            this._getSocket()
-
-            Debug('['+this._client_id+'] Crafting discovery_request packet');
-            var discovery_packet = Packer('simple.discovery_request')
-            var message  = discovery_packet.pack()
-
-            var consoles_found = []
-
             return new Promise(function(resolve, reject) {
+                this._getSocket()
+
+                Debug('['+this._client_id+'] Crafting discovery_request packet');
+                var discovery_packet = Packer('simple.discovery_request')
+                var message  = discovery_packet.pack()
+
+                var consoles_found = []
+
                 smartglassEvent.on('_on_discovery_response', function(message, xbox, remote){
                     consoles_found.push({
                         message: message.packet_decoded,
                         remote: remote
                     })
-                });
+
+                    if(this._is_broadcast == false){
+                        Debug('Console found, clear timeout because we query an ip (direct)')
+                        clearTimeout(this._interval_timeout)
+                        resolve(consoles_found)
+                        this._closeClient();
+                    }
+
+                }.bind(this));
 
                 this._send(message);
 
                 this._interval_timeout = setTimeout(function(){
-                    Debug('Discovery timeout after 2 sec')
+                    Debug('Discovery timeout after 2 sec (broadcast)')
                     this._closeClient();
+
                     resolve(consoles_found)
                 }.bind(this), 2000);
             }.bind(this))
@@ -99,12 +108,19 @@ module.exports = function()
                         client._closeClient();
 
                         client.discovery(options.ip).then(function(consoles){
-                            resolve({
-                                status: 'success'
-                            })
+                            if(consoles.length > 0){
+                                resolve({
+                                    status: 'success'
+                                })
+                            } else {
+                                reject({
+                                    status: 'error_discovery',
+                                    error: 'Console was not found on network. Probably failed'
+                                })
+                            }
                         }, function(error){
                             reject({
-                                status: 'discovery_failed',
+                                status: 'error_discovery',
                                 error: 'Console was not found on network. Probably failed'
                             })
                         })
@@ -114,70 +130,76 @@ module.exports = function()
             }.bind(this))
         },
 
-        powerOff: function(callback)
+        powerOff: function()
         {
-            if(this.isConnected() == true){
+            return new Promise(function(resolve, reject) {
+                if(this.isConnected() == true){
+                    Debug('['+this._client_id+'] Sending power off command to: '+this._console._liveid)
 
-                var xbox = this._console;
+                    this._console.get_requestnum()
+                    var poweroff = Packer('message.power_off');
+                    poweroff.set('liveid', this._console._liveid)
+                    var message = poweroff.pack(this._console);
 
-                xbox.get_requestnum()
-                var poweroff = Packer('message.power_off');
-                poweroff.set('liveid', xbox._liveid)
-                var message = poweroff.pack(xbox);
+                    this._send(message);
 
-                this._send(message);
+                    setTimeout(function(){
+                        this.disconnect()
+                        resolve(true)
+                    }.bind(this), 1000);
 
-                setTimeout(function(){
-                    this.disconnect()
-                }.bind(this), 1000);
-
-                callback(true)
-
-            } else {
-                callback(false)
-                return
-            }
+                } else {
+                    reject({
+                        status: 'error_not_connected',
+                        error: 'Console is not connected'
+                    })
+                }
+            }.bind(this))
         },
 
         connect: function(ip, callback)
         {
             this._ip = ip
 
-            this.discovery(function(consoles){
-                if(consoles.length > 0){
-                    Debug('['+this._client_id+'] Console is online. Lets connect...')
-                    clearTimeout(this._interval_timeout)
+            return new Promise(function(resolve, reject) {
+                this.discovery(this._ip).then(function(consoles){
+                    if(consoles.length > 0){
+                        Debug('['+this._client_id+'] Console is online. Lets connect...')
+                        // clearTimeout(this._interval_timeout)
 
-                    this._getSocket();
+                        this._getSocket();
 
-                    var xbox = Xbox(consoles[0].remote.address, consoles[0].message.certificate);
-                    var message = xbox.connect();
+                        var xbox = Xbox(consoles[0].remote.address, consoles[0].message.certificate);
+                        var message = xbox.connect();
 
-                    this._send(message);
+                        this._send(message);
 
-                    this._console = xbox
+                        this._console = xbox
 
-                    smartglassEvent.on('_on_connect_response', function(message, xbox, remote, smartglass){
-                        if(message.packet_decoded.protected_payload.connect_result == '0'){
-                            Debug('['+this._client_id+'] Console is connected')
-                            this._connection_status = true
-                            callback(true)
-                        } else {
-                            Debug('['+this._client_id+'] Error during connect.')
-                            this._connection_status = false
-                            callback(false)
-                        }
-                    }.bind(this))
+                        smartglassEvent.on('_on_connect_response', function(message, xbox, remote, smartglass){
+                            if(message.packet_decoded.protected_payload.connect_result == '0'){
+                                Debug('['+this._client_id+'] Console is connected')
+                                this._connection_status = true
+                                resolve()
+                            } else {
+                                Debug('['+this._client_id+'] Error during connect.')
+                                this._connection_status = false
+                                reject(error)
+                            }
+                        }.bind(this))
 
-                    smartglassEvent.on('_on_timeout', function(message, xbox, remote, smartglass){
-                        Debug('['+this._client_id+'] Client timeout...')
-                    }.bind(this))
-                } else {
-                    Debug('['+this._client_id+'] Device is offline...')
-                    this._connection_status = false
-                    callback(false)
-                }
-            }.bind(this), this._ip)
+                        smartglassEvent.on('_on_timeout', function(message, xbox, remote, smartglass){
+                            Debug('['+this._client_id+'] Client timeout...')
+                        }.bind(this))
+                    } else {
+                        Debug('['+this._client_id+'] Device is offline...')
+                        this._connection_status = false
+                        callback(false)
+                    }
+                }.bind(this), function(error){
+                    reject(error)
+                })
+            }.bind(this))
         },
 
         on: function(name,  callback)
