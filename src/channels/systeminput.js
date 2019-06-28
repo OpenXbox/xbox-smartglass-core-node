@@ -61,7 +61,12 @@ module.exports = function()
                             var message  = gamepad.pack(this._channel_manager.getConsole())
 
                             this._channel_manager.send(message);
-                            resolve()
+                            resolve({
+                                status: 'ok_gamepad_send',
+                                params: {
+                                    button: button
+                                }
+                            })
 
                         }.bind(this), 100)
 
