@@ -2,7 +2,7 @@
 var Smartglass = require('../src/smartglass');
 
 Smartglass().powerOn({
-    live_id: 'FD0021B76E34BD1F',
+    live_id: 'FD00000000000000',
     tries: 5,
     ip: '192.168.2.5'
 }).then(function(response){
