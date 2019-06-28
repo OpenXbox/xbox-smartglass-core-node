@@ -20,27 +20,18 @@ NodeJS smartglass library for controlling a Xbox
 ## Functions
 
     const Smartglass = require('xbox-smartglass-core-node')
-    var sgClient =  Smartglass()
-
-| Name | arguments | Comments |
-|------|-----------|----------|
-| discovery(`callback(consoles)`, `ip`) | `(Required)` `callback`: Callback function with consoles returned as array <br>`(Optional)` `ip`: IP address of the xbox | Detects xbox consoles  on the network |
-| connect(`ip`, `callback()`) | `(Required)` `ip`: IP address of the xbox <br> `(Required)` `callback`: Callback function with the status returned | Connects to the xbox console |
-| getCurrentApp() | `none` | Returns the current active app |
-| isConnected() | `none` | Returns the current connection status as boolean |
-| powerOn(`options`, `callback(status)`) | `(Required)` `options`: {`ip`: '127.0.0.1', `liveid`: 'FD000000000'} <br> `(Required)` `callback`: Callback function with the status returned | Returns the current active app |
-| powerOff(`callback(status)`) | `(Required)` `callback`: Callback function with the status returned | Shutdown xbox (need to connect first) |
-
-
-    const Smartglass = require('xbox-smartglass-core-node')
     var SystemInputChannel = require('xbox-smartglass-core-node/src/channels/systeminput')
     var SystemMediaChannel = require('xbox-smartglass-core-node/src/channels/systemmedia')
     var TvRemoteChannel = require('xbox-smartglass-core-node/src/channels/tvremote')
 
     var sgClient =  Smartglass()
-    sgClient.addManager('system_input', SystemInputChannel())
-    sgClient.addManager('system_media', SystemMediaChannel())
-    sgClient.addManager('tv_remote', TvRemoteChannel())
+    sgClient.connect(ip).then(function(){
+        sgClient.addManager('system_input', SystemInputChannel())
+        sgClient.addManager('system_media', SystemMediaChannel())
+        sgClient.addManager('tv_remote', TvRemoteChannel())
+    }, function(error){
+        console.log(error)
+    })
 
 ####  SystemInputChannel
 
@@ -50,9 +41,9 @@ NodeJS smartglass library for controlling a Xbox
     var sgClient =  Smartglass()
     sgClient.addManager('system_input', SystemInputChannel())
 
-    sgClient.getManager('system_input').sendCommand('nexus');
-    sgClient.getManager('system_input').sendCommand('left');
-    sgClient.getManager('system_input').sendCommand('a');
+    sgClient.getManager('system_input').sendCommand('nexus').then(function(button){ console.log(button) }, function(error){ console.log(error) });
+    sgClient.getManager('system_input').sendCommand('left').then(function(button){ console.log(button) }, function(error){ console.log(error) });
+    sgClient.getManager('system_input').sendCommand('a').then(function(button){ console.log(button) }, function(error){ console.log(error) });
 
 ####  SystemMediaChannel
 
@@ -62,8 +53,8 @@ NodeJS smartglass library for controlling a Xbox
     var sgClient =  Smartglass()
     sgClient.addManager('system_media', SystemMediaChannel())
 
-    sgClient.getManager('system_media').sendCommand('play')
-    sgClient.getManager('system_media').sendCommand('pause')
+    sgClient.getManager('system_media').sendCommand('play').then(function(button){ console.log(button) }, function(error){ console.log(error) });
+    sgClient.getManager('system_media').sendCommand('pause').then(function(button){ console.log(button) }, function(error){ console.log(error) });
     var media_state = sgClient.getManager('system_media').getState()
 
 
@@ -75,11 +66,10 @@ NodeJS smartglass library for controlling a Xbox
     var sgClient =  Smartglass()
     sgClient.addManager('tv_remote', TvRemoteChannel())
 
-    sgClient.getManager('tv_remote').requestConfiguration()
-    var configuration = sgClient.getManager('tv_remote').getConfiguration()
+    sgClient.getManager('tv_remote').getConfiguration().then(function(configuration){ console.log(configuration) }, function(error){ console.log(error) });
 
-    sgClient.getManager('tv_remote').sendIrCommand('btn.vol_up');
-    sgClient.getManager('tv_remote').sendIrCommand('btn.vol_down');
+    sgClient.getManager('tv_remote').sendIrCommand('btn.vol_up').then(function(button){ console.log(button) }, function(error){ console.log(error) });
+    sgClient.getManager('tv_remote').sendIrCommand('btn.vol_down').then(function(button){ console.log(button) }, function(error){ console.log(error) });
 
 ## How to use
 
