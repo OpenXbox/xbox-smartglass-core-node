@@ -71,43 +71,47 @@ module.exports = function()
             return this._connection_status
         },
 
-        powerOn: function(options, callback)
+        powerOn: function(options)
         {
-            this._getSocket();
+            return new Promise(function(resolve, reject) {
+                this._getSocket();
 
-            if(options.tries == undefined){
-                options.tries =  5;
-            }
-
-            this._ip = options.ip
-
-            var poweron_packet = Packer('simple.poweron')
-            poweron_packet.set('liveid', options.live_id)
-            var message  = poweron_packet.pack()
-
-            var try_num = 0;
-            var sendBoot = function(client, callback)
-            {
-                client._send(message);
-
-                try_num = try_num+1;
-                if(try_num <= options.tries)
-                {
-                    setTimeout(sendBoot, 500, client, callback);
-                } else {
-                    client._closeClient();
-
-                    client.discovery(function(consoles){
-                        client._closeClient();
-                        if(consoles.length  >  0){
-                            callback(true)
-                        } else {
-                            callback(false)
-                        }
-                    }, options.ip)
+                if(options.tries == undefined){
+                    options.tries =  5;
                 }
-            }
-            setTimeout(sendBoot, 1000, this, callback);
+
+                this._ip = options.ip
+
+                var poweron_packet = Packer('simple.poweron')
+                poweron_packet.set('liveid', options.live_id)
+                var message  = poweron_packet.pack()
+
+                var try_num = 0;
+                var sendBoot = function(client, callback)
+                {
+                    client._send(message);
+
+                    try_num = try_num+1;
+                    if(try_num <= options.tries)
+                    {
+                        setTimeout(sendBoot, 1000, client);
+                    } else {
+                        client._closeClient();
+
+                        client.discovery(options.ip).then(function(consoles){
+                            resolve({
+                                status: 'success'
+                            })
+                        }, function(error){
+                            reject({
+                                status: 'discovery_failed',
+                                error: 'Console was not found on network. Probably failed'
+                            })
+                        })
+                    }
+                }
+                setTimeout(sendBoot, 1000, this);
+            }.bind(this))
         },
 
         powerOff: function(callback)
