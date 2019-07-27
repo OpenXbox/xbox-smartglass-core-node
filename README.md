@@ -1,9 +1,9 @@
 # Xbox-Smartglass-Core-Node
-[![Build Status](https://travis-ci.org/OpenXbox/xbox-smartglass-core-node.svg?branch=release/0.6.0)](https://travis-ci.org/OpenXbox/xbox-smartglass-core-node)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=alert_status&branch=release/0.6.0)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=alert_status)
-[![Technical debt](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=sqale_index&branch=release/0.6.0)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=sqale_index)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=bugs&branch=release/0.6.0)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=bugs)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=coverage&branch=release/0.6.0)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=coverage)
+[![Build Status](https://travis-ci.org/OpenXbox/xbox-smartglass-core-node.svg?branch=release/0.6.1)](https://travis-ci.org/OpenXbox/xbox-smartglass-core-node)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=alert_status&branch=release/0.6.1)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=alert_status)
+[![Technical debt](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=sqale_index&branch=release/0.6.1)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=sqale_index)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=bugs&branch=release/0.6.1)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=bugs)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=coverage&branch=release/0.6.1)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=coverage)
 [![Discord](https://img.shields.io/badge/discord-OpenXbox-blue.svg)](https://openxbox.org/discord)
 
 
@@ -67,6 +67,10 @@ NodeJS smartglass library for controlling a Xbox
     sgClient.addManager('tv_remote', TvRemoteChannel())
 
     sgClient.getManager('tv_remote').getConfiguration().then(function(configuration){ console.log(configuration) }, function(error){ console.log(error) });
+    sgClient.getManager('tv_remote').getHeadendInfo().then(function(configuration){ console.log(configuration) }, function(error){ console.log(error) });
+    sgClient.getManager('tv_remote').getLiveTVInfo().then(function(configuration){ console.log(configuration) }, function(error){ console.log(error) });
+    sgClient.getManager('tv_remote').getTunerLineups().then(function(configuration){ console.log(configuration) }, function(error){ console.log(error) });
+    sgClient.getManager('tv_remote').getAppChannelLineups().then(function(configuration){ console.log(configuration) }, function(error){ console.log(error) });
 
     sgClient.getManager('tv_remote').sendIrCommand('btn.vol_up').then(function(button){ console.log(button) }, function(error){ console.log(error) });
     sgClient.getManager('tv_remote').sendIrCommand('btn.vol_down').then(function(button){ console.log(button) }, function(error){ console.log(error) });
