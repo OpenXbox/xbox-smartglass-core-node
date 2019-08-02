@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1
+
+    - Added commands to TvRemote channel to get more information about the provider and channel lineups
+
 ## 0.6.0
 
     - Smartglass class rewritten to support promises (API breaking changes)
