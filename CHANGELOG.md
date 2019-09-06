@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.2
+
+    - Fixed a bug that prevented multiple connections
+
 ## 0.6.1
 
     - Added commands to TvRemote channel to get more information about the provider and channel lineups
