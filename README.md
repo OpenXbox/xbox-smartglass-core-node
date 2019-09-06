@@ -79,6 +79,10 @@ NodeJS smartglass library for controlling a Xbox
 
 See the [examples](examples) folder for examples
 
+## Setting up the Xbox
+
+The plugin needs to be allowed to connect to your Xbox. To allow this make sure you set the setting to allow anonymous connections in Settings -> Devices -> Connections.
+
 ## Known Issues
 
 - Protocol can be broken sometimes.
