@@ -1,19 +1,20 @@
 const dgram = require('dgram');
 const Packer = require('./packet/packer');
 const Xbox = require('./xbox');
+const Events = require('./events');
 
 module.exports = function()
 {
     var id = Math.floor(Math.random() * (999 - 1)) + 1;
     var Debug = require('debug')('smartglass:client-'+id)
 
-    var smartglassEvent = require('./events')
+    var events = Events()
 
     return {
         _client_id: id,
         _console: false,
         _socket: false,
-        _events: smartglassEvent,
+        _events: events,
 
         _last_received_time: false,
         _is_broadcast: false,
@@ -44,7 +45,7 @@ module.exports = function()
 
                 var consoles_found = []
 
-                smartglassEvent.on('_on_discovery_response', function(message, xbox, remote){
+                this._events.on('_on_discovery_response', function(message, xbox, remote){
                     consoles_found.push({
                         message: message.packet_decoded,
                         remote: remote
@@ -176,7 +177,7 @@ module.exports = function()
 
                         this._console = xbox
 
-                        smartglassEvent.on('_on_connect_response', function(message, xbox, remote, smartglass){
+                        this._events.on('_on_connect_response', function(message, xbox, remote, smartglass){
                             if(message.packet_decoded.protected_payload.connect_result == '0'){
                                 Debug('['+this._client_id+'] Console is connected')
                                 this._connection_status = true
@@ -188,7 +189,7 @@ module.exports = function()
                             }
                         }.bind(this))
 
-                        smartglassEvent.on('_on_timeout', function(message, xbox, remote, smartglass){
+                        this._events.on('_on_timeout', function(message, xbox, remote, smartglass){
                             Debug('['+this._client_id+'] Client timeout...')
                             reject(false)
                         }.bind(this))
@@ -205,7 +206,7 @@ module.exports = function()
 
         on: function(name,  callback)
         {
-            smartglassEvent.on(name, callback)
+            this._events.on(name, callback)
         },
 
         disconnect: function()
@@ -260,7 +261,7 @@ module.exports = function()
             this._socket.on('message', function(message, remote){
                 this._last_received_time = Math.floor(Date.now() / 1000)
                 var xbox = this._console
-                smartglassEvent.emit('receive', message, xbox, remote, this);
+                this._events.emit('receive', message, xbox, remote, this);
             }.bind(this));
 
             this._socket.on('close', function() {
