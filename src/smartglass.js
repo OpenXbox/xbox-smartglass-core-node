@@ -183,9 +183,28 @@ module.exports = function()
                                 this._connection_status = true
                                 resolve()
                             } else {
-                                Debug('['+this._client_id+'] Error during connect.')
                                 this._connection_status = false
-                                reject(error)
+
+                                var errorTable = {
+                                    0: 'Success',
+                                    1: 'Pending',
+                                    2: 'Unknown',
+                                    3: 'No anonymous connections',
+                                    4: 'Device limit exceeded',
+                                    5: 'Smartglass is disabled',
+                                    6: 'User auth failed',
+                                    7: 'Signin failed',
+                                    8: 'Signin timeout',
+                                    9: 'Signin required',
+
+                                }
+                                Debug('['+this._client_id+'] Error during connect, xbox returned result:', errorTable[message.packet_decoded.protected_payload.connect_result])
+
+                                reject({
+                                    'error': 'connection_rejected',
+                                    'message': 'Xbox returned connection result: '+errorTable[message.packet_decoded.protected_payload.connect_result],
+                                    'details': message.packet_decoded.protected_payload
+                                })
                             }
                         }.bind(this))
 
