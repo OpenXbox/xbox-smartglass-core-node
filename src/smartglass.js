@@ -195,9 +195,9 @@ module.exports = function()
                                     6: 'User auth failed',
                                     7: 'Signin failed',
                                     8: 'Signin timeout',
-                                    9: 'Signin required',
-
+                                    9: 'Signin required'
                                 }
+                                
                                 Debug('['+this._client_id+'] Error during connect, xbox returned result:', errorTable[message.packet_decoded.protected_payload.connect_result])
 
                                 reject({
