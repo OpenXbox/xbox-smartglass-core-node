@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.3
+
+    - Update handlebars to version 4.5.3
+
 ## 0.6.2
 
     - Fixed a bug that prevented multiple connections
