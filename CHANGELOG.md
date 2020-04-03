@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.4
+
+    - Implemented authentication using a userhash and xsts token
+    - Added game_dvr_record() function to record the last 60 seconds
+
 ## 0.6.3
 
     - Update handlebars to version 4.5.3
