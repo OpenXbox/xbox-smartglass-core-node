@@ -158,7 +158,7 @@ module.exports = function()
             }.bind(this))
         },
 
-        connect: function(ip, callback)
+        connect: function(ip, userhash, xsts_token)
         {
             this._ip = ip
 
@@ -171,7 +171,7 @@ module.exports = function()
                         this._getSocket();
 
                         var xbox = Xbox(consoles[0].remote.address, consoles[0].message.certificate);
-                        var message = xbox.connect();
+                        var message = xbox.connect(userhash, xsts_token);
 
                         this._send(message);
 
@@ -183,9 +183,29 @@ module.exports = function()
                                 this._connection_status = true
                                 resolve()
                             } else {
-                                Debug('['+this._client_id+'] Error during connect.')
                                 this._connection_status = false
-                                reject(error)
+
+                                var errorTable = {
+                                    0: 'Success',
+                                    1: 'Pending login. Reconnect to complete',
+                                    2: 'Unknown error',
+                                    3: 'No anonymous connections',
+                                    4: 'Device limit exceeded',
+                                    5: 'Smartglass is disabled on the Xbox console',
+                                    6: 'User authentication failed',
+                                    7: 'Sign-in failed',
+                                    8: 'Sign-in timeout',
+                                    9: 'Sign-in required'
+                                }
+
+                                Debug('['+this._client_id+'] Error during connect, xbox returned result:', errorTable[message.packet_decoded.protected_payload.connect_result])
+                                this._closeClient()
+
+                                reject({
+                                    'error': 'connection_rejected',
+                                    'message': errorTable[message.packet_decoded.protected_payload.connect_result],
+                                    'details': message.packet_decoded.protected_payload
+                                })
                             }
                         }.bind(this))
 
