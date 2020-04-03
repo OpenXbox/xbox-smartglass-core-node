@@ -103,11 +103,11 @@ module.exports = function(ip, certificate)
             discovery_request.set('iv', this._crypto.getIv());
 
             if(uhs != undefined && xsts_token != undefined){
-                Debug('Connecting using token:', uhs+':'+xsts_token);
+                Debug('- Connecting using token:', uhs+':'+xsts_token);
                 discovery_request.set('userhash', uhs, true);
                 discovery_request.set('jwt', xsts_token, true);
             } else {
-                Debug('Connecting using anonymous login');
+                Debug('- Connecting using anonymous login');
             }
 
             var message = discovery_request.pack(this);
