@@ -212,6 +212,10 @@ module.exports = function(type, packet_data = false){
         _acknowledge_list: {
             id: Type.uInt32('0'),
         },
+        game_dvr_record: {
+            start_time_delta: Type.uInt32('0'),
+            end_time_delta: Type.uInt32('0'),
+        },
         start_channel_request: {
             channel_request_id: Type.uInt32('0'),
             title_id: Type.uInt32('0'),
@@ -310,7 +314,7 @@ module.exports = function(type, packet_data = false){
             0x33: "Orientation",
             0x36: "PairedIdentityStateChanged",
             0x37: "Unsnap",
-            0x38: "GameDvrRecord",
+            0x38: "game_dvr_record",
             0x39: "power_off",
             0xF00: "MediaControllerRemoved",
             0xF01: "media_command",
@@ -382,7 +386,7 @@ module.exports = function(type, packet_data = false){
             0x33: "Orientation",
             0x36: "PairedIdentityStateChanged",
             0x37: "Unsnap",
-            0x38: "GameDvrRecord",
+            game_dvr_record: Buffer.from('a038', 'hex'),
             power_off: Buffer.from('a039', 'hex'),
             0xF00: "MediaControllerRemoved",
             media_command: Buffer.from('af01', 'hex'),

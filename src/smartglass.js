@@ -245,6 +245,20 @@ module.exports = function()
             this._closeClient()
         },
 
+        record_game_dvr: function()
+        {
+            var xbox = this._console;
+
+            xbox.get_requestnum()
+
+            var game_dvr_record = Packer('message.game_dvr_record')
+            game_dvr_record.set('start_time_delta', 0)
+            game_dvr_record.set('end_time_delta', 0)
+            var dvr_message = game_dvr_record.pack(xbox)
+
+            this._send(dvr_message);
+        },
+
         addManager: function(name, manager)
         {
             Debug('Loaded manager: '+name + '('+this._managers_num+')')
