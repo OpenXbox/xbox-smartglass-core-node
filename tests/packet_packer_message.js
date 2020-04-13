@@ -301,7 +301,7 @@ describe('packet/packer/message', function(){
         assert.deepStrictEqual(message.packet_decoded.source_participant_id, 1)
         assert.deepStrictEqual(message.packet_decoded.target_participant_id, 0)
 
-        assert.deepStrictEqual(message.packet_decoded.protected_payload.start_time_delta, 4294967236)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.start_time_delta, -60)
         assert.deepStrictEqual(message.packet_decoded.protected_payload.end_time_delta, 0)
     });
 

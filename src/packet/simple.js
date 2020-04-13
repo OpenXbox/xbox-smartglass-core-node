@@ -151,6 +151,7 @@ module.exports = function(packet_format, packet_data = false){
             }
 
             Debug('Unpacking message:', this.name);
+            Debug('payload:', this.packet_data.toString('hex'));
 
             // Lets decrypt the data when the payload is encrypted
             if(packet.protected_payload != undefined){

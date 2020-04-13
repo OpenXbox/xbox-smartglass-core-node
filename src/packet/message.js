@@ -40,6 +40,18 @@ module.exports = function(type, packet_data = false){
                 }
             }
         },
+        sInt32: function(value){
+            return {
+                value: value,
+                pack: function(packet_structure){
+                    return packet_structure.writeInt32(this.value);
+                },
+                unpack: function(packet_structure){
+                    this.value = packet_structure.readInt32();
+                    return this.value
+                }
+            }
+        },
         uInt16: function(value){
             return {
                 value: value,
@@ -213,8 +225,8 @@ module.exports = function(type, packet_data = false){
             id: Type.uInt32('0'),
         },
         game_dvr_record: {
-            start_time_delta: Type.uInt32('0'),
-            end_time_delta: Type.uInt32('0'),
+            start_time_delta: Type.sInt32('0'),
+            end_time_delta: Type.sInt32('0'),
         },
         start_channel_request: {
             channel_request_id: Type.uInt32('0'),

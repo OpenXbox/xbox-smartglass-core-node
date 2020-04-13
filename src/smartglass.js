@@ -245,18 +245,28 @@ module.exports = function()
             this._closeClient()
         },
 
-        record_game_dvr: function()
+        recordGameDvr: function()
         {
-            var xbox = this._console;
+            return new Promise(function(resolve, reject) {
+                if(this.isConnected() == true){
+                    Debug('['+this._client_id+'] Sending record game dvr command')
 
-            xbox.get_requestnum()
+                    this._console.get_requestnum()
+                    var game_dvr_record = Packer('message.game_dvr_record')
+                    game_dvr_record.set('start_time_delta', -60) // Needs to be signed int
+                    game_dvr_record.set('end_time_delta', 0)
+                    var message = game_dvr_record.pack(this._console)
 
-            var game_dvr_record = Packer('message.game_dvr_record')
-            game_dvr_record.set('start_time_delta', 0)
-            game_dvr_record.set('end_time_delta', 0)
-            var dvr_message = game_dvr_record.pack(xbox)
+                    this._send(message);
 
-            this._send(dvr_message);
+                    resolve(true)
+                } else {
+                    reject({
+                        status: 'error_not_connected',
+                        error: 'Console is not connected'
+                    })
+                }
+            }.bind(this))
         },
 
         addManager: function(name, manager)
