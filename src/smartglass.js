@@ -158,7 +158,7 @@ module.exports = function()
             }.bind(this))
         },
 
-        connect: function(ip, callback)
+        connect: function(ip, userhash, xsts_token)
         {
             this._ip = ip
 
@@ -171,7 +171,7 @@ module.exports = function()
                         this._getSocket();
 
                         var xbox = Xbox(consoles[0].remote.address, consoles[0].message.certificate);
-                        var message = xbox.connect();
+                        var message = xbox.connect(userhash, xsts_token);
 
                         this._send(message);
 
@@ -183,20 +183,49 @@ module.exports = function()
                                 this._connection_status = true
                                 resolve()
                             } else {
-                                Debug('['+this._client_id+'] Error during connect.')
                                 this._connection_status = false
-                                reject(error)
+
+                                var errorTable = {
+                                    0: 'Success',
+                                    1: 'Pending login. Reconnect to complete',
+                                    2: 'Unknown error',
+                                    3: 'No anonymous connections',
+                                    4: 'Device limit exceeded',
+                                    5: 'Smartglass is disabled on the Xbox console',
+                                    6: 'User authentication failed',
+                                    7: 'Sign-in failed',
+                                    8: 'Sign-in timeout',
+                                    9: 'Sign-in required'
+                                }
+
+                                Debug('['+this._client_id+'] Error during connect, xbox returned result:', errorTable[message.packet_decoded.protected_payload.connect_result])
+                                this._closeClient()
+
+                                reject({
+                                    'error': 'connection_rejected',
+                                    'message': errorTable[message.packet_decoded.protected_payload.connect_result],
+                                    'details': message.packet_decoded.protected_payload
+                                })
                             }
                         }.bind(this))
 
                         this._events.on('_on_timeout', function(message, xbox, remote, smartglass){
                             Debug('['+this._client_id+'] Client timeout...')
-                            reject(false)
+                            this._connection_status = false
+                            
+                            reject({
+                                'error': 'connection_timeout',
+                                'message': 'No response from the xbox'
+                            })
                         }.bind(this))
                     } else {
-                        Debug('['+this._client_id+'] Device is offline...')
+                        Debug('['+this._client_id+'] Device is unavailable...')
                         this._connection_status = false
-                        reject(false)
+
+                        reject({
+                            'error': 'device_unavailable',
+                            'message': 'Xbox is unavalable on '+ip
+                        })
                     }
                 }.bind(this), function(error){
                     reject(error)
@@ -223,6 +252,37 @@ module.exports = function()
             this._send(disconnect_message);
 
             this._closeClient()
+        },
+
+        recordGameDvr: function()
+        {
+            return new Promise(function(resolve, reject) {
+                if(this.isConnected() == true){
+                    if(this._console._is_authenticated == true){
+                        Debug('['+this._client_id+'] Sending record game dvr command')
+
+                        this._console.get_requestnum()
+                        var game_dvr_record = Packer('message.game_dvr_record')
+                        game_dvr_record.set('start_time_delta', -60) // Needs to be signed int
+                        game_dvr_record.set('end_time_delta', 0)
+                        var message = game_dvr_record.pack(this._console)
+
+                        this._send(message);
+
+                        resolve(true)
+                    } else {
+                        reject({
+                            status: 'error_not_authenticated',
+                            error: 'Game DVR record function requires an authenticated user'
+                        })
+                    }
+                } else {
+                    reject({
+                        status: 'error_not_connected',
+                        error: 'Console is not connected'
+                    })
+                }
+            }.bind(this))
         },
 
         addManager: function(name, manager)

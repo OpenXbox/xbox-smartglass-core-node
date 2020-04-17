@@ -17,7 +17,8 @@ var packets = [
     {'message.gamepad': 'tests/data/packets/gamepad'},
     {'message.media_state': 'tests/data/packets/media_state'},
     {'message.media_command': 'tests/data/packets/media_command'},
-    {'message.json': 'tests/data/packets/json'}
+    {'message.json': 'tests/data/packets/json'},
+    {'message.game_dvr_record': 'tests/data/packets/gamedvr_record'}
 ]
 
 var device = Xbox('127.0.0.1', certificate);
@@ -287,6 +288,21 @@ describe('packet/packer/message', function(){
         assert.deepStrictEqual(message.packet_decoded.channel_id, Buffer.from('0000000000000097', 'hex'))
 
         assert.deepStrictEqual(message.packet_decoded.protected_payload.json, '{"msgid":"2ed6c0fd.2","request":"GetConfiguration"}')
+    });
+
+    it('should unpack a game_dvr_record packet', function(){
+        var data_packet = fs.readFileSync('tests/data/packets/gamedvr_record')
+
+        var game_dvr = Packer(data_packet)
+        var message = game_dvr.unpack(device)
+
+        assert.deepStrictEqual(message.type, 'message')
+        assert.deepStrictEqual(message.packet_decoded.sequence_number, 70)
+        assert.deepStrictEqual(message.packet_decoded.source_participant_id, 1)
+        assert.deepStrictEqual(message.packet_decoded.target_participant_id, 0)
+
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.start_time_delta, -60)
+        assert.deepStrictEqual(message.packet_decoded.protected_payload.end_time_delta, 0)
     });
 
     describe('should repack messages correctly', function(){
