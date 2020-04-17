@@ -114,6 +114,22 @@ module.exports = function(packet)
             return data;
         },
 
+        writeInt32: function(data)
+        {
+            var tempBuffer = Buffer.allocUnsafe(4);
+            tempBuffer.writeInt32BE(data, 0);
+            this._add(tempBuffer);
+            return this;
+        },
+
+        readInt32: function()
+        {
+            var data = this._packet.readInt32BE(this._offset);
+            this._offset = (this._offset+4);
+
+            return data;
+        },
+
         readUInt64: function()
         {
             var data = this.readBytes(8)

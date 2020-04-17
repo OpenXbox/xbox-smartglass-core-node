@@ -4,7 +4,7 @@ const ChannelManager = require('../channelmanager');
 
 module.exports = function()
 {
-    var channel_manager = ChannelManager('d451e3b360bb4c71b3dbf994b1aca3a7', 'TvRemote')
+    var channel_manager = new ChannelManager('d451e3b360bb4c71b3dbf994b1aca3a7', 'TvRemote')
 
     return {
         _channel_manager: channel_manager,

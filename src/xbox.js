@@ -16,6 +16,7 @@ module.exports = function(ip, certificate)
 
         _iv: false,
         _liveid: false,
+        _is_authenticated: false,
         _participantid: false,
 
         _connection_status: false,
@@ -63,7 +64,7 @@ module.exports = function(ip, certificate)
             this._source_participant_id = participantId;
         },
 
-        connect: function()
+        connect: function(uhs, xsts_token)
         {
             // // Set liveid
             var pem = '-----BEGIN CERTIFICATE-----'+EOL+this.getCertificate().toString('base64').match(/.{0,64}/g).join('\n')+'-----END CERTIFICATE-----';
@@ -101,6 +102,17 @@ module.exports = function(ip, certificate)
             discovery_request.set('uuid', uuid4);
             discovery_request.set('public_key', this._crypto.getPublicKey());
             discovery_request.set('iv', this._crypto.getIv());
+
+            if(uhs != undefined && xsts_token != undefined){
+                Debug('- Connecting using token:', uhs+':'+xsts_token);
+                discovery_request.set('userhash', uhs, true);
+                discovery_request.set('jwt', xsts_token, true);
+
+                this._is_authenticated = true
+            } else {
+                Debug('- Connecting using anonymous login');
+                this._is_authenticated = false
+            }
 
             var message = discovery_request.pack(this);
 

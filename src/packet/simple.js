@@ -97,18 +97,34 @@ module.exports = function(packet_format, packet_data = false){
 
     var structure = Packet[packet_format];
 
+    // Load protected payload PacketStructure
+    if(structure.protected_payload != undefined){
+        var protected_payload = PacketStructure();
+        var protected_structure = Packet[packet_format+'_protected'];
+        //structure.protected_payload = protected_structure
+        var structure_protected = protected_structure
+    }
+
     return {
         type: 'simple',
         name: packet_format,
         structure: structure,
+        structure_protected: structure_protected || false,
         packet_data: packet_data,
         packet_decoded: false,
 
-        set: function(key, value){
-            this.structure[key].value = value
+        set: function(key, value, protected = false){
+            if(protected == false){
+                this.structure[key].value = value
 
-            if(this.structure[key].length != undefined)
-                this.structure[key].length = value.length
+                if(this.structure[key].length != undefined)
+                    this.structure[key].length = value.length
+            } else {
+                this.structure_protected[key].value = value
+
+                if(this.structure_protected[key].length != undefined)
+                    this.structure_protected[key].length = value.length
+            }
         },
 
         unpack: function(device = undefined){
@@ -135,6 +151,7 @@ module.exports = function(packet_format, packet_data = false){
             }
 
             Debug('Unpacking message:', this.name);
+            Debug('payload:', this.packet_data.toString('hex'));
 
             // Lets decrypt the data when the payload is encrypted
             if(packet.protected_payload != undefined){
@@ -169,9 +186,7 @@ module.exports = function(packet_format, packet_data = false){
                     this.structure[name].pack(payload)
 
                 } else {
-                    var protected_payload = PacketStructure();
-
-                    var protected_structure = Packet[packet_format+'_protected'];
+                    var protected_structure = this.structure_protected
 
                     for(var name_struct in protected_structure){
 
