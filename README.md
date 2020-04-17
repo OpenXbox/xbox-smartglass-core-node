@@ -33,6 +33,14 @@ NodeJS smartglass library for controlling a Xbox
         console.log(error)
     })
 
+    # Send DVR Record command
+
+    sgClient.recordGameDvr().then(function(status){
+        console.log('DVR record send')
+    }).catch(function(error){
+        console.log('DVR record error:', error)
+    })
+
 ####  SystemInputChannel
 
     const Smartglass = require('xbox-smartglass-core-node')
