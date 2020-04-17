@@ -211,12 +211,21 @@ module.exports = function()
 
                         this._events.on('_on_timeout', function(message, xbox, remote, smartglass){
                             Debug('['+this._client_id+'] Client timeout...')
-                            reject(false)
+                            this._connection_status = false
+                            
+                            reject({
+                                'error': 'connection_timeout',
+                                'message': 'No response from the xbox'
+                            })
                         }.bind(this))
                     } else {
-                        Debug('['+this._client_id+'] Device is offline...')
+                        Debug('['+this._client_id+'] Device is unavailable...')
                         this._connection_status = false
-                        reject(false)
+
+                        reject({
+                            'error': 'device_unavailable',
+                            'message': 'Xbox is unavalable on '+ip
+                        })
                     }
                 }.bind(this), function(error){
                     reject(error)
