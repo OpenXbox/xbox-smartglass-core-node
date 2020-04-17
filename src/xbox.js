@@ -16,6 +16,7 @@ module.exports = function(ip, certificate)
 
         _iv: false,
         _liveid: false,
+        _is_authenticated: false,
         _participantid: false,
 
         _connection_status: false,
@@ -106,8 +107,11 @@ module.exports = function(ip, certificate)
                 Debug('- Connecting using token:', uhs+':'+xsts_token);
                 discovery_request.set('userhash', uhs, true);
                 discovery_request.set('jwt', xsts_token, true);
+
+                this._is_authenticated = true
             } else {
                 Debug('- Connecting using anonymous login');
+                this._is_authenticated = false
             }
 
             var message = discovery_request.pack(this);

@@ -249,17 +249,24 @@ module.exports = function()
         {
             return new Promise(function(resolve, reject) {
                 if(this.isConnected() == true){
-                    Debug('['+this._client_id+'] Sending record game dvr command')
+                    if(this._console._is_authenticated == true){
+                        Debug('['+this._client_id+'] Sending record game dvr command')
 
-                    this._console.get_requestnum()
-                    var game_dvr_record = Packer('message.game_dvr_record')
-                    game_dvr_record.set('start_time_delta', -60) // Needs to be signed int
-                    game_dvr_record.set('end_time_delta', 0)
-                    var message = game_dvr_record.pack(this._console)
+                        this._console.get_requestnum()
+                        var game_dvr_record = Packer('message.game_dvr_record')
+                        game_dvr_record.set('start_time_delta', -60) // Needs to be signed int
+                        game_dvr_record.set('end_time_delta', 0)
+                        var message = game_dvr_record.pack(this._console)
 
-                    this._send(message);
+                        this._send(message);
 
-                    resolve(true)
+                        resolve(true)
+                    } else {
+                        reject({
+                            status: 'error_not_authenticated',
+                            error: 'Game DVR record function requires an authenticated user'
+                        })
+                    }
                 } else {
                     reject({
                         status: 'error_not_connected',
