@@ -1,13 +1,21 @@
 # Xbox-Smartglass-Core-Node
-[![Build Status](https://travis-ci.org/OpenXbox/xbox-smartglass-core-node.svg?branch=release/0.6.4)](https://travis-ci.org/OpenXbox/xbox-smartglass-core-node)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=alert_status&branch=release/0.6.4)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=alert_status)
-[![Technical debt](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=sqale_index&branch=release/0.6.4)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=sqale_index)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=bugs&branch=release/0.6.4)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=bugs)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=coverage&branch=release/0.6.4)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=coverage)
+[![Build Status](https://travis-ci.org/OpenXbox/xbox-smartglass-core-node.svg?branch=release/0.6.5)](https://travis-ci.org/OpenXbox/xbox-smartglass-core-node)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=alert_status&branch=release/0.6.5)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=alert_status)
+[![Technical debt](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=sqale_index&branch=release/0.6.5)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=sqale_index)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=bugs&branch=release/0.6.5)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=bugs)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=coverage&branch=release/0.6.5)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=coverage)
 [![Discord](https://img.shields.io/badge/discord-OpenXbox-blue.svg)](https://openxbox.org/discord)
 
 
-NodeJS smartglass library for controlling a Xbox
+NodeJS smartglass library for controlling a Xbox.
+
+## Features
+
+- Detect Xbox consoles on the network that are turned on
+- Retrieve ip address, name and console id
+- Simple controls like navigation and controller buttons
+- Retrieve active application in realtime
+- Send STB and AVR remote commands like channels and volume
 
 ## Dependencies
 
@@ -93,7 +101,7 @@ The plugin needs to be allowed to connect to your Xbox. To allow this make sure 
 
 ## Known Issues
 
-- Protocol can be broken sometimes.
+- When sending multiple commands at once the protocol can disconnect
 
 ## Changelog
 
