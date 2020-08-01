@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.5
+
+    - Bump jsrsasign from 8.0.13 to 8.0.19
+    - Bump lodash from 4.17.15 to 4.17.19
+    - Bump elliptic from 6.5.2 to 6.5.3
+
 ## 0.6.4
 
     - Implemented authentication using a userhash and xsts token
