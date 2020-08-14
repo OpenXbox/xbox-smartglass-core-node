@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.6
+
+    - No new package release. CI Changes only
+
 ## 0.6.5
 
     - Bump jsrsasign from 8.0.13 to 8.0.19
