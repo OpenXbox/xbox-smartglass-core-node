@@ -1,7 +1,6 @@
 # Xbox-Smartglass-Core-Node
 
-[![GitHub Workflow - Build](https://img.shields.io/github/workflow/status/OpenXbox/xbox-smartglass-core-node/build?label=build)](https://github.com/OpenXbox/xbox-smartglass-core-node/actions?query=workflow%3Abuild)
-![.github/workflows/build.yml](https://github.com/OpenXbox/xbox-smartglass-core-node/workflows/.github/workflows/build.yml/badge.svg?branch=task/github_actions)
+[![GitHub Workflow - Build](https://github.com/OpenXbox/xbox-smartglass-core-node/workflows/.github/workflows/build.yml/badge.svg?branch=task/github_actions)](https://github.com/OpenXbox/xbox-smartglass-core-node/actions)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=alert_status&branch=release/0.6.5)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=alert_status)
 [![Technical debt](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=sqale_index&branch=release/0.6.5)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=sqale_index)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=bugs&branch=release/0.6.5)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=bugs)
