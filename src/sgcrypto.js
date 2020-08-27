@@ -85,18 +85,15 @@ module.exports = function()
             return this.encryptionkey;
         },
 
-        getIv: function(seed = false)
+        getIv: function()
         {
             if(this.iv == false)
                 this.load();
 
-            if(seed != false)
-                return Buffer(this.encrypt(seed, null), 'hex');
-            else
-                return this.iv;
+            return this.iv;
         },
 
-        getHashKey: function(seed = false)
+        getHashKey: function()
         {
             if(this.hash_key == false)
                 this.load();

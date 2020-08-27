@@ -43,6 +43,16 @@ describe('sgcrypto', function(){
         assert.deepStrictEqual(static_iv, Buffer.from('6789012345678901'));
     });
 
+    it('should generate a static iv with a secret using a seed', function(){
+        var clientCrypto = sgCrypto();
+        clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');
+
+        var static_iv = clientCrypto.getIv(123456);
+
+        assert.deepStrictEqual(static_iv.length, 16);
+        assert.deepStrictEqual(static_iv, Buffer.from('6789012345678901'));
+    });
+
     it('should encrypt a string', function(){
         var clientCrypto = sgCrypto();
         clientCrypto.load('pubkey', '0123456789012345678901234567890123456789012345678901234567890123');

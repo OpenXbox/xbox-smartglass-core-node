@@ -6,8 +6,4 @@ describe('smartglassEmitter', function(){
     it('should create a new smartglassEmitter instance', function(){
         var smartglassEmitter = SGEvents()
     });
-
-    it('should create a new smartglassEmitter instance', function(){
-        var smartglassEmitter = SGEvents()
-    });
 })
