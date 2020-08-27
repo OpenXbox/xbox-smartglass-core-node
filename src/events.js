@@ -68,7 +68,7 @@ module.exports = function(){
                         getValue: function(){
                             var buffer = Buffer.from('');
 
-                            for(partial in this.partials){
+                            for(let partial in this.partials){
                                 buffer = Buffer.concat([
                                     buffer,
                                     Buffer.from(this.partials[partial])

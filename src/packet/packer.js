@@ -38,8 +38,8 @@ module.exports = function(type)
     return {
         type: type,
         structure: structure,
-        set: function(key, value, protected = false){
-            this.structure.set(key, value, protected)
+        set: function(key, value, protected_payload = false){
+            this.structure.set(key, value, protected_payload)
         },
         pack: function(device = undefined){
             return structure.pack(device)
