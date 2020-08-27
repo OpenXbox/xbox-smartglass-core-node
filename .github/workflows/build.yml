@@ -22,6 +22,11 @@ jobs:
           run: npm test
           env:
             CI: true
+
+        - name: Fix code coverage paths
+          working-directory: ./coverage
+          run: |
+            sed -i 's/\/home\/runner\/work\/xbox-smartglass-core-node\/xbox-smartglass-core-node\//\/github\/workspace\//g' lcov.info
             
         - name: SonarCloud Scan
           uses: sonarsource/sonarcloud-github-action@master
