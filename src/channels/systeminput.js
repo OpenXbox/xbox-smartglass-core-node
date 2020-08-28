@@ -52,13 +52,13 @@ module.exports = function()
                         setTimeout(function(){
                             var timestamp = new Date().getTime()
 
-                            var gamepad = Packer('message.gamepad')
-                            gamepad.set('timestamp', Buffer.from('000'+timestamp.toString(), 'hex'))
-                            gamepad.set('buttons', 0);
-                            gamepad.setChannel(this._channel_manager.getChannel())
+                            var gamepad_unpress = Packer('message.gamepad')
+                            gamepad_unpress.set('timestamp', Buffer.from('000'+timestamp.toString(), 'hex'))
+                            gamepad_unpress.set('buttons', 0);
+                            gamepad_unpress.setChannel(this._channel_manager.getChannel())
 
                             this._channel_manager.getConsole().get_requestnum()
-                            var message  = gamepad.pack(this._channel_manager.getConsole())
+                            var message  = gamepad_unpress.pack(this._channel_manager.getConsole())
 
                             this._channel_manager.send(message);
                             resolve({

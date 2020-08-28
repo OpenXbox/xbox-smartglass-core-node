@@ -75,8 +75,8 @@ module.exports = function(){
                                 ])
                             }
 
-                            var buffer = Buffer(buffer.toString(), 'base64')
-                            return buffer
+                            var buffer_decoded = Buffer(buffer.toString(), 'base64')
+                            return buffer_decoded
                         },
                         isValid: function(){
                             var json = this.getValue()

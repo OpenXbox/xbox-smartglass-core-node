@@ -43,7 +43,6 @@ module.exports = function()
 
         signPublicKey: function(public_key)
         {
-            const crypto = require('crypto');
             var sha512 = crypto.createHash("sha512");
 
             var EC = require('elliptic').ec;
@@ -52,7 +51,7 @@ module.exports = function()
             // Generate keys
             var key1 = ec.genKeyPair();
             var key2 = ec.keyFromPublic(public_key, 'hex')
-            var public_key_client = key2
+            //var public_key_client = key2
 
             var shared1 = key1.derive(key2.getPublic());
             var derived_secret = Buffer.from(shared1.toString(16), 'hex')
