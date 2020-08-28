@@ -23,7 +23,7 @@ module.exports = function()
                 Debug('ChannelManager open() Error:', error)
             })
 
-            smartglass.on('_on_json', function(message, xbox, remote, smartglass){
+            smartglass.on('_on_json', function(message, xbox, remote, client_smartglass){
                 var response = JSON.parse(message.packet_decoded.protected_payload.json)
 
                 if(response.response == "Error"){

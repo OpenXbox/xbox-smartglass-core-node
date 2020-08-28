@@ -38,10 +38,10 @@ module.exports = function()
                     Debug('Send button: '+button);
 
                     if(this._button_map[button] != undefined){
-                        var timestamp = new Date().getTime()
+                        var timestamp_now = new Date().getTime()
 
                         var gamepad = Packer('message.gamepad')
-                        gamepad.set('timestamp', Buffer.from('000'+timestamp.toString(), 'hex'))
+                        gamepad.set('timestamp', Buffer.from('000'+timestamp_now.toString(), 'hex'))
                         gamepad.set('buttons', this._button_map[button]);
                         gamepad.setChannel(this._channel_manager.getChannel())
 
