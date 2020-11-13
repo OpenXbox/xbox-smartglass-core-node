@@ -13,6 +13,9 @@ module.exports = function(){
     smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
 
         message = Packer(message);
+        if(message.structure == false)
+            return;
+
         var response = message.unpack(xbox);
 
         var type = response.name;
