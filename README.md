@@ -1,10 +1,10 @@
 # Xbox-Smartglass-Core-Node
 
-[![GitHub Workflow - Build](https://github.com/OpenXbox/xbox-smartglass-core-node/workflows/.github/workflows/build.yml/badge.svg?branch=release/0.6.6)](https://github.com/OpenXbox/xbox-smartglass-core-node/actions)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=alert_status&branch=release/0.6.6)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=alert_status)
-[![Technical debt](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=sqale_index&branch=release/0.6.6)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=sqale_index)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=bugs&branch=release/0.6.6)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=bugs)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=coverage&branch=release/0.6.6)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=coverage)
+[![GitHub Workflow - Build](https://github.com/OpenXbox/xbox-smartglass-core-node/workflows/.github/workflows/build.yml/badge.svg?branch=release/0.6.7)](https://github.com/OpenXbox/xbox-smartglass-core-node/actions)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=alert_status&branch=release/0.6.7)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=alert_status)
+[![Technical debt](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=sqale_index&branch=release/0.6.7)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=sqale_index)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=bugs&branch=release/0.6.7)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=bugs)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xbox-smartglass-core-node&metric=coverage&branch=release/0.6.7)](https://sonarcloud.io/component_measures?id=xbox-smartglass-core-node&metric=coverage)
 [![Discord](https://img.shields.io/badge/discord-OpenXbox-blue.svg)](https://openxbox.org/discord)
 
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.7
+
+    - Fixed an issue where the library would stop working when received an unknown packet that is not from Smartglass
+    - Code cleanup
+
 ## 0.6.6
 
     - No new package release. CI Changes only
