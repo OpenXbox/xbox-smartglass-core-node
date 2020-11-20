@@ -20,9 +20,7 @@ jobs:
 
         - name: Execute tests
           run: npm test
-          env:
-            CI: true
-            
+        
         - name: SonarCloud Scan
           uses: sonarsource/sonarcloud-github-action@master
           env:

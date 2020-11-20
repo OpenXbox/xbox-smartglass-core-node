@@ -113,8 +113,8 @@ module.exports = function(packet_format, packet_data = false){
         packet_data: packet_data,
         packet_decoded: false,
 
-        set: function(key, value, protected = false){
-            if(protected == false){
+        set: function(key, value, is_protected = false){
+            if(is_protected == false){
                 this.structure[key].value = value
 
                 if(this.structure[key].length != undefined)
