@@ -39,7 +39,7 @@ module.exports = function(service_udid, name)
                 this._smartglass = smartglass
 
                 // @TODO: Find a better way to check
-                this._smartglass.on('_on_console_status', function(message, xbox, remote, smartglass){
+                this._smartglass.on('_on_console_status', function(message, xbox, remote, client_smartglass){
                     if(this._channel_status == false){
                         Debug('Request open channel: '+this._channel_name);
 
@@ -56,16 +56,16 @@ module.exports = function(service_udid, name)
                         this._smartglass._console.get_requestnum()
                         var channel_message = channel_request.pack(xbox)
 
-                        this._smartglass.on('_on_start_channel_response', function(message, xbox, remote){
-                            // console.log('Got channel response!', this._channel_client_id, message)
+                        this._smartglass.on('_on_start_channel_response', function(response_message, response_xbox, response_remote){
+                            // console.log('Got channel response!', this._channel_client_id, response_message)
 
-                            if(message.packet_decoded.protected_payload.channel_request_id == this._channel_client_id)
+                            if(response_message.packet_decoded.protected_payload.channel_request_id == this._channel_client_id)
                             {
-                                if(message.packet_decoded.protected_payload.result == 0)
+                                if(response_message.packet_decoded.protected_payload.result == 0)
                                 {
                                     Debug('Channel ready: '+this._channel_name);
                                     this._channel_status = true
-                                    this._channel_server_id = message.packet_decoded.protected_payload.target_channel_id
+                                    this._channel_server_id = response_message.packet_decoded.protected_payload.target_channel_id
 
                                     resolve(this)
                                 } else {

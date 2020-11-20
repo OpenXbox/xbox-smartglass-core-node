@@ -19,7 +19,8 @@ module.exports = function(type)
         } else if(type.slice(0, 7) == 'message'){
             return MessagePacket(type.slice(8), value);
         } else {
-            throw new Error('[packet/packer.js] Packet format not found: '+type.toString('hex'));
+            Debug('[packet/packer.js] Packet format not found: ', type.toString('hex'));
+            return false
         }
     }
 
@@ -38,8 +39,8 @@ module.exports = function(type)
     return {
         type: type,
         structure: structure,
-        set: function(key, value, protected = false){
-            this.structure.set(key, value, protected)
+        set: function(key, value, protected_payload = false){
+            this.structure.set(key, value, protected_payload)
         },
         pack: function(device = undefined){
             return structure.pack(device)

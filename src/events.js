@@ -13,6 +13,9 @@ module.exports = function(){
     smartglassEmitter.on('receive', function(message, xbox, remote, smartglass){
 
         message = Packer(message);
+        if(message.structure == false)
+            return;
+
         var response = message.unpack(xbox);
 
         var type = response.name;
@@ -68,15 +71,15 @@ module.exports = function(){
                         getValue: function(){
                             var buffer = Buffer.from('');
 
-                            for(partial in this.partials){
+                            for(let partial in this.partials){
                                 buffer = Buffer.concat([
                                     buffer,
                                     Buffer.from(this.partials[partial])
                                 ])
                             }
 
-                            var buffer = Buffer(buffer.toString(), 'base64')
-                            return buffer
+                            var buffer_decoded = Buffer(buffer.toString(), 'base64')
+                            return buffer_decoded
                         },
                         isValid: function(){
                             var json = this.getValue()
@@ -141,7 +144,7 @@ module.exports = function(){
             smartglass._interval_timeout = setInterval(function(){
                 var seconds_ago = (Math.floor(Date.now() / 1000))-this._last_received_time
 
-                if(seconds_ago == 5 || seconds_ago == 10){
+                if(seconds_ago == 4){
                     Debug('Check timeout: Last packet was '+((Math.floor(Date.now() / 1000))-this._last_received_time+' seconds ago'))
 
                     xbox.get_requestnum()
@@ -152,8 +155,8 @@ module.exports = function(){
                     this._send(ack_message);
                 }
 
-                if(seconds_ago > 15){
-                    Debug('Connection timeout after 15 sec. Call: _on_timeout()')
+                if(seconds_ago > 8){
+                    Debug('Connection timeout after 8 sec. Call: _on_timeout()')
                     smartglass._events.emit('_on_timeout', message, xbox, remote, this)
 
                     smartglass._closeClient()
