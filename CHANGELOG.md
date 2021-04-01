@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.8
+
+    - Bump elliptic from 6.5.3 to 6.5.4
+    - Bump Bump y18n from 4.0.0 to 4.0.1
+
 ## 0.6.7
 
     - Fixed an issue where the library would stop working when received an unknown packet that is not from Smartglass
