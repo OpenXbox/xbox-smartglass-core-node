@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.9
+
+    - Fixed typo 'unavalable' to 'unavailable'
+    - Bump jsrsasign from 8.0.19 to 10.3.0
+    - Bump lodash from 4.17.20 to 4.17.21
+    - Bump glob-parent from 5.1.1 to 5.1.2
+    - Bump uuid from 3.4.0 to 8.3.2
+
+
 ## 0.6.8
 
     - Bump elliptic from 6.5.3 to 6.5.4
