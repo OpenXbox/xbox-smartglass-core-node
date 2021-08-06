@@ -37,11 +37,9 @@ jobs:
       with:
         token: ${{ secrets.NPM_TOKEN }}
         tag: beta
-        dry-run: true
 
     - name: NPM publish package
       if: ${{ !contains(steps.tag_name.outputs.SOURCE_TAG, 'beta') }}
       uses: JS-DevTools/npm-publish@v1
       with:
         token: ${{ secrets.NPM_TOKEN }}
-        dry-run: true
