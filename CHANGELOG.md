@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.10
+
+    - Update dependencies
+    
 ## 0.6.9
 
     - Fixed typo 'unavalable' to 'unavailable'
