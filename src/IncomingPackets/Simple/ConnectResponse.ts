@@ -2,15 +2,6 @@ import { SGCrypto } from "../../SGCrypto";
 import { Bytes, Cursor, UInt16, UInt32 } from "../unpack";
 
 export class ConnectResponse {
-  // connect_response: {
-  //     iv: Type.bytes(16, ""),
-  //     protected_payload: Type.bytes(),
-  //   },
-  //   connect_response_protected: {
-  //     connect_result: Type.uInt16("1"),
-  //     pairing_state: Type.uInt16("2"),
-  //     participant_id: Type.uInt32("0"),
-  //   },
   readonly connectResult: number;
   readonly pairingState: number;
   readonly participantId: number;

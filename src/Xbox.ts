@@ -47,7 +47,7 @@ export class Xbox extends EventEmitter {
     return this.disposed;
   }
 
-  readonly controller: Controller;
+  readonly controller = new Controller();
 
   constructor(
     discoveryResponse: DiscoveryResponse,
@@ -63,7 +63,6 @@ export class Xbox extends EventEmitter {
     );
 
     this.liveId = this.crypto.liveId;
-    this.controller = new Controller();
     this.ip = discoveryResponse.ip;
 
     this.inputChannel = new InputChannel(
@@ -94,10 +93,7 @@ export class Xbox extends EventEmitter {
     });
 
     this.socket.on("connect_response", () => {
-      if (this.connectInterval) {
-        clearInterval(this.connectInterval);
-        this.connectInterval = undefined;
-      }
+      this.stopConnectionInterval();
     });
   }
 

@@ -38,7 +38,6 @@ export class InputChannel {
         this.log(
           "***\n\n\n\n****\n\n\nNeed to handle start channel failing\n\n\n\n*****"
         );
-        throw new Error("lol");
       }
       if (response.success && !this.channelId) {
         this.channelId = response.channelId;
